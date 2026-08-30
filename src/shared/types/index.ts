@@ -18,6 +18,9 @@ type EditorialGuidelineRow = Database['public']['Tables']['editorial_guidelines'
 type OnboardingItemRow = Database['public']['Tables']['onboarding_items']['Row'];
 type ClientOverviewRow = Database['public']['Views']['client_overview']['Row'];
 type PostRow = Database['public']['Tables']['posts']['Row'];
+type TagRow = Database['public']['Tables']['tags']['Row'];
+type CampaignRow = Database['public']['Tables']['campaigns']['Row'];
+type CampaignOverviewRow = Database['public']['Views']['campaign_overview']['Row'];
 
 export interface Profile {
   id: string;
@@ -241,5 +244,45 @@ export function toPost(row: PostRow): Post {
     deletedAt: row.deleted_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+}
+export function toTag(row: TagRow): Tag {
+  return { id: row.id, name: row.name, color: row.color };
+}
+
+export interface Campaign {
+  id: string;
+  clientId: string;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+  description: string;
+  postCount?: number;
+}
+export function toCampaign(row: CampaignRow): Campaign {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    name: row.name,
+    startsOn: row.starts_on,
+    endsOn: row.ends_on,
+    description: row.description,
+  };
+}
+export function toCampaignOverview(row: CampaignOverviewRow): Campaign {
+  return {
+    id: row.id ?? '',
+    clientId: row.client_id ?? '',
+    name: row.name ?? '',
+    startsOn: row.starts_on ?? '',
+    endsOn: row.ends_on ?? '',
+    description: row.description ?? '',
+    postCount: row.post_count ?? 0,
   };
 }

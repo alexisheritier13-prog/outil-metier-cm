@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
+import { listCampaignsForClient } from '@/services/campaigns';
 import type { Client, Profile } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
 
@@ -16,6 +18,8 @@ const schema = z.object({
   caption: z.string(),
   canvaUrl: z.string().trim().url('URL invalide').or(z.literal('')),
   authorId: z.string().optional(),
+  campaignId: z.string().optional(),
+  tagsText: z.string(),
 });
 type Values = z.infer<typeof schema>;
 
@@ -37,6 +41,8 @@ interface Props {
     caption: string;
     canvaUrl: string | null;
     authorId: string;
+    campaignId: string | null;
+    tags: string[];
   }>;
   submitLabel: string;
   pending: boolean;
@@ -59,6 +65,7 @@ export function PostForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -69,7 +76,16 @@ export function PostForm({
       caption: defaults?.caption ?? '',
       canvaUrl: defaults?.canvaUrl ?? '',
       authorId: defaults?.authorId,
+      campaignId: defaults?.campaignId ?? '',
+      tagsText: (defaults?.tags ?? []).join(', '),
     },
+  });
+
+  const clientId = watch('clientId');
+  const campaigns = useQuery({
+    queryKey: ['campaigns-for-client', clientId],
+    queryFn: () => listCampaignsForClient(clientId),
+    enabled: Boolean(clientId),
   });
 
   return (
@@ -94,6 +110,11 @@ export function PostForm({
           caption: v.caption,
           canvaUrl: v.canvaUrl || null,
           authorId: canReassign ? v.authorId : undefined,
+          campaignId: v.campaignId || null,
+          tags: v.tagsText
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
         });
       })}
     >
@@ -162,6 +183,29 @@ export function PostForm({
             {errors.canvaUrl.message}
           </p>
         )}
+      </div>
+
+      <div className="flex flex-wrap gap-4">
+        <div className="min-w-48 flex-1 space-y-1.5">
+          <Label htmlFor="pf-campaign">Campagne</Label>
+          <select
+            id="pf-campaign"
+            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            {...register('campaignId')}
+          >
+            <option value="">Aucune</option>
+            {(campaigns.data ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="min-w-48 flex-1 space-y-1.5">
+          <Label htmlFor="pf-tags">Tags</Label>
+          <Input id="pf-tags" placeholder="urgent, promo, UGC" {...register('tagsText')} />
+          <p className="text-muted-foreground text-xs">Séparés par des virgules. Créés à la volée.</p>
+        </div>
       </div>
 
       {canReassign && authors.length > 0 && (

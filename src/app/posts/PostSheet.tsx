@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Copy, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -12,10 +13,12 @@ import { NetworkIcon } from '@/components/NetworkIcon';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { getPostTagIds, listTags } from '@/services/tags';
+import { listCampaignsForClient } from '@/services/campaigns';
 import type { Client, Post, Profile } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { StatusControl } from './StatusControl';
-import { useTrashPost, useUpdatePost } from './usePosts';
+import { useDuplicatePost, useTrashPost, useUpdatePost } from './usePosts';
 
 interface Props {
   post: Post | null;
@@ -30,10 +33,27 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
   const canReassign = me?.role === 'lead' || me?.role === 'admin';
   const update = useUpdatePost(post?.id ?? '');
   const trash = useTrashPost();
+  const duplicate = useDuplicatePost();
   const [editOpen, setEditOpen] = useState(false);
+
+  const tagIds = useQuery({
+    queryKey: ['post-tags', post?.id],
+    queryFn: () => getPostTagIds(post!.id),
+    enabled: Boolean(post),
+  });
+  const allTags = useQuery({ queryKey: ['tags'], queryFn: listTags });
+  const campaigns = useQuery({
+    queryKey: ['campaigns-for-client', post?.clientId],
+    queryFn: () => listCampaignsForClient(post!.clientId),
+    enabled: Boolean(post),
+  });
 
   if (!post) return null;
   const client = clients.find((c) => c.id === post.clientId);
+  const tagNames = (allTags.data ?? [])
+    .filter((t) => (tagIds.data ?? []).includes(t.id))
+    .map((t) => t.name);
+  const campaignName = (campaigns.data ?? []).find((c) => c.id === post.campaignId)?.name;
 
   return (
     <Sheet open onOpenChange={(v) => !v && onClose()}>
@@ -83,11 +103,39 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               {post.caption || <span className="text-muted-foreground italic">Sans légende</span>}
             </p>
           </div>
+
+          {campaignName && (
+            <div>
+              <p className="text-muted-foreground text-xs">Campagne</p>
+              <p className="text-sm">{campaignName}</p>
+            </div>
+          )}
+
+          {tagNames.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {tagNames.map((t) => (
+                <span key={t} className="bg-surface-2 rounded-sm border px-1.5 py-0.5 text-xs">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <footer className="flex gap-2 border-t p-4">
           <Button variant="outline" onClick={() => setEditOpen(true)}>
             Modifier
+          </Button>
+          <Button
+            variant="ghost"
+            disabled={duplicate.isPending}
+            onClick={async () => {
+              const p = await duplicate.mutateAsync({ id: post.id, shiftDays: 7 });
+              onClose();
+              void p;
+            }}
+          >
+            <Copy className="h-4 w-4" /> Dupliquer
           </Button>
           <Button
             variant="ghost"
@@ -121,6 +169,8 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
                 caption: post.caption,
                 canvaUrl: post.canvaUrl,
                 authorId: post.authorId,
+                campaignId: post.campaignId,
+                tags: tagNames,
               }}
               onCancel={() => setEditOpen(false)}
               onSubmit={async (input) => {

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   changePostStatus,
   createPost,
+  duplicatePost,
   getPost,
   listPosts,
   reschedulePost,
@@ -83,6 +84,15 @@ export function useTrashPost() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => trashPost(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['posts'] }),
+  });
+}
+
+export function useDuplicatePost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, shiftDays }: { id: string; shiftDays?: number }) =>
+      duplicatePost(id, shiftDays),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['posts'] }),
   });
 }

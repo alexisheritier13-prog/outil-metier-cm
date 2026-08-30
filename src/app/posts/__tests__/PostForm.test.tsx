@@ -1,9 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { renderWithProviders } from '@/test/render';
 import { PostForm } from '@/app/posts/PostForm';
 import type { Client } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
+
+vi.mock('@/services/campaigns', () => ({ listCampaignsForClient: vi.fn().mockResolvedValue([]) }));
+afterEach(() => vi.clearAllMocks());
+const render = renderWithProviders;
 
 const clients: Client[] = [
   {

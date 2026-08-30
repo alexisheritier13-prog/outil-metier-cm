@@ -61,6 +61,51 @@ export type Database = {
           },
         ]
       }
+      campaigns: {
+        Row: {
+          client_id: string
+          created_at: string
+          description: string
+          ends_on: string
+          id: string
+          name: string
+          starts_on: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          description?: string
+          ends_on: string
+          id?: string
+          name: string
+          starts_on: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          description?: string
+          ends_on?: string
+          id?: string
+          name?: string
+          starts_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaigns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_contacts: {
         Row: {
           auth_user_id: string | null
@@ -332,6 +377,36 @@ export type Database = {
           },
         ]
       }
+      post_tags: {
+        Row: {
+          post_id: string
+          tag_id: string
+        }
+        Insert: {
+          post_id: string
+          tag_id: string
+        }
+        Update: {
+          post_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_transitions: {
         Row: {
           from_status: Database["public"]["Enums"]["post_status_t"]
@@ -441,6 +516,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "posts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "posts_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
@@ -539,6 +628,27 @@ export type Database = {
           },
         ]
       }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       user_clients: {
         Row: {
           client_id: string
@@ -578,6 +688,54 @@ export type Database = {
       }
     }
     Views: {
+      campaign_overview: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          description: string | null
+          ends_on: string | null
+          id: string | null
+          name: string | null
+          post_count: number | null
+          starts_on: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          ends_on?: string | null
+          id?: string | null
+          name?: string | null
+          post_count?: never
+          starts_on?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          ends_on?: string | null
+          id?: string | null
+          name?: string | null
+          post_count?: never
+          starts_on?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaigns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_onboarding_progress: {
         Row: {
           client_id: string | null
@@ -638,6 +796,40 @@ export type Database = {
           p_post_id: string
           p_to: Database["public"]["Enums"]["post_status_t"]
         }
+        Returns: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "posts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      post_duplicate: {
+        Args: { p_post_id: string; p_shift_days?: number }
         Returns: {
           author_id: string
           campaign_id: string | null

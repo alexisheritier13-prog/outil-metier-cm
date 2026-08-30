@@ -20,6 +20,12 @@ const ClientsPage = lazy(() =>
 const ClientDetailPage = lazy(() =>
   import('@/app/clients/ClientDetailPage').then((m) => ({ default: m.ClientDetailPage })),
 );
+const CampaignsPage = lazy(() =>
+  import('@/app/campaigns/CampaignsPage').then((m) => ({ default: m.CampaignsPage })),
+);
+const CampaignDetailPage = lazy(() =>
+  import('@/app/campaigns/CampaignDetailPage').then((m) => ({ default: m.CampaignDetailPage })),
+);
 const PortalHome = lazy(() =>
   import('@/portal/PortalHome').then((m) => ({ default: m.PortalHome })),
 );
@@ -41,6 +47,8 @@ export const router = createBrowserRouter(
         { index: true, element: lazyRoute(<PlanningPage />) },
         { path: 'clients', element: lazyRoute(<ClientsPage />) },
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
+        { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },
+        { path: 'campagnes/:campaignId', element: lazyRoute(<CampaignDetailPage />) },
         {
           path: 'parametres/utilisateurs',
           element: <RequireRole roles={['admin']}>{lazyRoute(<UsersPage />)}</RequireRole>,

@@ -35,7 +35,8 @@ validation interne puis client, organisation du contenu. Application web héberg
   FullCalendar (lazy), panneau latéral `PostSheet`, drag & drop de re-planification. 101 tests.
 - **Story 3.4** faite : vues Liste (triable, virtualisée) et Kanban (drag entre colonnes → `can_transition`). 102 tests.
 - **Story 3.5** faite : barre de filtres transverse (client/statut/réseau/période/recherche), persistée dans l'URL + localStorage. 110 tests.
-- Prochaine : Story 3.6 (duplication, tags, campagnes).
+- **Story 3.6** faite : duplication de post, tags (à la volée), campagnes (`/app/campagnes`). 114 tests.
+- Prochaine : Story 3.7 (corbeille + purge).
 
 ### Tests
 
