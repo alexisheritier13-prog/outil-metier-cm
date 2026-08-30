@@ -34,7 +34,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 3.3** faite : calendrier `/app` — `PlanningPage` (Mois / Semaine / Liste),
   FullCalendar (lazy), panneau latéral `PostSheet`, drag & drop de re-planification. 101 tests.
 - **Story 3.4** faite : vues Liste (triable, virtualisée) et Kanban (drag entre colonnes → `can_transition`). 102 tests.
-- Prochaine : Story 3.5 (filtres transverses).
+- **Story 3.5** faite : barre de filtres transverse (client/statut/réseau/période/recherche), persistée dans l'URL + localStorage. 110 tests.
+- Prochaine : Story 3.6 (duplication, tags, campagnes).
 
 ### Tests
 

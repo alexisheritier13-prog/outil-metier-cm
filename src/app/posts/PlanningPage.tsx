@@ -19,6 +19,8 @@ import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { PostsTable } from './PostsTable';
 import { PostSheet } from './PostSheet';
+import { FiltersBar } from './FiltersBar';
+import { useFilters } from './useFilters';
 import { useCreatePost, usePosts } from './usePosts';
 
 const CalendarView = lazy(() =>
@@ -41,7 +43,9 @@ export function PlanningPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
 
-  const posts = usePosts();
+  const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
+    useFilters();
+  const posts = usePosts(toService);
   const clients = useQuery({
     queryKey: ['clients', { includeArchived: false }],
     queryFn: () => listClients(false),
@@ -117,6 +121,14 @@ export function PlanningPage() {
           </DialogContent>
         </Dialog>
       </header>
+
+      <FiltersBar
+        clients={clients.data ?? []}
+        filters={filters}
+        onChange={setFilters}
+        onReset={resetFilters}
+        isEmpty={filtersEmpty}
+      />
 
       {mode === 'list' && (
         <PostsTable
