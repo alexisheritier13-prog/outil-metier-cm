@@ -76,9 +76,11 @@ maybe('RLS — profiles / clients / user_clients (0002)', () => {
     if (data) await deleteTestClients([data.id]);
   });
 
-  it('le CM ne lit pas le profil du lead', async () => {
-    const { data } = await cm.client.from('profiles').select('id').eq('id', lead.id);
-    expect(data ?? []).toHaveLength(0);
+  it('le CM lit les profils internes (migration 0009) mais pas les non-internes', async () => {
+    // Depuis 0009 : un rôle interne voit les autres profils internes (choix du rédacteur,
+    // file « À valider »…). Ce qui reste cloisonné : les profils de rôle `client`.
+    const internal = await cm.client.from('profiles').select('id').eq('id', lead.id);
+    expect(internal.data ?? []).toHaveLength(1);
   });
 
   it("l'admin lit le profil de n'importe qui", async () => {

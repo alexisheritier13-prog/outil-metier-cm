@@ -23,5 +23,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test/load-env.ts', 'src/test/setup.ts'],
     css: false,
+    // Tests d'intégration DB : lancés à part (`npm run test:rls`), en série,
+    // car ils partagent un unique projet Supabase.
+    exclude: ['node_modules/**', 'dist/**', 'tests/integration/**'],
   },
 });

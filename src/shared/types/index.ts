@@ -1,5 +1,6 @@
 import type { Database } from '@/shared/types/database';
 import type { Role } from '@/shared/constants/roles';
+import type { PostStatus } from '@/shared/constants/postStatus';
 
 export type { Database } from '@/shared/types/database';
 export type { Role } from '@/shared/constants/roles';
@@ -16,6 +17,7 @@ type ClientContactRow = Database['public']['Tables']['client_contacts']['Row'];
 type EditorialGuidelineRow = Database['public']['Tables']['editorial_guidelines']['Row'];
 type OnboardingItemRow = Database['public']['Tables']['onboarding_items']['Row'];
 type ClientOverviewRow = Database['public']['Views']['client_overview']['Row'];
+type PostRow = Database['public']['Tables']['posts']['Row'];
 
 export interface Profile {
   id: string;
@@ -195,5 +197,49 @@ export function toClientOverview(row: ClientOverviewRow): ClientOverview {
     pendingInternal: row.pending_internal ?? 0,
     pendingClient: row.pending_client ?? 0,
     lastActivityAt: row.last_activity_at,
+  };
+}
+
+export interface Post {
+  id: string;
+  clientId: string;
+  network: Network;
+  scheduledAt: string; // ISO UTC
+  caption: string;
+  canvaUrl: string | null;
+  canvaThumbnailUrl: string | null;
+  canvaThumbnailSource: 'auto' | 'manual' | null;
+  canvaFetchedAt: string | null;
+  status: PostStatus;
+  authorId: string;
+  campaignId: string | null;
+  performanceNote: string | null;
+  performanceVisibleToClient: boolean;
+  statusChangedAt: string;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function toPost(row: PostRow): Post {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    network: row.network,
+    scheduledAt: row.scheduled_at,
+    caption: row.caption,
+    canvaUrl: row.canva_url,
+    canvaThumbnailUrl: row.canva_thumbnail_url,
+    canvaThumbnailSource: (row.canva_thumbnail_source as 'auto' | 'manual' | null) ?? null,
+    canvaFetchedAt: row.canva_fetched_at,
+    status: row.status,
+    authorId: row.author_id,
+    campaignId: row.campaign_id,
+    performanceNote: row.performance_note,
+    performanceVisibleToClient: row.performance_visible_to_client,
+    statusChangedAt: row.status_changed_at,
+    deletedAt: row.deleted_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

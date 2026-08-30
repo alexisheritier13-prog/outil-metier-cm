@@ -284,6 +284,120 @@ export type Database = {
           },
         ]
       }
+      posts: {
+        Row: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          campaign_id?: string | null
+          canva_fetched_at?: string | null
+          canva_thumbnail_source?: string | null
+          canva_thumbnail_url?: string | null
+          canva_url?: string | null
+          caption?: string
+          client_id: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id?: string | null
+          origin_type?: string | null
+          performance_note?: string | null
+          performance_visible_to_client?: boolean
+          scheduled_at: string
+          search_tsv?: unknown
+          status?: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at?: string
+          status_changed_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          campaign_id?: string | null
+          canva_fetched_at?: string | null
+          canva_thumbnail_source?: string | null
+          canva_thumbnail_url?: string | null
+          canva_url?: string | null
+          caption?: string
+          client_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          network?: Database["public"]["Enums"]["network_t"]
+          origin_id?: string | null
+          origin_type?: string | null
+          performance_note?: string | null
+          performance_visible_to_client?: boolean
+          scheduled_at?: string
+          search_tsv?: unknown
+          status?: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at?: string
+          status_changed_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_status_changed_by_fkey"
+            columns: ["status_changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -449,6 +563,13 @@ export type Database = {
         | "youtube"
         | "pinterest"
         | "threads"
+      post_status_t:
+        | "draft"
+        | "internal_review"
+        | "client_review"
+        | "approved"
+        | "scheduled"
+        | "published"
       role_t: "cm" | "lead" | "admin" | "client"
     }
     CompositeTypes: {
@@ -586,6 +707,14 @@ export const Constants = {
         "youtube",
         "pinterest",
         "threads",
+      ],
+      post_status_t: [
+        "draft",
+        "internal_review",
+        "client_review",
+        "approved",
+        "scheduled",
+        "published",
       ],
       role_t: ["cm", "lead", "admin", "client"],
     },

@@ -27,9 +27,16 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 2.4** faite : charte éditoriale par client (onglet « Charte »).
 - **Story 2.5** faite : checklist d'onboarding (modèle par défaut, auto-seed à la création
   client, onglet « Onboarding », avancement `x/y`).
-- **Story 2.6** faite : liste clients avec indicateurs (vue `client_overview`, colonnes
-  triables). **Epic 2 terminé** — 87 tests verts.
-- Prochaine : Epic 3 (posts & calendrier multi-clients).
+- **Story 2.6** faite : liste clients avec indicateurs. **Epic 2 terminé.**
+- **Story 3.1** faite : modèle de post + CRUD (migrations `0008`–`0010`), `PostForm` (date en
+  heure de Paris), vue liste provisoire sur `/app`. 96 tests (50 unitaires + 46 intégration).
+- Prochaine : Story 3.2 (pipeline de statuts + `can_transition`).
+
+### Tests
+
+- `npm run test` — unitaires, rapides, exécutés en CI.
+- `npm run test:rls` — intégration DB (un seul projet Supabase → **exécution en série**),
+  auto-skip sans `.env.test.local`.
 
 ## Documentation
 

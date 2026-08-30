@@ -11,7 +11,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:rls": "vitest run tests/integration",
+    "test:rls": "vitest run --config vitest.integration.config.ts",
     "db:apply": "node scripts/apply-migrations.mjs",
     "functions:deploy": "supabase functions deploy --project-ref vevdhfyyjwntxvajtlud",
     "gen:types": "node scripts/gen-types.mjs",
