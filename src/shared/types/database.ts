@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       app_meta: {
@@ -104,6 +79,27 @@ export type Database = {
           },
         ]
       }
+      networks: {
+        Row: {
+          code: Database["public"]["Enums"]["network_t"]
+          label: string
+          position: number
+          specs: string
+        }
+        Insert: {
+          code: Database["public"]["Enums"]["network_t"]
+          label: string
+          position?: number
+          specs?: string
+        }
+        Update: {
+          code?: Database["public"]["Enums"]["network_t"]
+          label?: string
+          position?: number
+          specs?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -133,6 +129,38 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      social_accounts: {
+        Row: {
+          client_id: string
+          created_at: string
+          handle: string
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          handle: string
+          id?: string
+          network: Database["public"]["Enums"]["network_t"]
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          handle?: string
+          id?: string
+          network?: Database["public"]["Enums"]["network_t"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_accounts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_clients: {
         Row: {
@@ -174,6 +202,15 @@ export type Database = {
       has_client_access: { Args: { cid: string }; Returns: boolean }
     }
     Enums: {
+      network_t:
+        | "instagram"
+        | "linkedin"
+        | "facebook"
+        | "tiktok"
+        | "x"
+        | "youtube"
+        | "pinterest"
+        | "threads"
       role_t: "cm" | "lead" | "admin" | "client"
     }
     CompositeTypes: {
@@ -300,11 +337,18 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
+      network_t: [
+        "instagram",
+        "linkedin",
+        "facebook",
+        "tiktok",
+        "x",
+        "youtube",
+        "pinterest",
+        "threads",
+      ],
       role_t: ["cm", "lead", "admin", "client"],
     },
   },

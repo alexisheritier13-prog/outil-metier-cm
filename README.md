@@ -20,9 +20,11 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Spec UX** : `docs/front-end-spec.md` (IA, parcours, design system).
 - **Design system** : palette monochrome (noir & blanc), Inter self-host, `StatusBadge` /
   `EmptyState` / `ClientAvatar` / `Tabs`.
-- **Story 2.1** faite : référentiel clients — liste `/app/clients`, fiche à onglets
-  `/app/clients/:id`, création/édition, archivage/réactivation (61 tests verts).
-- Prochaine : Story 2.2 (comptes sociaux du client).
+- **Story 2.1** faite : référentiel clients — liste, fiche à onglets, création/édition,
+  archivage.
+- **Story 2.2** faite : comptes sociaux du client (table `networks` de référence + onglet
+  « Comptes sociaux ») — 69 tests verts.
+- Prochaine : Story 2.3 (contacts de validation + invitation).
 
 ## Documentation
 

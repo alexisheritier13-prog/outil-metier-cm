@@ -6,8 +6,12 @@ export type { Role } from '@/shared/constants/roles';
 export type { Network } from '@/shared/constants/networks';
 export type { PostStatus } from '@/shared/constants/postStatus';
 
+import type { Network } from '@/shared/constants/networks';
+
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ClientRow = Database['public']['Tables']['clients']['Row'];
+type SocialAccountRow = Database['public']['Tables']['social_accounts']['Row'];
+type NetworkRow = Database['public']['Tables']['networks']['Row'];
 
 export interface Profile {
   id: string;
@@ -55,4 +59,33 @@ export function toClient(row: ClientRow): Client {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+export interface SocialAccount {
+  id: string;
+  clientId: string;
+  network: Network;
+  handle: string;
+  createdAt: string;
+}
+
+export function toSocialAccount(row: SocialAccountRow): SocialAccount {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    network: row.network,
+    handle: row.handle,
+    createdAt: row.created_at,
+  };
+}
+
+export interface NetworkRef {
+  code: Network;
+  label: string;
+  specs: string;
+  position: number;
+}
+
+export function toNetworkRef(row: NetworkRow): NetworkRef {
+  return { code: row.code, label: row.label, specs: row.specs, position: row.position };
 }

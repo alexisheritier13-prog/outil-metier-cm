@@ -14,7 +14,7 @@
     "test:rls": "vitest run tests/integration",
     "db:apply": "node scripts/apply-migrations.mjs",
     "functions:deploy": "supabase functions deploy --project-ref vevdhfyyjwntxvajtlud",
-    "gen:types": "supabase gen types typescript --project-id vevdhfyyjwntxvajtlud > src/shared/types/database.ts",
+    "gen:types": "node scripts/gen-types.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {
