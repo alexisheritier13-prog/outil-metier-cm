@@ -6,10 +6,13 @@ import {
   deleteTestClients,
   deleteTestUsers,
   hasDbTestEnv,
+  tableExists,
   type TestUser,
 } from './_helpers';
 
-const maybe = hasDbTestEnv ? describe : describe.skip;
+// N'active la suite que si l'instance de test ET la migration 0002 sont en place.
+const ready = hasDbTestEnv && (await tableExists('profiles'));
+const maybe = ready ? describe : describe.skip;
 
 /**
  * Vérifie l'isolation apportée par la migration 0002 :

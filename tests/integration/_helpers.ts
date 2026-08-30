@@ -21,6 +21,17 @@ export function anon(): SupabaseClient {
   });
 }
 
+/**
+ * Vrai si la table `public.<name>` existe (via service_role).
+ * Sert à n'activer une suite de tests qu'une fois la migration correspondante appliquée.
+ */
+export async function tableExists(name: string): Promise<boolean> {
+  if (!hasDbTestEnv) return false;
+  const { error } = await admin().from(name).select('*').limit(1);
+  // PGRST205 = table absente du cache de schéma.
+  return !error || error.code !== 'PGRST205';
+}
+
 const PASSWORD = 'Test-Passw0rd!';
 
 export interface TestUser {
