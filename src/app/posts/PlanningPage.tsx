@@ -24,9 +24,15 @@ import { useCreatePost, usePosts } from './usePosts';
 const CalendarView = lazy(() =>
   import('./CalendarView').then((m) => ({ default: m.CalendarView })),
 );
+const KanbanView = lazy(() => import('./KanbanView').then((m) => ({ default: m.KanbanView })));
 
-type ViewMode = 'month' | 'week' | 'list';
-const VIEW_LABEL: Record<ViewMode, string> = { month: 'Mois', week: 'Semaine', list: 'Liste' };
+type ViewMode = 'month' | 'week' | 'list' | 'kanban';
+const VIEW_LABEL: Record<ViewMode, string> = {
+  month: 'Mois',
+  week: 'Semaine',
+  list: 'Liste',
+  kanban: 'Kanban',
+};
 
 export function PlanningPage() {
   const { data: me } = useCurrentProfile();
@@ -70,7 +76,7 @@ export function PlanningPage() {
         <div className="flex items-center gap-3">
           <h1 className="text-title">Planning</h1>
           <div className="flex rounded-md border p-0.5">
-            {(['month', 'week', 'list'] as const).map((m) => (
+            {(['month', 'week', 'list', 'kanban'] as const).map((m) => (
               <button
                 key={m}
                 type="button"
@@ -112,15 +118,20 @@ export function PlanningPage() {
         </Dialog>
       </header>
 
-      {mode === 'list' ? (
+      {mode === 'list' && (
         <PostsTable
           posts={rows}
-          role={me.role}
           clientName={clientName}
           onOpen={setOpenPost}
           hasClients={hasClients}
         />
-      ) : (
+      )}
+      {mode === 'kanban' && (
+        <Suspense fallback={<FullPageSpinner />}>
+          <KanbanView posts={rows} role={me.role} clientName={clientName} onOpen={setOpenPost} />
+        </Suspense>
+      )}
+      {(mode === 'month' || mode === 'week') && (
         <Suspense fallback={<FullPageSpinner />}>
           <CalendarView
             posts={rows}

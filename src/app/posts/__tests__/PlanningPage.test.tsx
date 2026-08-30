@@ -75,6 +75,9 @@ describe('PlanningPage', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Liste' }));
     expect(await screen.findByText('Bonjour le monde')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Kanban' }));
+    expect(await screen.findAllByText('Brouillon')).not.toHaveLength(0);
   });
 
   it('désactive « Nouveau post » sans client', async () => {

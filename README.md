@@ -33,7 +33,8 @@ validation interne puis client, organisation du contenu. Application web héberg
   SQL + miroir TS (test de parité), RPC `post_change_status`.
 - **Story 3.3** faite : calendrier `/app` — `PlanningPage` (Mois / Semaine / Liste),
   FullCalendar (lazy), panneau latéral `PostSheet`, drag & drop de re-planification. 101 tests.
-- Prochaine : Story 3.4 (vue kanban + filtres).
+- **Story 3.4** faite : vues Liste (triable, virtualisée) et Kanban (drag entre colonnes → `can_transition`). 102 tests.
+- Prochaine : Story 3.5 (filtres transverses).
 
 ### Tests
 
