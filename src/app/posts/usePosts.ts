@@ -4,12 +4,14 @@ import {
   createPost,
   getPost,
   listPosts,
+  reschedulePost,
   trashPost,
   updatePost,
   type PostFilters,
   type PostInput,
 } from '@/services/posts';
 import type { PostStatus } from '@/shared/constants/postStatus';
+import type { Post } from '@/shared/types';
 
 export const postsKey = (filters: PostFilters) => ['posts', filters] as const;
 
@@ -41,6 +43,30 @@ export function useUpdatePost(id: string) {
       qc.invalidateQueries({ queryKey: ['posts'] });
       qc.invalidateQueries({ queryKey: ['post', id] });
     },
+  });
+}
+
+export function useReschedulePost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, scheduledAt }: { id: string; scheduledAt: string }) =>
+      reschedulePost(id, scheduledAt),
+    onMutate: async ({ id, scheduledAt }) => {
+      await qc.cancelQueries({ queryKey: ['posts'] });
+      const snapshots = qc.getQueriesData<Post[]>({ queryKey: ['posts'] });
+      for (const [key, list] of snapshots) {
+        if (!list) continue;
+        qc.setQueryData(
+          key,
+          list.map((p) => (p.id === id ? { ...p, scheduledAt } : p)),
+        );
+      }
+      return { snapshots };
+    },
+    onError: (_e, _v, ctx) => {
+      ctx?.snapshots.forEach(([key, list]) => qc.setQueryData(key, list));
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['posts'] }),
   });
 }
 

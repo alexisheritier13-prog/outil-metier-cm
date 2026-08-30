@@ -84,6 +84,16 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
   return toPost(data);
 }
 
+/** Re-planifie un post (drag & drop calendrier) — ne touche qu'à `scheduled_at`. */
+export async function reschedulePost(id: string, scheduledAt: string): Promise<void> {
+  const { error } = await getSupabase()
+    .from('posts')
+    .update({ scheduled_at: scheduledAt })
+    .eq('id', id)
+    .is('deleted_at', null);
+  if (error) throw error;
+}
+
 /** Change le statut d'un post via le RPC (contrôle rôle + can_transition côté serveur). */
 export async function changePostStatus(
   postId: string,

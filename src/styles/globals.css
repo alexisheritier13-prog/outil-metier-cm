@@ -64,3 +64,38 @@
     text-wrap: balance;
   }
 }
+
+/* FullCalendar — habillage monochrome */
+.fc-monochrome {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--background);
+  --fc-neutral-bg-color: var(--surface-2);
+  --fc-today-bg-color: var(--surface-2);
+  --fc-event-bg-color: var(--surface);
+  --fc-event-border-color: var(--border);
+  --fc-event-text-color: var(--foreground);
+  --fc-button-bg-color: var(--surface);
+  --fc-button-border-color: var(--border);
+  --fc-button-text-color: var(--foreground);
+  --fc-button-hover-bg-color: var(--surface-2);
+  --fc-button-hover-border-color: var(--border);
+  --fc-button-active-bg-color: var(--foreground);
+  --fc-button-active-border-color: var(--foreground);
+  font-size: 0.8125rem;
+}
+.fc-monochrome .fc-button.fc-button-active {
+  color: var(--background);
+}
+.fc-monochrome .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.fc-monochrome .fc-event {
+  cursor: pointer;
+  box-shadow: none;
+}
+.fc-monochrome .fc-daygrid-day-number,
+.fc-monochrome .fc-col-header-cell-cushion {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}

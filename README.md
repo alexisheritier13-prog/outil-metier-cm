@@ -29,10 +29,11 @@ validation interne puis client, organisation du contenu. Application web héberg
   client, onglet « Onboarding », avancement `x/y`).
 - **Story 2.6** faite : liste clients avec indicateurs. **Epic 2 terminé.**
 - **Story 3.1** faite : modèle de post + CRUD, `PostForm` (heure de Paris), vue liste sur `/app`.
-- **Story 3.2** faite : pipeline de statuts — table `post_transitions` (source de vérité),
-  `can_transition` SQL + miroir TS (test de parité), RPC `post_change_status`, garde
-  anti-UPDATE direct. 99 tests (49 unitaires + 50 intégration).
-- Prochaine : Story 3.3 (calendrier FullCalendar).
+- **Story 3.2** faite : pipeline de statuts — table `post_transitions`, `can_transition`
+  SQL + miroir TS (test de parité), RPC `post_change_status`.
+- **Story 3.3** faite : calendrier `/app` — `PlanningPage` (Mois / Semaine / Liste),
+  FullCalendar (lazy), panneau latéral `PostSheet`, drag & drop de re-planification. 101 tests.
+- Prochaine : Story 3.4 (vue kanban + filtres).
 
 ### Tests
 
