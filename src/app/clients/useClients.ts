@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createClient,
   getClient,
+  listClientOverview,
   listClients,
   setClientArchived,
   updateClient,
@@ -9,12 +10,21 @@ import {
 } from '@/services/clients';
 
 const listKey = (includeArchived: boolean) => ['clients', { includeArchived }] as const;
+const overviewKey = (includeArchived: boolean) =>
+  ['clients', 'overview', { includeArchived }] as const;
 const detailKey = (id: string) => ['client', id] as const;
 
 export function useClients(includeArchived: boolean) {
   return useQuery({
     queryKey: listKey(includeArchived),
     queryFn: () => listClients(includeArchived),
+  });
+}
+
+export function useClientOverview(includeArchived: boolean) {
+  return useQuery({
+    queryKey: overviewKey(includeArchived),
+    queryFn: () => listClientOverview(includeArchived),
   });
 }
 

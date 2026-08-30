@@ -32,6 +32,35 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_contacts: {
         Row: {
           auth_user_id: string | null
@@ -61,6 +90,13 @@ export type Database = {
           is_active?: boolean
         }
         Relationships: [
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "client_contacts_client_id_fkey"
             columns: ["client_id"]
@@ -153,6 +189,13 @@ export type Database = {
             foreignKeyName: "editorial_guidelines_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: true
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_guidelines_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -185,6 +228,61 @@ export type Database = {
           specs?: string
         }
         Relationships: []
+      }
+      onboarding_items: {
+        Row: {
+          client_id: string
+          created_at: string
+          done_at: string | null
+          done_by: string | null
+          id: string
+          is_done: boolean
+          label: string
+          position: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          is_done?: boolean
+          label: string
+          position?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          is_done?: boolean
+          label?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_items_done_by_fkey"
+            columns: ["done_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -243,6 +341,13 @@ export type Database = {
             foreignKeyName: "social_accounts_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_accounts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -266,6 +371,13 @@ export type Database = {
             foreignKeyName: "user_clients_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_clients_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
@@ -280,7 +392,46 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      client_onboarding_progress: {
+        Row: {
+          client_id: string | null
+          done: number | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_items_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_overview: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_archived: boolean | null
+          last_activity_at: string | null
+          logo_url: string | null
+          name: string | null
+          onboarding_done: number | null
+          onboarding_total: number | null
+          pending_client: number | null
+          pending_internal: number | null
+          sector: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       auth_is_active: { Args: never; Returns: boolean }

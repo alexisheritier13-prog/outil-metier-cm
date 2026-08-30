@@ -18,6 +18,10 @@ import { ClientForm } from './ClientForm';
 import { SocialAccountsTab } from './tabs/SocialAccountsTab';
 import { ContactsTab } from './tabs/ContactsTab';
 import { GuidelinesTab } from './tabs/GuidelinesTab';
+import { OnboardingTab } from './tabs/OnboardingTab';
+import { onboardingKey } from './tabs/onboardingKeys';
+import { useQuery } from '@tanstack/react-query';
+import { listOnboardingItems } from '@/services/onboarding';
 
 export function ClientDetailPage() {
   const { clientId = '' } = useParams();
@@ -26,6 +30,11 @@ export function ClientDetailPage() {
   const client = useClient(clientId);
   const update = useUpdateClient(clientId);
   const archive = useSetClientArchived(clientId);
+  const onboarding = useQuery({
+    queryKey: onboardingKey(clientId),
+    queryFn: () => listOnboardingItems(clientId),
+    enabled: Boolean(clientId),
+  });
   const [editOpen, setEditOpen] = useState(false);
 
   if (client.isLoading) return <FullPageSpinner />;
@@ -64,6 +73,12 @@ export function ClientDetailPage() {
             <h1 className="text-title">{c.name}</h1>
             <p className="text-muted-foreground text-sm">
               {c.sector || 'Secteur non renseigné'} · {c.isArchived ? 'Archivé' : 'Actif'}
+              {onboarding.data && onboarding.data.length > 0 && (
+                <>
+                  {' · '}Onboarding {onboarding.data.filter((i) => i.isDone).length}/
+                  {onboarding.data.length}
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -127,13 +142,15 @@ export function ClientDetailPage() {
           <GuidelinesTab clientId={c.id} />
         </TabsContent>
 
-        {(['onboarding', 'activity'] as const).map((v) => (
-          <TabsContent key={v} value={v}>
-            <p className="text-muted-foreground text-sm">
-              Cette section arrive dans une prochaine story de l'Epic 2.
-            </p>
-          </TabsContent>
-        ))}
+        <TabsContent value="onboarding">
+          <OnboardingTab clientId={c.id} />
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <p className="text-muted-foreground text-sm">
+            Le journal d'activité du client arrive avec la Story 5.5.
+          </p>
+        </TabsContent>
       </Tabs>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

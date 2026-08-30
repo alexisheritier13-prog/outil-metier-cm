@@ -24,8 +24,12 @@ validation interne puis client, organisation du contenu. Application web héberg
   archivage.
 - **Story 2.2** faite : comptes sociaux du client (table `networks` + onglet).
 - **Story 2.3** faite : contacts de validation + invitation via Edge Function.
-- **Story 2.4** faite : charte éditoriale par client (onglet « Charte ») — 79 tests verts.
-- Prochaine : Story 2.5 (checklist d'onboarding client).
+- **Story 2.4** faite : charte éditoriale par client (onglet « Charte »).
+- **Story 2.5** faite : checklist d'onboarding (modèle par défaut, auto-seed à la création
+  client, onglet « Onboarding », avancement `x/y`).
+- **Story 2.6** faite : liste clients avec indicateurs (vue `client_overview`, colonnes
+  triables). **Epic 2 terminé** — 87 tests verts.
+- Prochaine : Epic 3 (posts & calendrier multi-clients).
 
 ## Documentation
 

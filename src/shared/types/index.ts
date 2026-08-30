@@ -14,6 +14,8 @@ type SocialAccountRow = Database['public']['Tables']['social_accounts']['Row'];
 type NetworkRow = Database['public']['Tables']['networks']['Row'];
 type ClientContactRow = Database['public']['Tables']['client_contacts']['Row'];
 type EditorialGuidelineRow = Database['public']['Tables']['editorial_guidelines']['Row'];
+type OnboardingItemRow = Database['public']['Tables']['onboarding_items']['Row'];
+type ClientOverviewRow = Database['public']['Views']['client_overview']['Row'];
 
 export interface Profile {
   id: string;
@@ -145,3 +147,53 @@ export const EMPTY_GUIDELINE = (clientId: string): EditorialGuideline => ({
   visualGuidelines: '',
   updatedAt: '',
 });
+
+export interface OnboardingItem {
+  id: string;
+  clientId: string;
+  label: string;
+  position: number;
+  isDone: boolean;
+  doneAt: string | null;
+  doneBy: string | null;
+}
+
+export function toOnboardingItem(row: OnboardingItemRow): OnboardingItem {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    label: row.label,
+    position: row.position,
+    isDone: row.is_done,
+    doneAt: row.done_at,
+    doneBy: row.done_by,
+  };
+}
+
+export interface ClientOverview {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  sector: string | null;
+  isArchived: boolean;
+  onboardingDone: number;
+  onboardingTotal: number;
+  pendingInternal: number;
+  pendingClient: number;
+  lastActivityAt: string | null;
+}
+
+export function toClientOverview(row: ClientOverviewRow): ClientOverview {
+  return {
+    id: row.id ?? '',
+    name: row.name ?? '',
+    logoUrl: row.logo_url,
+    sector: row.sector,
+    isArchived: row.is_archived ?? false,
+    onboardingDone: row.onboarding_done ?? 0,
+    onboardingTotal: row.onboarding_total ?? 0,
+    pendingInternal: row.pending_internal ?? 0,
+    pendingClient: row.pending_client ?? 0,
+    lastActivityAt: row.last_activity_at,
+  };
+}
