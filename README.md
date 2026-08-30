@@ -9,10 +9,11 @@ validation interne puis client, organisation du contenu. Application web héberg
 - Phase **planning BMad** terminée — voir `docs/`.
 - **Story 1.1** faite : base technique (Vite + React + TS strict + Tailwind + shadcn/ui,
   ESLint/Prettier, Vitest, page canari, CI GitHub Actions).
-- **Story 1.2** code complet (couche Supabase : `supabase/`, migration `0001_init`, client
-  typé, services) — **vérification contre une vraie base en attente** (Docker absent, ou
-  projet Supabase cloud à créer).
-- Prochaine : Story 1.3 (profils, rôles, assignations clients + RLS).
+- **Story 1.2** faite : couche Supabase (client typé, migration `0001`, services), vérifiée
+  contre le projet cloud.
+- **Story 1.3** faite : `profiles` / `clients` / `user_clients`, rôles, fonctions
+  d'autorisation, **RLS d'isolation** + 9 tests d'isolation verts.
+- Prochaine : Story 1.4 (connexion + redirection par rôle).
 
 ## Documentation
 
@@ -65,24 +66,23 @@ npm run dev                       # http://localhost:5173
 
 Le schéma vit dans `supabase/migrations/` (fichiers SQL horodatés, additifs).
 
-```bash
-# Local — nécessite Docker Desktop
-supabase start                 # démarre Postgres + Auth + Edge runtime
-supabase db reset              # applique migrations/ + seed.sql
-npm run gen:types              # régénère src/shared/types/database.ts
+Appliquées sur le projet cloud via l'**API Management** (pas besoin du mot de passe DB) :
 
-# Cloud / production — via CI (.github/workflows/db-migrate.yaml sur main)
-supabase link --project-ref <ref>
-supabase db push
+```bash
+npm run db:apply          # applique supabase/migrations/*.sql (idempotent)
+npm run db:apply 0004     # seulement les migrations préfixées 0004
+npm run gen:types         # régénère src/shared/types/database.ts
 ```
 
-Tests d'intégration DB : `tests/integration/` — ignorés automatiquement si
-`SUPABASE_TEST_URL` / `SUPABASE_TEST_ANON_KEY` ne sont pas définis (voir
-`tests/integration/README.md`).
+Requiert dans `.env.test.local` (non versionné) : `SUPABASE_ACCESS_TOKEN` (jeton perso
+Supabase) et `SUPABASE_PROJECT_REF`.
 
-> État actuel : Docker n'étant pas installé, la couche Supabase est écrite mais pas encore
-> exécutée. Pour débloquer : installer Docker Desktop **ou** créer un projet Supabase cloud
-> (région EU) et renseigner `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`.
+Alternative Docker (si installé) : `supabase start` + `supabase db reset`.
+
+Tests d'intégration / RLS : `npm run test:rls` (`tests/integration/`) — ignorés
+automatiquement si `.env.test.local` absent ou si la migration concernée n'est pas encore
+appliquée. Nécessite `SUPABASE_TEST_SERVICE_ROLE_KEY` pour provisionner des utilisateurs de
+test. Voir `tests/integration/README.md`.
 
 ## CI
 

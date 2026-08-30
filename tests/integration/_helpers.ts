@@ -10,14 +10,22 @@ export const hasDbTestEnv = Boolean(TEST_URL && TEST_ANON_KEY && TEST_SERVICE_KE
 /** Client service_role : contourne la RLS. Réservé au setup/teardown des tests. */
 export function admin(): SupabaseClient {
   return createClient(TEST_URL, TEST_SERVICE_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      storageKey: `test-admin-${crypto.randomUUID()}`,
+    },
   });
 }
 
-/** Client anonyme (comme le navigateur). */
+/** Client anonyme (comme le navigateur). Chaque instance a sa propre clé de stockage. */
 export function anon(): SupabaseClient {
   return createClient(TEST_URL, TEST_ANON_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      storageKey: `test-${crypto.randomUUID()}`,
+    },
   });
 }
 

@@ -11,8 +11,9 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:rls": "echo \"[test:rls] nécessite une instance Supabase (Docker ou projet cloud) — voir docs/stories\" && exit 0",
-    "gen:types": "supabase gen types typescript --local > src/shared/types/database.ts",
+    "test:rls": "vitest run tests/integration",
+    "db:apply": "node scripts/apply-migrations.mjs",
+    "gen:types": "supabase gen types typescript --project-id vevdhfyyjwntxvajtlud > src/shared/types/database.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
