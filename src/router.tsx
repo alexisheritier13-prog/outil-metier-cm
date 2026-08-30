@@ -2,7 +2,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { INTERNAL_ROLES } from '@/shared/constants/roles';
 import { RequireRole } from '@/auth/RequireRole';
 import { LoginPage } from '@/auth/LoginPage';
+import { AppLayout } from '@/app/AppLayout';
 import { AppHome } from '@/app/AppHome';
+import { UsersPage } from '@/app/settings/UsersPage';
 import { PortalHome } from '@/portal/PortalHome';
 
 export const router = createBrowserRouter(
@@ -10,12 +12,23 @@ export const router = createBrowserRouter(
     { path: '/', element: <Navigate to="/app" replace /> },
     { path: '/login', element: <LoginPage /> },
     {
-      path: '/app/*',
+      path: '/app',
       element: (
         <RequireRole roles={INTERNAL_ROLES}>
-          <AppHome />
+          <AppLayout />
         </RequireRole>
       ),
+      children: [
+        { index: true, element: <AppHome /> },
+        {
+          path: 'parametres/utilisateurs',
+          element: (
+            <RequireRole roles={['admin']}>
+              <UsersPage />
+            </RequireRole>
+          ),
+        },
+      ],
     },
     {
       path: '/portail/*',

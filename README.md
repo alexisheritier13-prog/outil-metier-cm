@@ -14,8 +14,10 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 1.3** faite : `profiles` / `clients` / `user_clients`, rôles, fonctions
   d'autorisation, **RLS d'isolation** + 9 tests d'isolation verts.
 - **Story 1.4** faite : écran de connexion, gardes de routes par rôle, redirection,
-  déconnexion, persistance de session (48 tests verts).
-- Prochaine : Story 1.5 (gestion des utilisateurs internes par l'admin).
+  déconnexion, persistance de session.
+- **Story 1.5** faite : Edge Function `admin-users`, écran `/app/parametres/utilisateurs`
+  (création, rôle, activation, assignations clients). **Epic 1 terminé** (54 tests verts).
+- Prochaine : Epic 2 (référentiel clients) — ou `/ux-expert` pour `docs/front-end-spec.md`.
 
 ## Documentation
 
@@ -80,6 +82,17 @@ Requiert dans `.env.test.local` (non versionné) : `SUPABASE_ACCESS_TOKEN` (jeto
 Supabase) et `SUPABASE_PROJECT_REF`.
 
 Alternative Docker (si installé) : `supabase start` + `supabase db reset`.
+
+### Edge Functions
+
+```bash
+npm run functions:deploy              # déploie toutes les fonctions (sans Docker)
+npm run functions:deploy admin-users  # une seule
+```
+
+`admin-users` : opérations sur les comptes réservées à l'Admin (création d'utilisateur
+interne). Les variables `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`
+sont injectées automatiquement par la plateforme.
 
 Tests d'intégration / RLS : `npm run test:rls` (`tests/integration/`) — ignorés
 automatiquement si `.env.test.local` absent ou si la migration concernée n'est pas encore

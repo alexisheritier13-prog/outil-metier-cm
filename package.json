@@ -13,11 +13,14 @@
     "test:watch": "vitest",
     "test:rls": "vitest run tests/integration",
     "db:apply": "node scripts/apply-migrations.mjs",
+    "functions:deploy": "supabase functions deploy --project-ref vevdhfyyjwntxvajtlud",
     "gen:types": "supabase gen types typescript --project-id vevdhfyyjwntxvajtlud > src/shared/types/database.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-label": "^2.1.15",
     "@radix-ui/react-slot": "^1.1.1",
     "@supabase/supabase-js": "^2.47.10",
     "@tanstack/react-query": "^5.102.8",
