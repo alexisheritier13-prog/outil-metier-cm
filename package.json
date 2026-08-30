@@ -11,10 +11,13 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:rls": "echo \"[test:rls] nécessite une instance Supabase (Docker ou projet cloud) — voir docs/stories\" && exit 0",
+    "gen:types": "supabase gen types typescript --local > src/shared/types/database.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
+    "@supabase/supabase-js": "^2.47.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "react": "^18.3.1",

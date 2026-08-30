@@ -9,7 +9,10 @@ validation interne puis client, organisation du contenu. Application web héberg
 - Phase **planning BMad** terminée — voir `docs/`.
 - **Story 1.1** faite : base technique (Vite + React + TS strict + Tailwind + shadcn/ui,
   ESLint/Prettier, Vitest, page canari, CI GitHub Actions).
-- Prochaine : Story 1.2 (Supabase + migrations).
+- **Story 1.2** code complet (couche Supabase : `supabase/`, migration `0001_init`, client
+  typé, services) — **vérification contre une vraie base en attente** (Docker absent, ou
+  projet Supabase cloud à créer).
+- Prochaine : Story 1.3 (profils, rôles, assignations clients + RLS).
 
 ## Documentation
 
@@ -58,10 +61,34 @@ npm run dev                       # http://localhost:5173
 | `VITE_SUPABASE_ANON_KEY` | dès Story 1.2 | Clé anon (publique) Supabase |
 | `VITE_SENTRY_DSN` | non | Monitoring erreurs front |
 
+## Base de données (Supabase)
+
+Le schéma vit dans `supabase/migrations/` (fichiers SQL horodatés, additifs).
+
+```bash
+# Local — nécessite Docker Desktop
+supabase start                 # démarre Postgres + Auth + Edge runtime
+supabase db reset              # applique migrations/ + seed.sql
+npm run gen:types              # régénère src/shared/types/database.ts
+
+# Cloud / production — via CI (.github/workflows/db-migrate.yaml sur main)
+supabase link --project-ref <ref>
+supabase db push
+```
+
+Tests d'intégration DB : `tests/integration/` — ignorés automatiquement si
+`SUPABASE_TEST_URL` / `SUPABASE_TEST_ANON_KEY` ne sont pas définis (voir
+`tests/integration/README.md`).
+
+> État actuel : Docker n'étant pas installé, la couche Supabase est écrite mais pas encore
+> exécutée. Pour débloquer : installer Docker Desktop **ou** créer un projet Supabase cloud
+> (région EU) et renseigner `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`.
+
 ## CI
 
 `.github/workflows/ci.yaml` : sur chaque PR et push `main` → `npm ci` puis `lint`,
-`typecheck`, `test`, `build`. (Les tests RLS `test:rls` seront ajoutés en Story 1.2.)
+`typecheck`, `test`, `build`. Les tests RLS (pgTAP) seront câblés dès que les premières
+tables réelles arrivent (Story 1.3).
 
 ## Déploiement (à faire — action manuelle)
 
