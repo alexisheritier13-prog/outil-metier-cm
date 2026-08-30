@@ -18,6 +18,7 @@ export function AppLayout() {
           <NavItem to="/app" end>
             Calendrier
           </NavItem>
+          <NavItem to="/app/clients">Clients</NavItem>
           {profile?.role === 'admin' && (
             <NavItem to="/app/parametres/utilisateurs">Utilisateurs</NavItem>
           )}

@@ -15,9 +15,14 @@ validation interne puis client, organisation du contenu. Application web héberg
   d'autorisation, **RLS d'isolation** + 9 tests d'isolation verts.
 - **Story 1.4** faite : écran de connexion, gardes de routes par rôle, redirection,
   déconnexion, persistance de session.
-- **Story 1.5** faite : Edge Function `admin-users`, écran `/app/parametres/utilisateurs`
-  (création, rôle, activation, assignations clients). **Epic 1 terminé** (54 tests verts).
-- Prochaine : Epic 2 (référentiel clients) — ou `/ux-expert` pour `docs/front-end-spec.md`.
+- **Story 1.5** faite : Edge Function `admin-users`, écran `/app/parametres/utilisateurs`.
+  **Epic 1 terminé.**
+- **Spec UX** : `docs/front-end-spec.md` (IA, parcours, design system).
+- **Design system** : palette monochrome (noir & blanc), Inter self-host, `StatusBadge` /
+  `EmptyState` / `ClientAvatar` / `Tabs`.
+- **Story 2.1** faite : référentiel clients — liste `/app/clients`, fiche à onglets
+  `/app/clients/:id`, création/édition, archivage/réactivation (61 tests verts).
+- Prochaine : Story 2.2 (comptes sociaux du client).
 
 ## Documentation
 
