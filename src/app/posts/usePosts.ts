@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  changePostStatus,
   createPost,
   getPost,
   listPosts,
@@ -8,6 +9,7 @@ import {
   type PostFilters,
   type PostInput,
 } from '@/services/posts';
+import type { PostStatus } from '@/shared/constants/postStatus';
 
 export const postsKey = (filters: PostFilters) => ['posts', filters] as const;
 
@@ -39,6 +41,15 @@ export function useUpdatePost(id: string) {
       qc.invalidateQueries({ queryKey: ['posts'] });
       qc.invalidateQueries({ queryKey: ['post', id] });
     },
+  });
+}
+
+export function useChangePostStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, to, comment }: { id: string; to: PostStatus; comment?: string }) =>
+      changePostStatus(id, to, comment),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['posts'] }),
   });
 }
 

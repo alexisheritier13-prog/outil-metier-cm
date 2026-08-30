@@ -91,20 +91,16 @@ maybe('posts — CRUD & RLS (3.1)', () => {
     expect((data ?? []).some((r) => r.caption.includes('bougies'))).toBe(true);
   });
 
-  it('le changement de statut renseigne status_changed_at', async () => {
+  it('un UPDATE direct du statut est refusé (passer par le RPC)', async () => {
     const { data: p } = await cm.client
       .from('posts')
       .insert(draft(clientA, cm.id))
-      .select('id, status_changed_at')
+      .select('id')
       .single();
-    const before = p!.status_changed_at;
-    await new Promise((r) => setTimeout(r, 20));
-    await cm.client.from('posts').update({ status: 'internal_review' }).eq('id', p!.id);
-    const { data: after } = await cm.client
+    const r = await cm.client
       .from('posts')
-      .select('status_changed_at')
-      .eq('id', p!.id)
-      .single();
-    expect(after!.status_changed_at).not.toBe(before);
+      .update({ status: 'internal_review' })
+      .eq('id', p!.id);
+    expect(r.error).not.toBeNull();
   });
 });

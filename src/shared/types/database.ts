@@ -284,6 +284,78 @@ export type Database = {
           },
         ]
       }
+      post_history: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          field: string | null
+          id: number
+          new_value: string | null
+          old_value: string | null
+          post_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          field?: string | null
+          id?: never
+          new_value?: string | null
+          old_value?: string | null
+          post_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          field?: string | null
+          id?: never
+          new_value?: string | null
+          old_value?: string | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_history_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_history_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_transitions: {
+        Row: {
+          from_status: Database["public"]["Enums"]["post_status_t"]
+          needs_client_contact: boolean
+          needs_comment: boolean
+          roles: Database["public"]["Enums"]["role_t"][]
+          to_status: Database["public"]["Enums"]["post_status_t"]
+        }
+        Insert: {
+          from_status: Database["public"]["Enums"]["post_status_t"]
+          needs_client_contact?: boolean
+          needs_comment?: boolean
+          roles: Database["public"]["Enums"]["role_t"][]
+          to_status: Database["public"]["Enums"]["post_status_t"]
+        }
+        Update: {
+          from_status?: Database["public"]["Enums"]["post_status_t"]
+          needs_client_contact?: boolean
+          needs_comment?: boolean
+          roles?: Database["public"]["Enums"]["role_t"][]
+          to_status?: Database["public"]["Enums"]["post_status_t"]
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string
@@ -550,8 +622,61 @@ export type Database = {
     Functions: {
       auth_is_active: { Args: never; Returns: boolean }
       auth_role: { Args: never; Returns: Database["public"]["Enums"]["role_t"] }
+      can_transition: {
+        Args: {
+          p_from: Database["public"]["Enums"]["post_status_t"]
+          p_role: Database["public"]["Enums"]["role_t"]
+          p_to: Database["public"]["Enums"]["post_status_t"]
+        }
+        Returns: boolean
+      }
       contact_client_ids: { Args: never; Returns: string[] }
       has_client_access: { Args: { cid: string }; Returns: boolean }
+      post_change_status: {
+        Args: {
+          p_comment?: string
+          p_post_id: string
+          p_to: Database["public"]["Enums"]["post_status_t"]
+        }
+        Returns: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "posts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      transition_needs_comment: {
+        Args: {
+          p_from: Database["public"]["Enums"]["post_status_t"]
+          p_to: Database["public"]["Enums"]["post_status_t"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       network_t:

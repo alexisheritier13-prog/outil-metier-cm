@@ -10,8 +10,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/EmptyState';
-import { StatusBadge } from '@/components/StatusBadge';
 import { NetworkIcon } from '@/components/NetworkIcon';
+import { StatusControl } from './StatusControl';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { listClients } from '@/services/clients';
@@ -125,7 +125,7 @@ export function PostsView() {
                     {p.caption || <span className="italic">Sans légende</span>}
                   </td>
                   <td className="p-3">
-                    <StatusBadge status={p.status} />
+                    {me && <StatusControl postId={p.id} status={p.status} role={me.role} />}
                   </td>
                   <td className="p-3 text-right">
                     <Button

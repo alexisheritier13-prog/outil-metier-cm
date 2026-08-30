@@ -84,6 +84,29 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
   return toPost(data);
 }
 
+/** Change le statut d'un post via le RPC (contrôle rôle + can_transition côté serveur). */
+export async function changePostStatus(
+  postId: string,
+  to: PostStatus,
+  comment?: string,
+): Promise<Post> {
+  const { data, error } = await getSupabase().rpc('post_change_status', {
+    p_post_id: postId,
+    p_to: to,
+    p_comment: comment ?? undefined,
+  });
+  if (error) throw new Error(mapStatusError(error));
+  return toPost(data as never);
+}
+
+function mapStatusError(error: { message?: string; code?: string }): string {
+  const m = error.message ?? '';
+  if (/commentaire est obligatoire/i.test(m)) return 'Un commentaire est obligatoire pour cette action.';
+  if (/non autorisée|réservée|accès refusé/i.test(m)) return "Cette transition n'est pas autorisée.";
+  if (/introuvable/i.test(m)) return 'Post introuvable.';
+  return "Le changement de statut a échoué.";
+}
+
 /** Mise en corbeille (soft delete). Les règles de droits fines arrivent en Story 3.7. */
 export async function trashPost(id: string): Promise<void> {
   const { data: userRes } = await getSupabase().auth.getUser();

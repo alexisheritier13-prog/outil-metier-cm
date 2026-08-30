@@ -28,9 +28,11 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 2.5** faite : checklist d'onboarding (modèle par défaut, auto-seed à la création
   client, onglet « Onboarding », avancement `x/y`).
 - **Story 2.6** faite : liste clients avec indicateurs. **Epic 2 terminé.**
-- **Story 3.1** faite : modèle de post + CRUD (migrations `0008`–`0010`), `PostForm` (date en
-  heure de Paris), vue liste provisoire sur `/app`. 96 tests (50 unitaires + 46 intégration).
-- Prochaine : Story 3.2 (pipeline de statuts + `can_transition`).
+- **Story 3.1** faite : modèle de post + CRUD, `PostForm` (heure de Paris), vue liste sur `/app`.
+- **Story 3.2** faite : pipeline de statuts — table `post_transitions` (source de vérité),
+  `can_transition` SQL + miroir TS (test de parité), RPC `post_change_status`, garde
+  anti-UPDATE direct. 99 tests (49 unitaires + 50 intégration).
+- Prochaine : Story 3.3 (calendrier FullCalendar).
 
 ### Tests
 
