@@ -13,6 +13,7 @@ type ClientRow = Database['public']['Tables']['clients']['Row'];
 type SocialAccountRow = Database['public']['Tables']['social_accounts']['Row'];
 type NetworkRow = Database['public']['Tables']['networks']['Row'];
 type ClientContactRow = Database['public']['Tables']['client_contacts']['Row'];
+type EditorialGuidelineRow = Database['public']['Tables']['editorial_guidelines']['Row'];
 
 export interface Profile {
   id: string;
@@ -112,3 +113,35 @@ export function toClientContact(row: ClientContactRow): ClientContact {
     createdAt: row.created_at,
   };
 }
+
+export interface EditorialGuideline {
+  clientId: string;
+  tone: string;
+  wordsToAvoid: string;
+  wordsToPrefer: string;
+  goodExamples: string;
+  visualGuidelines: string;
+  updatedAt: string;
+}
+
+export function toEditorialGuideline(row: EditorialGuidelineRow): EditorialGuideline {
+  return {
+    clientId: row.client_id,
+    tone: row.tone,
+    wordsToAvoid: row.words_to_avoid,
+    wordsToPrefer: row.words_to_prefer,
+    goodExamples: row.good_examples,
+    visualGuidelines: row.visual_guidelines,
+    updatedAt: row.updated_at,
+  };
+}
+
+export const EMPTY_GUIDELINE = (clientId: string): EditorialGuideline => ({
+  clientId,
+  tone: '',
+  wordsToAvoid: '',
+  wordsToPrefer: '',
+  goodExamples: '',
+  visualGuidelines: '',
+  updatedAt: '',
+});

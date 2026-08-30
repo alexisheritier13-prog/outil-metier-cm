@@ -17,6 +17,7 @@ import { useClient, useSetClientArchived, useUpdateClient } from './useClients';
 import { ClientForm } from './ClientForm';
 import { SocialAccountsTab } from './tabs/SocialAccountsTab';
 import { ContactsTab } from './tabs/ContactsTab';
+import { GuidelinesTab } from './tabs/GuidelinesTab';
 
 export function ClientDetailPage() {
   const { clientId = '' } = useParams();
@@ -122,7 +123,11 @@ export function ClientDetailPage() {
           <ContactsTab clientId={c.id} />
         </TabsContent>
 
-        {(['guidelines', 'onboarding', 'activity'] as const).map((v) => (
+        <TabsContent value="guidelines">
+          <GuidelinesTab clientId={c.id} />
+        </TabsContent>
+
+        {(['onboarding', 'activity'] as const).map((v) => (
           <TabsContent key={v} value={v}>
             <p className="text-muted-foreground text-sm">
               Cette section arrive dans une prochaine story de l'Epic 2.

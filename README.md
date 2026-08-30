@@ -23,9 +23,9 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 2.1** faite : référentiel clients — liste, fiche à onglets, création/édition,
   archivage.
 - **Story 2.2** faite : comptes sociaux du client (table `networks` + onglet).
-- **Story 2.3** faite : contacts de validation (onglet « Contacts ») + invitation via Edge
-  Function (`invite_contact`) — 76 tests verts.
-- Prochaine : Story 2.4 (charte éditoriale par client).
+- **Story 2.3** faite : contacts de validation + invitation via Edge Function.
+- **Story 2.4** faite : charte éditoriale par client (onglet « Charte ») — 79 tests verts.
+- Prochaine : Story 2.5 (checklist d'onboarding client).
 
 ## Documentation
 

@@ -117,6 +117,54 @@ export type Database = {
           },
         ]
       }
+      editorial_guidelines: {
+        Row: {
+          client_id: string
+          good_examples: string
+          tone: string
+          updated_at: string
+          updated_by: string | null
+          visual_guidelines: string
+          words_to_avoid: string
+          words_to_prefer: string
+        }
+        Insert: {
+          client_id: string
+          good_examples?: string
+          tone?: string
+          updated_at?: string
+          updated_by?: string | null
+          visual_guidelines?: string
+          words_to_avoid?: string
+          words_to_prefer?: string
+        }
+        Update: {
+          client_id?: string
+          good_examples?: string
+          tone?: string
+          updated_at?: string
+          updated_by?: string | null
+          visual_guidelines?: string
+          words_to_avoid?: string
+          words_to_prefer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_guidelines_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_guidelines_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       networks: {
         Row: {
           code: Database["public"]["Enums"]["network_t"]
