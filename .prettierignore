@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+.bmad-core
+package-lock.json
+*.md

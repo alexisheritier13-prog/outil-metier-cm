@@ -6,35 +6,79 @@ validation interne puis client, organisation du contenu. Application web héberg
 
 ## État
 
-Phase **planning BMad** terminée. Développement pas encore commencé.
+- Phase **planning BMad** terminée — voir `docs/`.
+- **Story 1.1** faite : base technique (Vite + React + TS strict + Tailwind + shadcn/ui,
+  ESLint/Prettier, Vitest, page canari, CI GitHub Actions).
+- Prochaine : Story 1.2 (Supabase + migrations).
 
-- `docs/brief.md` — brief projet
-- `docs/prd.md` — Product Requirements Document (9 epics, stories + critères d'acceptation)
-- `docs/architecture.md` — architecture fullstack (Supabase, RLS, Edge Functions)
-- `docs/architecture/coding-standards.md` · `tech-stack.md` · `source-tree.md` — socle dev
+## Documentation
 
-## Stack (voir `docs/architecture/tech-stack.md`)
+| Fichier | Contenu |
+|---|---|
+| `docs/brief.md` | Brief projet |
+| `docs/prd.md` | PRD — 9 epics, stories + critères d'acceptation |
+| `docs/architecture.md` | Architecture fullstack (Supabase, RLS, Edge Functions) |
+| `docs/architecture/coding-standards.md` · `tech-stack.md` · `source-tree.md` | Socle dev |
+| `docs/stories/` | Stories générées (SM) et implémentées (dev) |
 
-React 18 + TypeScript + Vite + Tailwind + shadcn/ui · TanStack Query · Supabase
-(PostgreSQL + RLS + Auth + Edge Functions) · pg_cron · Playwright / Vitest / pgTAP.
+## Stack
 
-## Workflow BMad — prochaines étapes
+React 18 · TypeScript 5.5 (strict) · Vite 5 · Tailwind 3 · shadcn/ui (Radix) ·
+React Router 6 · Vitest + Testing Library. Backend (à partir de la Story 1.2) : Supabase
+(PostgreSQL + RLS + Auth + Edge Functions). Détail : `docs/architecture/tech-stack.md`.
 
-1. (optionnel) `/ux-expert` → `docs/front-end-spec.md`
-2. `/po` — exécuter la checklist maître, valider la cohérence PRD ↔ architecture
-3. `/po` ou `/analyst` — `shard-doc` sur `docs/prd.md` et `docs/architecture.md` vers `docs/prd/` et `docs/architecture/`
-4. `/sm` — `create-next-story` (Epic 1, Story 1.1) → `docs/stories/`
-5. `/dev` — implémenter la story ; `/qa` — relire
-6. répéter 4–5 story par story
-
-Guide complet : `.bmad-core/user-guide.md`.
-
-## Développement local (une fois le code initialisé)
+## Développement local
 
 ```bash
 npm install
-cp .env.example .env.local        # renseigner VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
-supabase start
-supabase db reset
-npm run dev
+cp .env.example .env.local        # VITE_SUPABASE_* seront nécessaires à partir de la Story 1.2
+npm run dev                       # http://localhost:5173
 ```
+
+### Commandes
+
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | Serveur de dev Vite |
+| `npm run build` | Typecheck (`tsc -b`) + build statique dans `dist/` |
+| `npm run preview` | Sert le build de `dist/` |
+| `npm run lint` | ESLint (flat config, jsx-a11y) |
+| `npm run typecheck` | `tsc -b --noEmit` |
+| `npm run test` | Vitest (une passe) |
+| `npm run test:watch` | Vitest en watch |
+| `npm run format` | Prettier --write |
+
+### Variables d'environnement
+
+`.env.local` (préfixe `VITE_`, exposées au client) :
+
+| Variable | Requis | Usage |
+|---|---|---|
+| `VITE_SUPABASE_URL` | dès Story 1.2 | URL du projet Supabase |
+| `VITE_SUPABASE_ANON_KEY` | dès Story 1.2 | Clé anon (publique) Supabase |
+| `VITE_SENTRY_DSN` | non | Monitoring erreurs front |
+
+## CI
+
+`.github/workflows/ci.yaml` : sur chaque PR et push `main` → `npm ci` puis `lint`,
+`typecheck`, `test`, `build`. (Les tests RLS `test:rls` seront ajoutés en Story 1.2.)
+
+## Déploiement (à faire — action manuelle)
+
+Non automatisé pour l'instant (compte requis). Sur **Vercel** :
+
+1. Importer le dépôt GitHub.
+2. Framework preset : **Vite**. Build command : `npm run build`. Output directory : `dist`.
+3. Rewrite SPA : ajouter `vercel.json` avec
+   `{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }`.
+4. `main` = production ; chaque PR génère une preview automatiquement.
+5. Renseigner `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` dans les variables du projet
+   Vercel une fois la Story 1.2 faite.
+
+## Workflow BMad — suite
+
+1. `/sm` → `create-next-story` (Story 1.2) dans `docs/stories/`
+2. `/dev` implémente → `/qa` relit
+3. répéter story par story
+
+Guide : `.bmad-core/user-guide.md`.
