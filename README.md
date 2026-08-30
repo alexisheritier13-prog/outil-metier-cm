@@ -13,7 +13,9 @@ validation interne puis client, organisation du contenu. Application web héberg
   contre le projet cloud.
 - **Story 1.3** faite : `profiles` / `clients` / `user_clients`, rôles, fonctions
   d'autorisation, **RLS d'isolation** + 9 tests d'isolation verts.
-- Prochaine : Story 1.4 (connexion + redirection par rôle).
+- **Story 1.4** faite : écran de connexion, gardes de routes par rôle, redirection,
+  déconnexion, persistance de session (48 tests verts).
+- Prochaine : Story 1.5 (gestion des utilisateurs internes par l'admin).
 
 ## Documentation
 

@@ -31,9 +31,13 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
   },
   {
-    // Primitives shadcn/ui : co-exporter les variantes (cva) est la convention.
+    // Primitives shadcn/ui : co-exporter les variantes (cva) est la convention ;
+    // l'association label/contrôle se fait sur le site d'utilisation (htmlFor + id).
     files: ['src/components/ui/**/*.tsx'],
-    rules: { 'react-refresh/only-export-components': 'off' },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
+    },
   },
   {
     files: ['*.config.{ts,js}', 'vite.config.ts'],
