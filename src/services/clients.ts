@@ -64,3 +64,28 @@ export async function setClientArchived(id: string, archived: boolean): Promise<
     .eq('id', id);
   if (error) throw error;
 }
+
+export async function trashClient(id: string): Promise<void> {
+  const { error } = await getSupabase().rpc('client_trash', { p_client_id: id });
+  if (error) throw error;
+}
+
+export async function restoreClient(id: string): Promise<void> {
+  const { error } = await getSupabase().rpc('client_restore', { p_client_id: id });
+  if (error) throw error;
+}
+
+export async function listTrashedClients(): Promise<Client[]> {
+  const { data, error } = await getSupabase()
+    .from('clients')
+    .select('*')
+    .not('deleted_at', 'is', null)
+    .order('deleted_at', { ascending: false });
+  if (error) throw error;
+  return data.map(toClient);
+}
+
+export async function purgeClientNow(id: string): Promise<void> {
+  const { error } = await getSupabase().rpc('trash_purge_now', { p_entity: 'client', p_id: id });
+  if (error) throw error;
+}

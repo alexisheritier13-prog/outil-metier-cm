@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { trashClient } from '@/services/clients';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,9 +29,18 @@ export function ClientDetailPage() {
   const { clientId = '' } = useParams();
   const { data: me } = useCurrentProfile();
   const canWrite = me?.role === 'lead' || me?.role === 'admin';
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const client = useClient(clientId);
   const update = useUpdateClient(clientId);
   const archive = useSetClientArchived(clientId);
+  const trash = useMutation({
+    mutationFn: () => trashClient(clientId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['clients'] });
+      navigate('/app/clients');
+    },
+  });
   const onboarding = useQuery({
     queryKey: onboardingKey(clientId),
     queryFn: () => listOnboardingItems(clientId),
@@ -94,6 +105,20 @@ export function ClientDetailPage() {
               onClick={() => archive.mutate(!c.isArchived)}
             >
               {c.isArchived ? 'Réactiver' : 'Archiver'}
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={trash.isPending}
+              onClick={() => {
+                if (
+                  confirm(
+                    `Mettre « ${c.name} » à la corbeille ? Récupérable pendant 60 jours.`,
+                  )
+                )
+                  trash.mutate();
+              }}
+            >
+              Corbeille
             </Button>
           </div>
         )}

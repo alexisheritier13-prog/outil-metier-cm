@@ -14,6 +14,7 @@ const PlanningPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('@/app/settings/UsersPage').then((m) => ({ default: m.UsersPage })),
 );
+const TrashPage = lazy(() => import('@/app/trash/TrashPage').then((m) => ({ default: m.TrashPage })));
 const ClientsPage = lazy(() =>
   import('@/app/clients/ClientsPage').then((m) => ({ default: m.ClientsPage })),
 );
@@ -49,6 +50,12 @@ export const router = createBrowserRouter(
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
         { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },
         { path: 'campagnes/:campaignId', element: lazyRoute(<CampaignDetailPage />) },
+        {
+          path: 'corbeille',
+          element: (
+            <RequireRole roles={['lead', 'admin']}>{lazyRoute(<TrashPage />)}</RequireRole>
+          ),
+        },
         {
           path: 'parametres/utilisateurs',
           element: <RequireRole roles={['admin']}>{lazyRoute(<UsersPage />)}</RequireRole>,

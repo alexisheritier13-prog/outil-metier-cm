@@ -253,6 +253,36 @@ export type Database = {
           },
         ]
       }
+      job_runs: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          id?: never
+          job_name: string
+          ok?: boolean | null
+          started_at?: string
+          stats?: Json
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          id?: never
+          job_name?: string
+          ok?: boolean | null
+          started_at?: string
+          stats?: Json
+        }
+        Relationships: []
+      }
       networks: {
         Row: {
           code: Database["public"]["Enums"]["network_t"]
@@ -788,6 +818,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      client_restore: { Args: { p_client_id: string }; Returns: undefined }
+      client_trash: { Args: { p_client_id: string }; Returns: undefined }
       contact_client_ids: { Args: never; Returns: string[] }
       has_client_access: { Args: { cid: string }; Returns: boolean }
       post_change_status: {
@@ -862,12 +894,69 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      post_restore: {
+        Args: { p_post_id: string }
+        Returns: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "posts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      post_trash: { Args: { p_post_id: string }; Returns: undefined }
+      purge_trash: {
+        Args: never
+        Returns: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "job_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       transition_needs_comment: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]
           p_to: Database["public"]["Enums"]["post_status_t"]
         }
         Returns: boolean
+      }
+      trash_purge_now: {
+        Args: { p_entity: string; p_id: string }
+        Returns: undefined
       }
     }
     Enums: {

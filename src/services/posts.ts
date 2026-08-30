@@ -141,12 +141,38 @@ function mapStatusError(error: { message?: string; code?: string }): string {
   return "Le changement de statut a échoué.";
 }
 
-/** Mise en corbeille (soft delete). Les règles de droits fines arrivent en Story 3.7. */
+/**
+ * Mise en corbeille via le RPC (règles FR45 : un CM ne supprime que ses brouillons ;
+ * un post validé ou plus → Lead/Admin).
+ */
 export async function trashPost(id: string): Promise<void> {
-  const { data: userRes } = await getSupabase().auth.getUser();
-  const { error } = await getSupabase()
+  const { error } = await getSupabase().rpc('post_trash', { p_post_id: id });
+  if (error) {
+    if (/brouillons|autoris/i.test(error.message)) {
+      throw new Error(
+        'Un CM ne peut mettre à la corbeille que ses propres brouillons. Demandez à un Lead.',
+      );
+    }
+    throw error;
+  }
+}
+
+export async function restorePost(id: string): Promise<void> {
+  const { error } = await getSupabase().rpc('post_restore', { p_post_id: id });
+  if (error) throw error;
+}
+
+export async function listTrashedPosts(): Promise<Post[]> {
+  const { data, error } = await getSupabase()
     .from('posts')
-    .update({ deleted_at: new Date().toISOString(), deleted_by: userRes.user?.id ?? null })
-    .eq('id', id);
+    .select('*')
+    .not('deleted_at', 'is', null)
+    .order('deleted_at', { ascending: false });
+  if (error) throw error;
+  return data.map(toPost);
+}
+
+export async function purgePostNow(id: string): Promise<void> {
+  const { error } = await getSupabase().rpc('trash_purge_now', { p_entity: 'post', p_id: id });
   if (error) throw error;
 }

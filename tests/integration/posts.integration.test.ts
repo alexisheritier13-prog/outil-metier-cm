@@ -64,14 +64,15 @@ maybe('posts — CRUD & RLS (3.1)', () => {
     expect(error).toBeNull();
   });
 
-  it('la mise en corbeille (soft delete) exclut le post de la liste', async () => {
+  it('la mise en corbeille (via RPC post_trash) exclut le post de la liste', async () => {
     const { data: p } = await cm.client
       .from('posts')
       .insert(draft(clientA, cm.id))
       .select('id')
       .single();
 
-    await cm.client.from('posts').update({ deleted_at: new Date().toISOString() }).eq('id', p!.id);
+    const r = await cm.client.rpc('post_trash', { p_post_id: p!.id });
+    expect(r.error).toBeNull();
 
     const visible = await cm.client.from('posts').select('id').is('deleted_at', null);
     expect((visible.data ?? []).map((r) => r.id)).not.toContain(p!.id);
