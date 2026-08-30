@@ -22,9 +22,10 @@ validation interne puis client, organisation du contenu. Application web héberg
   `EmptyState` / `ClientAvatar` / `Tabs`.
 - **Story 2.1** faite : référentiel clients — liste, fiche à onglets, création/édition,
   archivage.
-- **Story 2.2** faite : comptes sociaux du client (table `networks` de référence + onglet
-  « Comptes sociaux ») — 69 tests verts.
-- Prochaine : Story 2.3 (contacts de validation + invitation).
+- **Story 2.2** faite : comptes sociaux du client (table `networks` + onglet).
+- **Story 2.3** faite : contacts de validation (onglet « Contacts ») + invitation via Edge
+  Function (`invite_contact`) — 76 tests verts.
+- Prochaine : Story 2.4 (charte éditoriale par client).
 
 ## Documentation
 

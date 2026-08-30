@@ -12,6 +12,7 @@ type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type ClientRow = Database['public']['Tables']['clients']['Row'];
 type SocialAccountRow = Database['public']['Tables']['social_accounts']['Row'];
 type NetworkRow = Database['public']['Tables']['networks']['Row'];
+type ClientContactRow = Database['public']['Tables']['client_contacts']['Row'];
 
 export interface Profile {
   id: string;
@@ -88,4 +89,26 @@ export interface NetworkRef {
 
 export function toNetworkRef(row: NetworkRow): NetworkRef {
   return { code: row.code, label: row.label, specs: row.specs, position: row.position };
+}
+
+export interface ClientContact {
+  id: string;
+  clientId: string;
+  fullName: string;
+  email: string;
+  authUserId: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export function toClientContact(row: ClientContactRow): ClientContact {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    fullName: row.full_name,
+    email: row.email,
+    authUserId: row.auth_user_id,
+    isActive: row.is_active,
+    createdAt: row.created_at,
+  };
 }

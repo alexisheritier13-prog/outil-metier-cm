@@ -32,6 +32,44 @@ export type Database = {
         }
         Relationships: []
       }
+      client_contacts: {
+        Row: {
+          auth_user_id: string | null
+          client_id: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          auth_user_id?: string | null
+          client_id: string
+          created_at?: string
+          email: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          auth_user_id?: string | null
+          client_id?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           archived_at: string | null
@@ -199,6 +237,7 @@ export type Database = {
     Functions: {
       auth_is_active: { Args: never; Returns: boolean }
       auth_role: { Args: never; Returns: Database["public"]["Enums"]["role_t"] }
+      contact_client_ids: { Args: never; Returns: string[] }
       has_client_access: { Args: { cid: string }; Returns: boolean }
     }
     Enums: {
