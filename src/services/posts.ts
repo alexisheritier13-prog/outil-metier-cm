@@ -189,3 +189,41 @@ export async function purgePostNow(id: string): Promise<void> {
   const { error } = await getSupabase().rpc('trash_purge_now', { p_entity: 'post', p_id: id });
   if (error) throw error;
 }
+
+/**
+ * File « À valider » (Story 5.4). `internal` = posts en validation interne,
+ * `client` = posts en attente du client. RLS applique déjà l'isolation par rôle.
+ * Triés par ancienneté dans le statut (le plus vieux d'abord).
+ */
+export async function listReviewQueue(
+  kind: 'internal' | 'client',
+  clientIds?: string[],
+): Promise<Post[]> {
+  const status: PostStatus = kind === 'internal' ? 'internal_review' : 'client_review';
+  let q = getSupabase()
+    .from('posts')
+    .select('*')
+    .is('deleted_at', null)
+    .eq('status', status);
+  if (clientIds?.length) q = q.in('client_id', clientIds);
+  const { data, error } = await q.order('status_changed_at', { ascending: true });
+  if (error) throw error;
+  return data.map(toPost);
+}
+
+/** Nombre de posts en attente de validation (interne + client) visibles par l'utilisateur. */
+export async function countReviewQueue(): Promise<number> {
+  const { count, error } = await getSupabase()
+    .from('posts')
+    .select('id', { count: 'exact', head: true })
+    .is('deleted_at', null)
+    .in('status', ['internal_review', 'client_review']);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+/** Relance in-app des contacts du client sur un post « à valider client » (Story 5.4). */
+export async function remindClientReview(postId: string): Promise<void> {
+  const { error } = await getSupabase().rpc('remind_client_review', { p_post_id: postId });
+  if (error) throw error;
+}

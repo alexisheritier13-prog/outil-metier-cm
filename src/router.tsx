@@ -15,6 +15,9 @@ const UsersPage = lazy(() =>
   import('@/app/settings/UsersPage').then((m) => ({ default: m.UsersPage })),
 );
 const TrashPage = lazy(() => import('@/app/trash/TrashPage').then((m) => ({ default: m.TrashPage })));
+const ReviewQueuePage = lazy(() =>
+  import('@/app/review/ReviewQueuePage').then((m) => ({ default: m.ReviewQueuePage })),
+);
 const ClientsPage = lazy(() =>
   import('@/app/clients/ClientsPage').then((m) => ({ default: m.ClientsPage })),
 );
@@ -46,6 +49,7 @@ export const router = createBrowserRouter(
       ),
       children: [
         { index: true, element: lazyRoute(<PlanningPage />) },
+        { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
         { path: 'clients', element: lazyRoute(<ClientsPage />) },
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
         { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },

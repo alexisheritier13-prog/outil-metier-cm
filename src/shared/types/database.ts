@@ -1181,6 +1181,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      remind_client_review: { Args: { p_post_id: string }; Returns: undefined }
       transition_needs_comment: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]

@@ -1,14 +1,21 @@
 import type { ReactNode } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
+import { countReviewQueue } from '@/services/posts';
 
 export function AppLayout() {
   const { data: profile } = useCurrentProfile();
   const signOut = useSignOut();
+  const reviewCount = useQuery({
+    queryKey: ['review-queue', 'count'],
+    queryFn: countReviewQueue,
+    enabled: Boolean(profile),
+  });
 
   return (
     <div className="min-h-dvh">
@@ -17,6 +24,14 @@ export function AppLayout() {
           <span className="mr-4 font-semibold">Outil métier CM</span>
           <NavItem to="/app" end>
             Calendrier
+          </NavItem>
+          <NavItem to="/app/a-valider">
+            À valider
+            {(reviewCount.data ?? 0) > 0 && (
+              <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
+                {reviewCount.data}
+              </span>
+            )}
           </NavItem>
           <NavItem to="/app/clients">Clients</NavItem>
           <NavItem to="/app/campagnes">Campagnes</NavItem>
