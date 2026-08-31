@@ -12,12 +12,12 @@ export const SheetContent = forwardRef<
 >(function SheetContent({ className, children, ...props }, ref) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-modal-backdrop bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-modal-backdrop bg-foreground/20 backdrop-blur-[1px] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'bg-background fixed inset-y-0 right-0 z-modal flex w-full max-w-[480px] flex-col border-l shadow-lg',
-          'data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right',
+          'bg-background shadow-panel fixed inset-y-0 right-0 z-modal flex w-full max-w-[496px] flex-col border-l',
+          'data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=open]:duration-200 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right',
           'focus:outline-none',
           className,
         )}

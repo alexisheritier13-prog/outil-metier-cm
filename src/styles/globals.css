@@ -127,10 +127,15 @@
 @layer components {
   /* Contrôle de formulaire natif (select, input date) — hauteur et style homogènes. */
   .field {
-    @apply border-input bg-background h-9 rounded-md border px-2.5 text-sm;
+    @apply border-input bg-background h-9 rounded-md border px-2.5 text-sm transition-colors;
   }
   .field:focus-visible {
-    outline-offset: 0;
+    @apply border-primary outline-none;
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 25%, transparent);
+  }
+  /* Bloc de contenu encadré (cartes tableau, panneaux d'accueil). */
+  .surface-card {
+    @apply bg-surface rounded-lg border;
   }
 }
 

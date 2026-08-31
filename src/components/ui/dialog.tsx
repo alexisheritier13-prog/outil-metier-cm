@@ -17,11 +17,12 @@ export const DialogContent = forwardRef<
 >(function DialogContent({ className, children, ...props }, ref) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-modal-backdrop bg-foreground/20 backdrop-blur-[1px] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'bg-background fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border p-6 shadow-lg focus:outline-none',
+          'bg-background shadow-panel fixed left-1/2 top-1/2 z-modal w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border p-6 focus:outline-none',
+          'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:duration-150',
           className,
         )}
         {...props}
@@ -43,7 +44,7 @@ export const DialogTitle = forwardRef<
   return (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn('text-lg font-semibold', className)}
+      className={cn('text-[17px] font-semibold tracking-tight', className)}
       {...props}
     />
   );
