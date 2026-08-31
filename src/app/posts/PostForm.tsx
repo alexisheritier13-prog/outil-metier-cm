@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
+import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
+import { listNetworks } from '@/services/socialAccounts';
 import type { Client, Profile } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
 import { CanvaField } from './CanvaField';
@@ -90,11 +92,14 @@ export function PostForm({
   });
 
   const clientId = watch('clientId');
+  const network = watch('network');
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', clientId],
     queryFn: () => listCampaignsForClient(clientId),
     enabled: Boolean(clientId),
   });
+  const networks = useQuery({ queryKey: ['networks'], queryFn: listNetworks, staleTime: 5 * 60_000 });
+  const networkSpecs = networks.data?.find((n) => n.code === network)?.specs;
 
   return (
     <form
@@ -164,6 +169,13 @@ export function PostForm({
           </select>
         </div>
       </div>
+
+      {networkSpecs && (
+        <p className="text-muted-foreground flex gap-1.5 text-xs">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          {networkSpecs}
+        </p>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="pf-date">Date et heure de publication (Europe/Paris)</Label>

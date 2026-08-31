@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
@@ -18,6 +19,8 @@ import { listCampaignsForClient } from '@/services/campaigns';
 import type { Client, Post, Profile } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { StatusControl } from './StatusControl';
+import { CommentThread } from './CommentThread';
+import { PostHistory } from './PostHistory';
 import { useDuplicatePost, useTrashPost, useUpdatePost } from './usePosts';
 
 interface Props {
@@ -72,7 +75,17 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
           </SheetClose>
         </header>
 
-        <div className="flex-1 space-y-5 overflow-y-auto p-4">
+        <Tabs defaultValue="detail" className="flex flex-1 flex-col overflow-hidden">
+          <TabsList className="px-4">
+            <TabsTrigger value="detail">Détail</TabsTrigger>
+            <TabsTrigger value="history">Historique</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="history" className="flex-1 overflow-y-auto p-4 pt-4">
+            <PostHistory postId={post.id} />
+          </TabsContent>
+
+          <TabsContent value="detail" className="flex-1 space-y-5 overflow-y-auto p-4 pt-4">
           <div>
             <p className="text-muted-foreground text-xs">Statut</p>
             {me && <StatusControl postId={post.id} status={post.status} role={me.role} />}
@@ -129,7 +142,12 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               ))}
             </div>
           )}
-        </div>
+
+          <div className="border-t pt-4">
+            <CommentThread postId={post.id} />
+          </div>
+          </TabsContent>
+        </Tabs>
 
         <footer className="flex gap-2 border-t p-4">
           <Button variant="outline" onClick={() => setEditOpen(true)}>

@@ -359,6 +359,54 @@ export type Database = {
           },
         ]
       }
+      post_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          post_id: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["comment_visibility_t"]
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          post_id: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["comment_visibility_t"]
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          post_id?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["comment_visibility_t"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_history: {
         Row: {
           action: string
@@ -960,6 +1008,7 @@ export type Database = {
       }
     }
     Enums: {
+      comment_visibility_t: "internal" | "client"
       network_t:
         | "instagram"
         | "linkedin"
@@ -1104,6 +1153,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      comment_visibility_t: ["internal", "client"],
       network_t: [
         "instagram",
         "linkedin",

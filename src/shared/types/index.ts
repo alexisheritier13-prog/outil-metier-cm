@@ -286,3 +286,49 @@ export function toCampaignOverview(row: CampaignOverviewRow): Campaign {
     postCount: row.post_count ?? 0,
   };
 }
+
+type PostHistoryRow = Database['public']['Tables']['post_history']['Row'];
+type PostCommentRow = Database['public']['Tables']['post_comments']['Row'];
+
+export interface PostHistoryEntry {
+  id: number;
+  actorId: string | null;
+  action: string;
+  field: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  createdAt: string;
+}
+export function toPostHistoryEntry(row: PostHistoryRow): PostHistoryEntry {
+  return {
+    id: row.id,
+    actorId: row.actor_id,
+    action: row.action,
+    field: row.field,
+    oldValue: row.old_value,
+    newValue: row.new_value,
+    createdAt: row.created_at,
+  };
+}
+
+export type CommentVisibility = 'internal' | 'client';
+export interface PostComment {
+  id: string;
+  postId: string;
+  authorId: string;
+  body: string;
+  visibility: CommentVisibility;
+  createdAt: string;
+  updatedAt: string;
+}
+export function toPostComment(row: PostCommentRow): PostComment {
+  return {
+    id: row.id,
+    postId: row.post_id,
+    authorId: row.author_id,
+    body: row.body,
+    visibility: row.visibility,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}

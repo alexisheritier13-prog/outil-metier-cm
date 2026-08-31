@@ -38,7 +38,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 3.6** faite : duplication de post, tags (à la volée), campagnes (`/app/campagnes`). 114 tests.
 - **Story 3.7** faite : corbeille (`/app/corbeille`), règles FR45, `purge_trash()` 60j. **Epic 3 terminé** — 122 tests.
 - **Stories 4.1 + 4.2** faites : Edge Function `canva-preview` (récupère l'og:image d'un lien Canva public) + `CanvaField` (auto + miniature manuelle + aperçu iframe). 137 tests.
-- Prochaine : Story 4.3 (rappel specs réseau) + 4.4 (historique) + 4.5 (commentaires).
+- **Stories 4.3 à 4.5** faites : rappel des specs réseau, historique du post (triggers), fil de commentaires (interne / visible client). **Epic 4 terminé** — 141 tests.
+- Prochaine : Epic 5 (workflow de validation).
 
 ### Tests
 
