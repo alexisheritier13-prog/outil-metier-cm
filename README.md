@@ -63,7 +63,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 9.1** faite : sélection multiple + actions en masse (Liste et Kanban) — barre flottante `BulkActionBar` (dupliquer / statut / réassigner / corbeille), exécution atomique par post avec récapitulatif des échecs (`useBulkActions`). Aucune migration (réutilise les RPC unitaires). 16 tests unitaires + 3 d'intégration.
 - **Story 9.2** faite : export `.ics` du calendrier filtré (bouton dans `/app/planning`) — générateur pur `postsToIcs` conforme RFC 5545 (VTIMEZONE Europe/Paris, échappement, pliage), `downloadTextFile`. 10 tests unitaires, zéro dépendance ajoutée.
 - **Story 9.3** faite : export PDF du calendrier client — route imprimable autonome `/app/clients/:id/export` (période dans l'URL) + « Enregistrer en PDF » du navigateur, bouton sur la fiche client. Décision (ni Edge Function ni `react-pdf`) documentée dans `docs/architecture.md`. 2 tests composant.
-- Prochaine : Epic 9 — suite (champ performance, a11y AA + polish).
+- **Story 9.4** faite : note de performance éditable sur les posts publiés (panneau de détail), visibilité client explicite (interne par défaut), filtre « Avec note de perf » (`?perf=1`) + affichage dans la vue liste, note reprise dans l'espace client. Migration 0029 (journalisation de la visibilité). 10 tests unit + 4 intégration.
+- Prochaine : Story 9.5 — passe a11y AA + polish (tables, skeletons, E2E).
 
 ### Tests
 

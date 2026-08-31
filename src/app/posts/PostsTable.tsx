@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { CalendarDays, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { BarChart3, CalendarDays, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { NetworkIcon } from '@/components/NetworkIcon';
@@ -156,8 +156,16 @@ export function PostsTable({
                 <span className="px-3">
                   <NetworkIcon network={p.network} />
                 </span>
-                <span className="text-muted-foreground truncate px-3">
-                  {p.caption || <span className="italic">Sans légende</span>}
+                <span className="text-muted-foreground flex items-center gap-1.5 truncate px-3">
+                  <span className="truncate">
+                    {p.caption || <span className="italic">Sans légende</span>}
+                  </span>
+                  {p.performanceNote && (
+                    <span className="text-success-strong flex shrink-0 items-center gap-1 text-xs">
+                      <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span className="max-w-[16rem] truncate">{p.performanceNote}</span>
+                    </span>
+                  )}
                 </span>
                 <span className="px-3">
                   <StatusBadge status={p.status} />

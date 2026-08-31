@@ -81,6 +81,13 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
             </p>
           </div>
 
+          {post.performanceVisibleToClient && post.performanceNote && (
+            <div>
+              <p className="text-muted-foreground mb-1 text-xs">Performance</p>
+              <p className="whitespace-pre-wrap text-sm">{post.performanceNote}</p>
+            </div>
+          )}
+
           <div className="border-t pt-4">
             <p className="text-muted-foreground mb-2 text-xs font-medium">Échanges</p>
             {comments.isLoading ? (

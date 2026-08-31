@@ -11,6 +11,7 @@ const FIELD_LABELS: Record<string, string> = {
   campaign_id: 'Campagne',
   author_id: 'Rédacteur',
   performance_note: 'Note de performance',
+  performance_visible_to_client: 'Visibilité de la note (client)',
   status: 'Statut',
 };
 

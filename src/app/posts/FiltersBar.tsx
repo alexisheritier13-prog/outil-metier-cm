@@ -1,4 +1,4 @@
-import { Check, ChevronDown, X } from 'lucide-react';
+import { BarChart3, Check, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -65,6 +65,15 @@ export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Pro
         value={filters.q}
         onChange={(e) => onChange({ q: e.target.value })}
       />
+
+      <Button
+        variant={filters.hasPerformanceNote ? 'default' : 'outline'}
+        size="sm"
+        aria-pressed={filters.hasPerformanceNote}
+        onClick={() => onChange({ hasPerformanceNote: !filters.hasPerformanceNote })}
+      >
+        <BarChart3 className="h-4 w-4" /> Avec note de perf
+      </Button>
 
       {!isEmpty && (
         <Button variant="ghost" size="sm" onClick={onReset}>

@@ -19,6 +19,7 @@ import { listCampaignsForClient } from '@/services/campaigns';
 import { ORIGIN_TYPE_LABELS, describeOrigin } from '@/services/postOrigin';
 import type { Client, Post, Profile } from '@/shared/types';
 import { PostForm } from './PostForm';
+import { PerformanceSection } from './PerformanceSection';
 import { StatusActions } from './StatusActions';
 import { CommentThread } from './CommentThread';
 import { PostHistory } from './PostHistory';
@@ -162,6 +163,8 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               ))}
             </div>
           )}
+
+          <PerformanceSection post={post} />
 
           <div className="border-t pt-4">
             <CommentThread postId={post.id} />

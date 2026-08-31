@@ -10,6 +10,8 @@ export interface PostFilters {
   from?: string | null;
   to?: string | null;
   q?: string;
+  /** Ne garder que les posts qui portent une note de performance (Story 9.4). */
+  hasPerformanceNote?: boolean;
 }
 
 export async function listPosts(filters: PostFilters = {}): Promise<Post[]> {
@@ -19,6 +21,7 @@ export async function listPosts(filters: PostFilters = {}): Promise<Post[]> {
   if (filters.networks?.length) q = q.in('network', filters.networks);
   if (filters.from) q = q.gte('scheduled_at', filters.from);
   if (filters.to) q = q.lte('scheduled_at', filters.to);
+  if (filters.hasPerformanceNote) q = q.not('performance_note', 'is', null);
   if (filters.q?.trim()) {
     q = q.textSearch('search_tsv', filters.q.trim(), { type: 'websearch', config: 'french' });
   }
@@ -133,6 +136,31 @@ export async function reassignPost(id: string, authorId: string): Promise<void> 
     .eq('id', id)
     .is('deleted_at', null);
   if (error) throw error;
+}
+
+/**
+ * Note de performance d'un post publié (Story 9.4). `note` vide → `null` et la
+ * visibilité client est forcée à `false` (rien à montrer). Le trigger
+ * `posts_log_field_changes` journalise note ET visibilité (migr 0015 + 0029).
+ */
+export async function updatePostPerformance(
+  id: string,
+  note: string | null,
+  visibleToClient: boolean,
+): Promise<Post> {
+  const clean = note && note.trim() ? note.trim() : null;
+  const { data, error } = await getSupabase()
+    .from('posts')
+    .update({
+      performance_note: clean,
+      performance_visible_to_client: clean ? visibleToClient : false,
+    })
+    .eq('id', id)
+    .is('deleted_at', null)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return toPost(data);
 }
 
 /** Re-planifie un post (drag & drop calendrier) — ne touche qu'à `scheduled_at`. */

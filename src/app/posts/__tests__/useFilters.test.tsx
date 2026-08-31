@@ -49,6 +49,16 @@ describe('useFilters', () => {
     expect(result.current.filters.clientIds).toEqual(['c9']);
   });
 
+  it('gère le filtre « avec note de performance » (perf=1)', () => {
+    const { result } = renderHook(() => useFilters(), { wrapper: wrapper('/?perf=1') });
+    expect(result.current.filters.hasPerformanceNote).toBe(true);
+    expect(result.current.toService.hasPerformanceNote).toBe(true);
+    expect(result.current.isEmpty).toBe(false);
+
+    act(() => result.current.set({ hasPerformanceNote: false }));
+    expect(result.current.isEmpty).toBe(true);
+  });
+
   it('toService convertit les dates en ISO', () => {
     const { result } = renderHook(() => useFilters(), {
       wrapper: wrapper('/?from=2026-07-01&to=2026-07-31'),

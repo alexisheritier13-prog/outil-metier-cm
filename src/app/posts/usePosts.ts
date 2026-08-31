@@ -8,6 +8,7 @@ import {
   reschedulePost,
   trashPost,
   updatePost,
+  updatePostPerformance,
   type PostFilters,
   type PostInput,
 } from '@/services/posts';
@@ -43,6 +44,19 @@ export function useUpdatePost(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['posts'] });
       qc.invalidateQueries({ queryKey: ['post', id] });
+    },
+  });
+}
+
+export function useUpdatePerformance(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ note, visibleToClient }: { note: string | null; visibleToClient: boolean }) =>
+      updatePostPerformance(id, note, visibleToClient),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['posts'] });
+      qc.invalidateQueries({ queryKey: ['post', id] });
+      qc.invalidateQueries({ queryKey: ['post-history', id] });
     },
   });
 }

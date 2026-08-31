@@ -23,6 +23,7 @@ export interface PlanningFilters {
   from: string | null;
   to: string | null;
   q: string;
+  hasPerformanceNote: boolean;
 }
 
 const EMPTY: PlanningFilters = {
@@ -32,6 +33,7 @@ const EMPTY: PlanningFilters = {
   from: null,
   to: null,
   q: '',
+  hasPerformanceNote: false,
 };
 
 function parse(sp: URLSearchParams): PlanningFilters {
@@ -42,6 +44,7 @@ function parse(sp: URLSearchParams): PlanningFilters {
     from: sp.get('from'),
     to: sp.get('to'),
     q: sp.get('q') ?? '',
+    hasPerformanceNote: sp.get('perf') === '1',
   };
 }
 
@@ -53,6 +56,7 @@ function serialize(f: PlanningFilters): URLSearchParams {
   if (f.from) sp.set('from', f.from);
   if (f.to) sp.set('to', f.to);
   if (f.q.trim()) sp.set('q', f.q.trim());
+  if (f.hasPerformanceNote) sp.set('perf', '1');
   return sp;
 }
 
@@ -63,7 +67,8 @@ export function isEmpty(f: PlanningFilters): boolean {
     f.networks.length === 0 &&
     !f.from &&
     !f.to &&
-    !f.q.trim()
+    !f.q.trim() &&
+    !f.hasPerformanceNote
   );
 }
 
@@ -116,6 +121,7 @@ export function useFilters() {
       from: filters.from ? dayStartUtc(filters.from) : null,
       to: filters.to ? dayEndUtc(filters.to) : null,
       q: filters.q,
+      hasPerformanceNote: filters.hasPerformanceNote,
     }),
     [filters],
   );
