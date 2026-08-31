@@ -37,6 +37,9 @@ interface AxeResult {
  * Les règles `moderate` / `minor` sont rapportées en console sans bloquer.
  */
 export async function checkA11y(page: Page, context?: string) {
+  // Laisse les animations d'entrée (fade/slide) se terminer avant de mesurer le
+  // contraste — sinon axe lit une opacité transitoire.
+  await page.waitForTimeout(450);
   await page.addScriptTag({ content: AXE_SOURCE });
   const result = (await page.evaluate(async () => {
     // @ts-expect-error axe est injecté globalement

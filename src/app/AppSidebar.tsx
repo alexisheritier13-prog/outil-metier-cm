@@ -142,7 +142,7 @@ type IconType = typeof Bell;
 
 function itemClass(active: boolean) {
   return cn(
-    'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors',
+    'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-[background-color,color,box-shadow] duration-150',
     active
       ? 'bg-background text-foreground shadow-card font-medium'
       : 'text-muted-foreground hover:bg-surface-3 hover:text-foreground',

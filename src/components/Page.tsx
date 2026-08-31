@@ -13,7 +13,15 @@ export function Page({
   size?: 'full' | 'form';
 }) {
   return (
-    <section className={cn('p-6', size === 'form' && 'max-w-2xl', className)}>{children}</section>
+    <section
+      className={cn(
+        'animate-in fade-in slide-in-from-bottom-1 p-6 duration-300 ease-out',
+        size === 'form' && 'max-w-2xl',
+        className,
+      )}
+    >
+      {children}
+    </section>
   );
 }
 

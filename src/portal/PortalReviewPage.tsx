@@ -20,7 +20,7 @@ export function PortalReviewPage() {
   if (posts.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+    <section className="animate-in fade-in slide-in-from-bottom-1 mx-auto max-w-5xl p-4 duration-300 ease-out sm:p-6 lg:py-8">
       <div className="mb-5 flex items-baseline gap-2">
         <h1 className="text-title tracking-tight">À valider</h1>
         {rows.length > 0 && (

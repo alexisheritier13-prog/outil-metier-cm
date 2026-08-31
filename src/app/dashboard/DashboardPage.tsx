@@ -108,7 +108,7 @@ export function DashboardPage() {
       <PageHeader title={`Bonjour ${firstName}`} description={today} />
 
       {/* À traiter */}
-      <div className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-8 grid gap-3 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           to="/app/a-valider"
           icon={Inbox}
@@ -287,7 +287,7 @@ function StatTile({
     <Link
       to={to}
       className={cn(
-        'group hover:border-border-strong flex flex-col gap-2 rounded-lg border p-4 transition-colors',
+        'group hover:border-border-strong hover:shadow-card flex flex-col gap-2 rounded-lg border p-4 transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5',
         tone === 'danger' && 'border-danger-border bg-danger-surface',
         tone === 'warning' && 'border-warning-border bg-warning-surface',
       )}

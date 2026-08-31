@@ -33,7 +33,7 @@ export function Segmented<T extends string>({
             aria-selected={active}
             onClick={() => onChange(o.value)}
             className={cn(
-              'rounded-[5px] px-3 py-1 text-sm font-medium transition-colors',
+              'rounded-[5px] px-3 py-1 text-sm font-medium transition-[background-color,color,box-shadow] duration-150 ease-out active:scale-[0.97]',
               active
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',

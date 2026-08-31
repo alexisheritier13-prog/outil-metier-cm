@@ -212,7 +212,7 @@ function MapItem({
     <li>
       <Link
         to={to}
-        className="hover:border-border-strong group block h-full rounded-lg border p-3 transition-colors"
+        className="hover:border-border-strong hover:shadow-card group block h-full rounded-lg border p-3 transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5"
       >
         <span className="flex items-center gap-2 font-medium">
           <Icon className="text-muted-foreground h-4 w-4" aria-hidden="true" />

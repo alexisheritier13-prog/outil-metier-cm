@@ -35,7 +35,7 @@ export function PortalPublishedPage() {
   const open = rows.find((p) => p.id === openId) ?? null;
 
   return (
-    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+    <section className="animate-in fade-in slide-in-from-bottom-1 mx-auto max-w-5xl p-4 duration-300 ease-out sm:p-6 lg:py-8">
       <h1 className="text-title mb-5 tracking-tight">Publiés</h1>
 
       <div className="mb-4 flex flex-wrap items-end gap-3">

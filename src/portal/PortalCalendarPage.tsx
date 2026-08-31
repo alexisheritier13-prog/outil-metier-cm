@@ -32,7 +32,7 @@ export function PortalCalendarPage() {
   if (posts.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+    <section className="animate-in fade-in slide-in-from-bottom-1 mx-auto max-w-5xl p-4 duration-300 ease-out sm:p-6 lg:py-8">
       <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-title tracking-tight">Calendrier</h1>
         <Segmented
