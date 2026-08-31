@@ -49,7 +49,7 @@ describe('LoginPage', () => {
     vi.mocked(authService.signIn).mockResolvedValue(profile);
     renderWithProviders(<Tree />);
 
-    await userEvent.type(await screen.findByLabelText(/email/i), 'lea@example.test');
+    await userEvent.type(await screen.findByLabelText(/e-?mail/i), 'lea@example.test');
     await userEvent.type(screen.getByLabelText(/mot de passe/i), 'secret');
     await userEvent.click(screen.getByRole('button', { name: /se connecter/i }));
 
@@ -61,7 +61,7 @@ describe('LoginPage', () => {
     vi.mocked(authService.signIn).mockRejectedValue(new AccountDisabledError());
     renderWithProviders(<Tree />);
 
-    await userEvent.type(await screen.findByLabelText(/email/i), 'x@example.test');
+    await userEvent.type(await screen.findByLabelText(/e-?mail/i), 'x@example.test');
     await userEvent.type(screen.getByLabelText(/mot de passe/i), 'secret');
     await userEvent.click(screen.getByRole('button', { name: /se connecter/i }));
 
@@ -73,7 +73,7 @@ describe('LoginPage', () => {
     vi.mocked(authService.signIn).mockRejectedValue(new InvalidCredentialsError());
     renderWithProviders(<Tree />);
 
-    await userEvent.type(await screen.findByLabelText(/email/i), 'x@example.test');
+    await userEvent.type(await screen.findByLabelText(/e-?mail/i), 'x@example.test');
     await userEvent.type(screen.getByLabelText(/mot de passe/i), 'bad');
     await userEvent.click(screen.getByRole('button', { name: /se connecter/i }));
 
