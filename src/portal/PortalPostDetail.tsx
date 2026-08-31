@@ -4,10 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
+import { MediaGallery } from '@/components/MediaGallery';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
-import { useAddPortalComment, useApprovePost, usePortalComments, useRejectPost } from './usePortal';
+import {
+  useAddPortalComment,
+  useApprovePost,
+  usePortalComments,
+  usePortalPostMedia,
+  useRejectPost,
+} from './usePortal';
 
 /**
  * Détail d'un post côté client (Stories 6.2 + 6.3). Lecture des méta + échanges `client`,
@@ -16,6 +23,7 @@ import { useAddPortalComment, useApprovePost, usePortalComments, useRejectPost }
  */
 export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose: () => void }) {
   const comments = usePortalComments(post?.id ?? null);
+  const media = usePortalPostMedia(post?.id ?? null);
   const addComment = useAddPortalComment(post?.id ?? '');
   const approve = useApprovePost();
   const reject = useRejectPost();
@@ -46,14 +54,7 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
         </header>
 
         <div className="flex-1 space-y-5 overflow-y-auto p-4">
-          {post.canvaThumbnailUrl && (
-            <img
-              src={post.canvaThumbnailUrl}
-              alt="Aperçu du visuel"
-              className="max-h-72 w-full rounded border object-contain"
-              loading="lazy"
-            />
-          )}
+          {(media.data ?? []).length > 0 && <MediaGallery media={media.data!} />}
 
           <dl className="grid grid-cols-[6rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">Date</dt>
@@ -62,16 +63,6 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
             </dd>
             <dt className="text-muted-foreground">Réseau</dt>
             <dd>{NETWORK_LABELS[post.network]}</dd>
-            {post.canvaUrl && (
-              <>
-                <dt className="text-muted-foreground">Visuel</dt>
-                <dd className="truncate">
-                  <a href={post.canvaUrl} target="_blank" rel="noreferrer" className="hover:underline">
-                    Ouvrir dans Canva
-                  </a>
-                </dd>
-              </>
-            )}
           </dl>
 
           <div>

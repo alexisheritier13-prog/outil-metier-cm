@@ -29,7 +29,6 @@ const mkPost = (over: Partial<Post>): Post =>
     scheduledAt: over.scheduledAt ?? '2026-07-01T08:00:00.000Z',
     caption: over.caption ?? '',
     canvaUrl: null,
-    canvaThumbnailUrl: null,
     status: over.status ?? 'scheduled',
     authorId: 'me',
     campaignId: null,

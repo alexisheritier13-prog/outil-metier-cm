@@ -11,9 +11,10 @@ import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
 import { listNetworks } from '@/services/socialAccounts';
-import type { Client, PostTemplate, Profile } from '@/shared/types';
+import { probeFile, uploadPostMedia } from '@/services/postMedia';
+import type { Client, Post, PostTemplate, Profile } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
-import { CanvaField } from './CanvaField';
+import { MediaField } from './MediaField';
 import { templatePrefill } from './applyTemplate';
 
 const schema = z.object({
@@ -40,14 +41,14 @@ interface Props {
   canReassign?: boolean;
   /** Templates disponibles — affiche « Partir d'un template » en création (Story 7.2). */
   templates?: PostTemplate[];
+  /** Post existant : active la gestion « live » des visuels. Absent = création. */
+  postId?: string;
   defaults?: Partial<{
     clientId: string;
     network: Network;
     scheduledAt: string;
     caption: string;
     canvaUrl: string | null;
-    canvaThumbnailUrl: string | null;
-    canvaThumbnailSource: 'auto' | 'manual' | null;
     authorId: string;
     campaignId: string | null;
     tags: string[];
@@ -55,7 +56,10 @@ interface Props {
   submitLabel: string;
   pending: boolean;
   error?: unknown;
-  onSubmit: (input: PostInput) => void;
+  /** Doit créer/mettre à jour le post et le **retourner** (ne ferme pas la fenêtre). */
+  onSubmit: (input: PostInput) => Promise<Post>;
+  /** Appelé quand tout est fini (post + visuels) — ferme la fenêtre. */
+  onSuccess?: () => void;
   onCancel?: () => void;
 }
 
@@ -64,11 +68,13 @@ export function PostForm({
   authors = [],
   canReassign = false,
   templates = [],
+  postId,
   defaults,
   submitLabel,
   pending,
   error,
   onSubmit,
+  onSuccess,
   onCancel,
 }: Props) {
   const {
@@ -91,10 +97,9 @@ export function PostForm({
   });
 
   const [canvaUrl, setCanvaUrl] = useState(defaults?.canvaUrl ?? '');
-  const [thumb, setThumb] = useState<{ url: string | null; source: 'auto' | 'manual' | null }>({
-    url: defaults?.canvaThumbnailUrl ?? null,
-    source: defaults?.canvaThumbnailSource ?? null,
-  });
+  const [staged, setStaged] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [mediaError, setMediaError] = useState<string | null>(null);
 
   const clientId = watch('clientId');
   const network = watch('network');
@@ -124,7 +129,7 @@ export function PostForm({
     <form
       className="space-y-4"
       noValidate
-      onSubmit={handleSubmit((v) => {
+      onSubmit={handleSubmit(async (v) => {
         const [datePart, timePart] = v.scheduledLocal.split('T');
         const [y, m, d] = datePart!.split('-').map(Number);
         const [hh, mm] = timePart!.split(':').map(Number);
@@ -135,14 +140,13 @@ export function PostForm({
           hour: hh!,
           minute: mm!,
         }).toISOString();
-        onSubmit({
+        setMediaError(null);
+        const post = await onSubmit({
           clientId: v.clientId,
           network: v.network,
           scheduledAt,
           caption: v.caption,
           canvaUrl: canvaUrl.trim() || null,
-          canvaThumbnailUrl: thumb.url,
-          canvaThumbnailSource: thumb.source,
           authorId: canReassign ? v.authorId : undefined,
           campaignId: v.campaignId || null,
           tags: v.tagsText
@@ -150,6 +154,24 @@ export function PostForm({
             .map((t) => t.trim())
             .filter(Boolean),
         });
+
+        // Visuels mis en attente à la création → upload contre le post créé.
+        if (staged.length > 0) {
+          setUploading(true);
+          try {
+            for (let i = 0; i < staged.length; i++) {
+              const probed = await probeFile(staged[i]!);
+              await uploadPostMedia(post.clientId, post.id, probed, i);
+            }
+          } catch {
+            setMediaError(
+              'Le post est créé mais certains visuels n’ont pas pu être envoyés. Rouvrez le post pour réessayer.',
+            );
+          } finally {
+            setUploading(false);
+          }
+        }
+        onSuccess?.();
       })}
     >
       {isCreation && applicableTemplates.length > 0 && (
@@ -238,13 +260,26 @@ export function PostForm({
         />
       </div>
 
-      <CanvaField
-        url={canvaUrl}
-        onUrlChange={setCanvaUrl}
-        thumbnailUrl={thumb.url}
-        thumbnailSource={thumb.source}
-        onThumbnail={(url, source) => setThumb({ url, source })}
+      <MediaField
+        clientId={clientId}
+        postId={postId}
+        stagedFiles={postId ? undefined : staged}
+        onStagedChange={postId ? undefined : setStaged}
       />
+      {mediaError && <p className="text-danger-strong text-sm">{mediaError}</p>}
+
+      <div className="space-y-1.5">
+        <Label htmlFor="pf-canva">Lien Canva (interne)</Label>
+        <Input
+          id="pf-canva"
+          placeholder="https://www.canva.com/design/…"
+          value={canvaUrl}
+          onChange={(e) => setCanvaUrl(e.target.value)}
+        />
+        <p className="text-muted-foreground text-xs">
+          Lien de travail vers le design. Jamais montré au client.
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-4">
         <div className="min-w-48 flex-1 space-y-1.5">
@@ -298,8 +333,8 @@ export function PostForm({
             Annuler
           </Button>
         )}
-        <Button type="submit" disabled={pending || clients.length === 0}>
-          {pending ? 'Enregistrement…' : submitLabel}
+        <Button type="submit" disabled={pending || uploading || clients.length === 0}>
+          {pending || uploading ? 'Enregistrement…' : submitLabel}
         </Button>
       </div>
     </form>

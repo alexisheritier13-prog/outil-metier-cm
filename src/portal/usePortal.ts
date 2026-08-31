@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { approvePost, rejectPost } from '@/services/clientReview';
+import { listMediaForPosts, listPostMedia } from '@/services/postMedia';
 import {
   addPortalComment,
   countPortalPending,
@@ -24,6 +25,23 @@ export function usePortalPendingCount(clientId: string | null) {
     queryKey: ['portal', 'pending-count', clientId],
     queryFn: () => countPortalPending(clientId as string),
     enabled: Boolean(clientId),
+  });
+}
+
+export function usePortalPostMedia(postId: string | null) {
+  return useQuery({
+    queryKey: ['portal', 'media', postId],
+    queryFn: () => listPostMedia(postId as string),
+    enabled: Boolean(postId),
+  });
+}
+
+/** Médias de plusieurs posts d'un coup (vignettes de liste). */
+export function usePortalMediaForPosts(postIds: string[]) {
+  return useQuery({
+    queryKey: ['portal', 'media-batch', [...postIds].sort()],
+    queryFn: () => listMediaForPosts(postIds),
+    enabled: postIds.length > 0,
   });
 }
 

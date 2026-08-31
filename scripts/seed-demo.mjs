@@ -35,7 +35,34 @@ const day = (n) => {
   d.setHours(10, 0, 0, 0);
   return d.toISOString();
 };
-const thumb = (seed) => `https://picsum.photos/seed/${seed}/640/640`;
+/** Upload un visuel d'exemple dans le bucket + crée la ligne post_media. */
+async function uploadSampleMedia(postId, index) {
+  let res;
+  try {
+    res = await fetch(`https://picsum.photos/seed/${postId}-${index}/1080/1080`, {
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch {
+    return; // picsum injoignable : on continue sans visuel
+  }
+  if (!res.ok) return; // best-effort : pas de visuel si picsum indisponible
+  const buf = Buffer.from(await res.arrayBuffer());
+  const path = `${CLIENT_ID}/${postId}/${crypto.randomUUID()}.jpg`;
+  const up = await admin.storage
+    .from('post-media')
+    .upload(path, buf, { contentType: 'image/jpeg', upsert: true });
+  if (up.error) throw up.error;
+  await admin.from('post_media').insert({
+    post_id: postId,
+    storage_path: path,
+    kind: 'image',
+    mime_type: 'image/jpeg',
+    size_bytes: buf.length,
+    width: 1080,
+    height: 1080,
+    position: index,
+  });
+}
 
 async function ensureUser(email, role, fullName) {
   const list = await admin.auth.admin.listUsers({ perPage: 1000 });
@@ -95,6 +122,23 @@ async function main() {
   const contact = await actor('client.demo@studiolumen.test');
 
   console.log('→ purge des données démo');
+  // Visuels : vider le dossier du client dans le bucket (les lignes post_media
+  // partent en cascade avec les posts juste après).
+  try {
+    const { data: postFolders } = await admin.storage.from('post-media').list(CLIENT_ID);
+    for (const f of postFolders ?? []) {
+      const { data: files } = await admin.storage
+        .from('post-media')
+        .list(`${CLIENT_ID}/${f.name}`);
+      if (files?.length) {
+        await admin.storage
+          .from('post-media')
+          .remove(files.map((x) => `${CLIENT_ID}/${f.name}/${x.name}`));
+      }
+    }
+  } catch {
+    /* bucket vide ou absent : rien à purger */
+  }
   await admin.from('posts').delete().eq('client_id', CLIENT_ID);
   await admin.from('campaigns').delete().eq('client_id', CLIENT_ID);
   await admin.from('social_accounts').delete().eq('client_id', CLIENT_ID);
@@ -189,9 +233,6 @@ async function main() {
         author_id: p.author ?? cmId,
         campaign_id: p.campaign ?? null,
         canva_url: p.canva ? 'https://www.canva.com/design/DEMO/view' : null,
-        canva_thumbnail_url: p.canva ? thumb(p.canva) : null,
-        canva_thumbnail_source: p.canva ? 'manual' : null,
-        canva_fetched_at: p.canva ? new Date().toISOString() : null,
         performance_note: p.perf ?? null,
         performance_visible_to_client: p.perfVisible ?? false,
       })
@@ -203,18 +244,19 @@ async function main() {
         .from('post_tags')
         .insert(p.tags.map((t) => ({ post_id: data.id, tag_id: tags[t] })));
     }
+    for (let i = 0; i < (p.media ?? 0); i++) await uploadSampleMedia(data.id, i);
     return data.id;
   };
 
   const P = {};
-  P.pub1 = await mkPost({ network: 'instagram', at: day(-38), caption: 'La nouvelle collection lin lavé est là 🌾 Nuances sable, écru, terracotta.', status: 'published', campaign: campPrintemps, canva: 'p1', tags: ['produit', 'printemps'] });
-  P.pub2 = await mkPost({ network: 'linkedin', at: day(-24), caption: 'Dans les coulisses de l’atelier : le tissage du lin, étape par étape.', status: 'published', author: leadId, canva: 'p2', tags: ['coulisses'] });
-  P.pub3 = await mkPost({ network: 'instagram', at: day(-9), caption: 'Carrousel — 5 gestes pour garder son lin impeccable ✨', status: 'published', canva: 'p3', tags: ['tuto'], perf: '820 likes · 34 partages · +180 abonnés', perfVisible: true });
-  P.sched1 = await mkPost({ network: 'instagram', at: day(4), caption: 'Teasing été ☀️ Quelque chose se prépare pour juin…', status: 'scheduled', campaign: campEte, canva: 'p4', tags: ['été'] });
-  P.appr1 = await mkPost({ network: 'linkedin', at: day(7), caption: 'Collaboration avec un créateur textile local — interview à venir.', status: 'approved', author: leadId, canva: 'p5' });
-  P.cr1 = await mkPost({ network: 'instagram', at: day(10), caption: 'Fête des mères : notre sélection de parures en lin lavé 💐', status: 'client_review', canva: 'p6', tags: ['produit'] });
-  P.cr2 = await mkPost({ network: 'tiktok', at: day(13), caption: 'Reel — le process de teinture naturelle en 20 secondes.', status: 'client_review', author: leadId, canva: 'p7' });
-  P.ir1 = await mkPost({ network: 'instagram', at: day(6), caption: 'On ouvre un pop-up store éphémère ! Rendez-vous rue de Turenne.', status: 'internal_review', campaign: campEte, canva: 'p8' });
+  P.pub1 = await mkPost({ network: 'instagram', at: day(-38), caption: 'La nouvelle collection lin lavé est là 🌾 Nuances sable, écru, terracotta.', status: 'published', campaign: campPrintemps, canva: true, media: 1, tags: ['produit', 'printemps'] });
+  P.pub2 = await mkPost({ network: 'linkedin', at: day(-24), caption: 'Dans les coulisses de l’atelier : le tissage du lin, étape par étape.', status: 'published', author: leadId, canva: true, media: 1, tags: ['coulisses'] });
+  P.pub3 = await mkPost({ network: 'instagram', at: day(-9), caption: 'Carrousel — 5 gestes pour garder son lin impeccable ✨', status: 'published', canva: true, media: 4, tags: ['tuto'], perf: '820 likes · 34 partages · +180 abonnés', perfVisible: true });
+  P.sched1 = await mkPost({ network: 'instagram', at: day(4), caption: 'Teasing été ☀️ Quelque chose se prépare pour juin…', status: 'scheduled', campaign: campEte, canva: true, media: 1, tags: ['été'] });
+  P.appr1 = await mkPost({ network: 'linkedin', at: day(7), caption: 'Collaboration avec un créateur textile local — interview à venir.', status: 'approved', author: leadId, canva: true });
+  P.cr1 = await mkPost({ network: 'instagram', at: day(10), caption: 'Fête des mères : notre sélection de parures en lin lavé 💐', status: 'client_review', canva: true, media: 2, tags: ['produit'] });
+  P.cr2 = await mkPost({ network: 'tiktok', at: day(13), caption: 'Reel — le process de teinture naturelle en 20 secondes.', status: 'client_review', author: leadId, canva: true });
+  P.ir1 = await mkPost({ network: 'instagram', at: day(6), caption: 'On ouvre un pop-up store éphémère ! Rendez-vous rue de Turenne.', status: 'internal_review', campaign: campEte, canva: true, media: 1 });
   P.ir2 = await mkPost({ network: 'linkedin', at: day(16), caption: 'Portrait — rencontre avec Camille, responsable de production.', status: 'internal_review' });
   P.draft1 = await mkPost({ network: 'instagram', at: day(21), caption: 'Idée : reposter les photos de nos clientes (UGC) avec leur accord.', tags: ['UGC'] });
   P.trash1 = await mkPost({ network: 'instagram', at: day(28), caption: 'Brouillon soldes — à ne pas publier finalement.' });

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
+import { MediaGallery } from '@/components/MediaGallery';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
@@ -23,6 +24,7 @@ import { PerformanceSection } from './PerformanceSection';
 import { StatusActions } from './StatusActions';
 import { CommentThread } from './CommentThread';
 import { PostHistory } from './PostHistory';
+import { usePostMedia } from './usePostMedia';
 import { useDuplicatePost, useTrashPost, useUpdatePost } from './usePosts';
 
 interface Props {
@@ -47,6 +49,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
     enabled: Boolean(post),
   });
   const allTags = useQuery({ queryKey: ['tags'], queryFn: listTags });
+  const mediaQ = usePostMedia(post?.id);
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', post?.clientId],
     queryFn: () => listCampaignsForClient(post!.clientId),
@@ -98,13 +101,13 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             {me && <StatusActions post={post} role={me.role} />}
           </div>
 
-          {post.canvaThumbnailUrl && (
-            <img
-              src={post.canvaThumbnailUrl}
-              alt="Aperçu du visuel Canva"
-              className="max-h-64 w-full rounded border object-contain"
-              loading="lazy"
-            />
+          {(mediaQ.data ?? []).length > 0 && (
+            <div>
+              <p className="text-muted-foreground mb-1.5 text-xs">
+                Visuels ({mediaQ.data!.length})
+              </p>
+              <MediaGallery media={mediaQ.data!} />
+            </div>
           )}
 
           <dl className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
@@ -210,6 +213,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               clients={clients}
               authors={authors}
               canReassign={canReassign}
+              postId={post.id}
               submitLabel="Enregistrer"
               pending={update.isPending}
               error={update.isError ? update.error : undefined}
@@ -219,17 +223,13 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
                 scheduledAt: post.scheduledAt,
                 caption: post.caption,
                 canvaUrl: post.canvaUrl,
-                canvaThumbnailUrl: post.canvaThumbnailUrl,
-                canvaThumbnailSource: post.canvaThumbnailSource,
                 authorId: post.authorId,
                 campaignId: post.campaignId,
                 tags: tagNames,
               }}
               onCancel={() => setEditOpen(false)}
-              onSubmit={async (input) => {
-                await update.mutateAsync(input);
-                setEditOpen(false);
-              }}
+              onSubmit={(input) => update.mutateAsync(input)}
+              onSuccess={() => setEditOpen(false)}
             />
           </DialogContent>
         </Dialog>

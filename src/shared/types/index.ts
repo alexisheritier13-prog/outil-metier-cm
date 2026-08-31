@@ -18,6 +18,7 @@ type EditorialGuidelineRow = Database['public']['Tables']['editorial_guidelines'
 type OnboardingItemRow = Database['public']['Tables']['onboarding_items']['Row'];
 type ClientOverviewRow = Database['public']['Views']['client_overview']['Row'];
 type PostRow = Database['public']['Tables']['posts']['Row'];
+type PostMediaRow = Database['public']['Tables']['post_media']['Row'];
 type TagRow = Database['public']['Tables']['tags']['Row'];
 type CampaignRow = Database['public']['Tables']['campaigns']['Row'];
 type CampaignOverviewRow = Database['public']['Views']['campaign_overview']['Row'];
@@ -209,10 +210,8 @@ export interface Post {
   network: Network;
   scheduledAt: string; // ISO UTC
   caption: string;
+  /** Lien de travail Canva — interne, jamais exposé au contact client. */
   canvaUrl: string | null;
-  canvaThumbnailUrl: string | null;
-  canvaThumbnailSource: 'auto' | 'manual' | null;
-  canvaFetchedAt: string | null;
   status: PostStatus;
   authorId: string;
   campaignId: string | null;
@@ -228,6 +227,38 @@ export interface Post {
 
 export type PostOriginType = 'idea' | 'key_date' | 'client_request' | 'duplicate';
 
+export type PostMediaKind = 'image' | 'video';
+
+export interface PostMedia {
+  id: string;
+  postId: string;
+  storagePath: string;
+  kind: PostMediaKind;
+  mimeType: string;
+  sizeBytes: number;
+  width: number | null;
+  height: number | null;
+  durationSeconds: number | null;
+  position: number;
+  createdAt: string;
+}
+
+export function toPostMedia(row: PostMediaRow): PostMedia {
+  return {
+    id: row.id,
+    postId: row.post_id,
+    storagePath: row.storage_path,
+    kind: row.kind as PostMediaKind,
+    mimeType: row.mime_type,
+    sizeBytes: Number(row.size_bytes),
+    width: row.width,
+    height: row.height,
+    durationSeconds: row.duration_seconds === null ? null : Number(row.duration_seconds),
+    position: row.position,
+    createdAt: row.created_at,
+  };
+}
+
 export function toPost(row: PostRow): Post {
   return {
     id: row.id,
@@ -236,9 +267,6 @@ export function toPost(row: PostRow): Post {
     scheduledAt: row.scheduled_at,
     caption: row.caption,
     canvaUrl: row.canva_url,
-    canvaThumbnailUrl: row.canva_thumbnail_url,
-    canvaThumbnailSource: (row.canva_thumbnail_source as 'auto' | 'manual' | null) ?? null,
-    canvaFetchedAt: row.canva_fetched_at,
     status: row.status,
     authorId: row.author_id,
     campaignId: row.campaign_id,

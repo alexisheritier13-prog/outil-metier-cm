@@ -36,7 +36,7 @@ describe('PostForm', () => {
   });
 
   it("convertit l'heure de Paris saisie en UTC (été → UTC+2)", async () => {
-    const onSubmit = vi.fn<(i: PostInput) => void>();
+    const onSubmit = vi.fn<(i: PostInput) => Promise<never>>().mockResolvedValue(undefined as never);
     render(
       <PostForm clients={clients} submitLabel="Créer" pending={false} onSubmit={onSubmit} />,
     );
@@ -59,7 +59,7 @@ describe('PostForm', () => {
   });
 
   it('« Partir d\'un template » pré-remplit réseau, légende et tags', async () => {
-    const onSubmit = vi.fn<(i: PostInput) => void>();
+    const onSubmit = vi.fn<(i: PostInput) => Promise<never>>().mockResolvedValue(undefined as never);
     render(
       <PostForm
         clients={clients}

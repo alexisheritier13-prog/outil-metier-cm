@@ -5,11 +5,13 @@ import { ArrowLeft, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ClientAvatar } from '@/components/ClientAvatar';
 import { NetworkIcon } from '@/components/NetworkIcon';
+import { FirstMediaThumb } from '@/components/MediaGallery';
 import { StatusBadge } from '@/components/StatusBadge';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { EmptyState } from '@/components/EmptyState';
 import { getClient } from '@/services/clients';
 import { listPosts } from '@/services/posts';
+import { listMediaForPosts } from '@/services/postMedia';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateKey, parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
@@ -51,6 +53,13 @@ export function ClientCalendarExportPage() {
         to: new Date(to + 'T23:59:59').toISOString(),
       }),
     enabled: Boolean(clientId),
+  });
+
+  const postIds = (posts.data ?? []).map((p) => p.id);
+  const mediaByPost = useQuery({
+    queryKey: ['export-media', [...postIds].sort()],
+    queryFn: () => listMediaForPosts(postIds),
+    enabled: postIds.length > 0,
   });
 
   const byDay = useMemo(() => {
@@ -174,11 +183,10 @@ export function ClientCalendarExportPage() {
                 <ul className="divide-y">
                   {dayPosts.map((p) => (
                     <li key={p.id} className="post-row flex gap-4 py-3">
-                      {p.canvaThumbnailUrl ? (
-                        <img
-                          src={p.canvaThumbnailUrl}
-                          alt=""
-                          className="h-20 w-20 shrink-0 rounded border object-cover"
+                      {(mediaByPost.data?.get(p.id) ?? []).length > 0 ? (
+                        <FirstMediaThumb
+                          media={mediaByPost.data!.get(p.id)!}
+                          className="h-20 w-20 shrink-0 rounded border"
                         />
                       ) : (
                         <span className="bg-surface-2 grid h-20 w-20 shrink-0 place-items-center rounded border">

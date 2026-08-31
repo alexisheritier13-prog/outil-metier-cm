@@ -3,11 +3,12 @@ import { CheckCheck } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
+import { FirstMediaThumb } from '@/components/MediaGallery';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { parisDateLabel } from '@/shared/utils/tz';
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue';
 import { usePortalClient } from './PortalClientContext';
-import { usePortalPosts } from './usePortal';
+import { usePortalMediaForPosts, usePortalPosts } from './usePortal';
 import { PortalPostDetail } from './PortalPostDetail';
 
 /** Historique des posts publiés du client (Story 6.4). */
@@ -33,6 +34,7 @@ export function PortalPublishedPage() {
     [posts.data],
   );
   const open = rows.find((p) => p.id === openId) ?? null;
+  const mediaByPost = usePortalMediaForPosts(rows.map((p) => p.id));
 
   return (
     <section className="animate-in fade-in slide-in-from-bottom-1 mx-auto max-w-5xl p-4 duration-300 ease-out sm:p-6 lg:py-8">
@@ -100,12 +102,10 @@ export function PortalPublishedPage() {
                 onClick={() => setOpenId(p.id)}
                 className="hover:bg-surface-2/60 flex w-full gap-3 rounded-md border p-3 text-left"
               >
-                {p.canvaThumbnailUrl ? (
-                  <img
-                    src={p.canvaThumbnailUrl}
-                    alt=""
-                    className="h-16 w-16 shrink-0 rounded border object-cover"
-                    loading="lazy"
+                {(mediaByPost.data?.get(p.id) ?? []).length > 0 ? (
+                  <FirstMediaThumb
+                    media={mediaByPost.data!.get(p.id)!}
+                    className="h-16 w-16 shrink-0 rounded border"
                   />
                 ) : (
                   <span className="bg-surface-2 grid h-16 w-16 shrink-0 place-items-center rounded border">

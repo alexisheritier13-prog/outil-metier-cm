@@ -183,10 +183,8 @@ export function PlanningPage() {
                 pending={create.isPending}
                 error={create.isError ? create.error : undefined}
                 onCancel={() => setCreateOpen(false)}
-                onSubmit={async (input) => {
-                  await create.mutateAsync(input);
-                  setCreateOpen(false);
-                }}
+                onSubmit={(input) => create.mutateAsync(input)}
+                onSuccess={() => setCreateOpen(false)}
               />
             </DialogContent>
           </Dialog>

@@ -66,6 +66,12 @@ contenu. Application web hébergée (SPA React + Vite + Supabase). Remplace Noti
 - **Story 9.4** faite : note de performance éditable sur les posts publiés (panneau de détail), visibilité client explicite (interne par défaut), filtre « Avec note de perf » (`?perf=1`) + affichage dans la vue liste, note reprise dans l'espace client. Migration 0029 (journalisation de la visibilité). 10 tests unit + 4 intégration.
 - **Story 9.5** faite : passe a11y AA (audit axe sur 8 écrans via E2E Playwright, 0 violation serious/critical — `nested-interactive`, `aria-controls`, contrastes, `role-img-alt` corrigés) + polish (dates FR homogènes via `parisDateLabel`/`parisDateTimeLabel`, tableaux allégés, `TableSkeleton` par vue). `@playwright/test` + `axe-core`, `npm run test:e2e` (Chrome système, auto-skip sans `E2E_EMAIL`/`E2E_PASSWORD`). **Epic 9 terminé.**
 
+### Post-v1
+
+- **App renommée « Cadence »** (dépôt reste `outil-metier-cm`). Rôles : Directeur / Chef de projet / CM.
+- **Aide in-app** `/app/aide`, **marronniers pré-remplis** (~68 dates, migr 0030), **mode « CM seul »** (migr 0031, `/app/parametres/workflow`), **animations** discrètes, **vrais logos de réseaux**.
+- **Upload de visuels** (migr 0032) : `post_media` (carrousel ordonné) + bucket `post-media` public. Le champ « aperçu Canva » devient un vrai upload photo/vidéo (`MediaField` / `MediaGallery`) ; `canva_url` reste un lien de travail **interne** (masqué côté client). Nettoyage bucket via Storage API (`deletePostMedia`) ; orphelins possibles au purge d'un post. 3 tests unit + 5 d'intégration (RLS + storage).
+
 ### Tests
 
 - `npm run test` — unitaires, rapides, exécutés en CI.

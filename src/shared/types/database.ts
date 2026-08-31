@@ -857,6 +857,66 @@ export type Database = {
           },
         ]
       }
+      post_media: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          duration_seconds: number | null
+          height: number | null
+          id: string
+          kind: string
+          mime_type: string
+          position: number
+          post_id: string
+          size_bytes: number
+          storage_path: string
+          width: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          height?: number | null
+          id?: string
+          kind: string
+          mime_type?: string
+          position?: number
+          post_id: string
+          size_bytes?: number
+          storage_path: string
+          width?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          height?: number | null
+          id?: string
+          kind?: string
+          mime_type?: string
+          position?: number
+          post_id?: string
+          size_bytes?: number
+          storage_path?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_media_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_media_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_tags: {
         Row: {
           post_id: string
@@ -976,9 +1036,6 @@ export type Database = {
         Row: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1001,9 +1058,6 @@ export type Database = {
         Insert: {
           author_id: string
           campaign_id?: string | null
-          canva_fetched_at?: string | null
-          canva_thumbnail_source?: string | null
-          canva_thumbnail_url?: string | null
           canva_url?: string | null
           caption?: string
           client_id: string
@@ -1026,9 +1080,6 @@ export type Database = {
         Update: {
           author_id?: string
           campaign_id?: string | null
-          canva_fetched_at?: string | null
-          canva_thumbnail_source?: string | null
-          canva_thumbnail_url?: string | null
           canva_url?: string | null
           caption?: string
           client_id?: string
@@ -1371,9 +1422,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1408,9 +1456,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1482,9 +1527,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1521,9 +1563,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1592,9 +1631,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1626,9 +1662,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1655,14 +1688,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      post_media_reorder: {
+        Args: { p_ids: string[]; p_post_id: string }
+        Returns: undefined
+      }
       post_restore: {
         Args: { p_post_id: string }
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1713,9 +1747,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1752,9 +1783,6 @@ export type Database = {
         Returns: {
           author_id: string
           campaign_id: string | null
-          canva_fetched_at: string | null
-          canva_thumbnail_source: string | null
-          canva_thumbnail_url: string | null
           canva_url: string | null
           caption: string
           client_id: string
@@ -1828,6 +1856,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      workflow_skips_internal: { Args: never; Returns: boolean }
     }
     Enums: {
       alert_status_t: "new" | "seen" | "dismissed"

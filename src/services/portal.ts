@@ -61,7 +61,10 @@ export async function listPortalPosts(
  * visible — la RLS renvoie la colonne, on la masque ici (garde applicative).
  */
 export function redactClientPost(post: Post): Post {
-  return post.performanceVisibleToClient ? post : { ...post, performanceNote: null };
+  // Le lien de travail Canva ne sort jamais côté client ; la note de perf non plus
+  // si elle n'est pas explicitement partagée.
+  const base = { ...post, canvaUrl: null };
+  return post.performanceVisibleToClient ? base : { ...base, performanceNote: null };
 }
 
 /** Nombre de posts en attente de la réponse du contact (statut `client_review`). */

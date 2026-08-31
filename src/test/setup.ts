@@ -14,6 +14,10 @@ if (!('ResizeObserver' in globalThis)) {
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
+if (!('createObjectURL' in URL)) {
+  (URL as unknown as { createObjectURL: unknown }).createObjectURL = () => 'blob:test';
+  (URL as unknown as { revokeObjectURL: unknown }).revokeObjectURL = () => {};
+}
 
 afterEach(() => {
   cleanup();

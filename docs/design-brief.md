@@ -243,8 +243,8 @@ Onglet Détail :
   rôle (« Soumettre à la validation interne », « Valider en interne », « Renvoyer
   au rédacteur », « Planifier », « Marquer comme publié »…). Certaines exigent un
   commentaire → mini-dialogue.
-- Aperçu du visuel Canva (image) si disponible.
-- Liste de définition : Date (heure de Paris), Réseau, Lien Canva.
+- Galerie des visuels (`MediaGallery`) : carrousel de photos/vidéos uploadées, clic → lightbox.
+- Liste de définition : Date (heure de Paris), Réseau, Lien Canva (interne).
 - Légende (texte complet).
 - Campagne / Origine (idée, demande, marronnier…) / Tags si présents.
 - **Section Performance** (si post « Publié ») : zone de texte + case « Visible
@@ -464,7 +464,7 @@ Canva / ids. Échelle rem fixe (pas de `clamp`) :
 - **`NetworkIcon`** — pastille monochrome 2 lettres (IG, IN, FB, TT, X, YT, PT,
   TH) + nom en `sr-only` (ou visible si `withLabel`). Pas de logo couleur.
 - **`ClientAvatar`** — logo client ou initiales, repli si l'image casse.
-- **`PostSheet`**, **`PostForm`**, **`CanvaField`**, **`CommentThread`**,
+- **`PostSheet`**, **`PostForm`**, **`MediaField`** / **`MediaGallery`**, **`CommentThread`**,
   **`PostHistory`**, **`StatusActions`**, **`PerformanceSection`**,
   **`BulkActionBar`**, **`FiltersBar`** — voir §6.
 
