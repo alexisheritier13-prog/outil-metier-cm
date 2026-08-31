@@ -73,6 +73,35 @@ describe('allowedTransitions', () => {
   });
 });
 
+describe('canTransition — mode « CM seul »', () => {
+  it('draft → client_review refusé par défaut', () => {
+    expect(canTransition('draft', 'client_review', 'cm').allowed).toBe(false);
+  });
+  it('draft → client_review permis pour un rôle interne quand skipInternalReview', () => {
+    expect(canTransition('draft', 'client_review', 'cm', { skipInternalReview: true }).allowed).toBe(
+      true,
+    );
+    expect(
+      canTransition('draft', 'client_review', 'lead', { skipInternalReview: true }).allowed,
+    ).toBe(true);
+  });
+  it('le mode ne change rien pour un contact client ni les autres transitions', () => {
+    expect(
+      canTransition('draft', 'client_review', 'client', { skipInternalReview: true }).allowed,
+    ).toBe(false);
+    expect(
+      canTransition('client_review', 'approved', 'cm', { skipInternalReview: true }).allowed,
+    ).toBe(false);
+  });
+  it('allowedTransitions ajoute client_review au brouillon quand le mode est actif', () => {
+    expect(allowedTransitions('draft', 'cm').sort()).toEqual(['internal_review']);
+    expect(allowedTransitions('draft', 'cm', { skipInternalReview: true }).sort()).toEqual([
+      'client_review',
+      'internal_review',
+    ]);
+  });
+});
+
 describe('transitionDirection', () => {
   it('classe avant / arrière / inexistant', () => {
     expect(transitionDirection('draft', 'internal_review')).toBe('forward');

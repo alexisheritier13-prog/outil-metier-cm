@@ -11,6 +11,7 @@ import {
 } from '@/shared/utils/transitions';
 import type { Post } from '@/shared/types';
 import { useChangePostStatus } from './usePosts';
+import { useWorkflowOptions } from './useWorkflow';
 
 /**
  * Actions de workflow d'un post (Story 5.1) : boutons nommés pour chaque transition
@@ -20,6 +21,7 @@ import { useChangePostStatus } from './usePosts';
 
 const ACTION_LABELS: Record<string, string> = {
   'draft>internal_review': 'Soumettre à la validation interne',
+  'draft>client_review': 'Envoyer au client',
   'internal_review>client_review': 'Valider en interne',
   'internal_review>draft': 'Renvoyer au rédacteur',
   'client_review>draft': 'Repasser en brouillon',
@@ -39,10 +41,11 @@ const actionLabel = (from: PostStatus, to: PostStatus) =>
 
 export function StatusActions({ post, role }: { post: Post; role: Role }) {
   const change = useChangePostStatus();
+  const workflow = useWorkflowOptions();
   const [ask, setAsk] = useState<{ to: PostStatus; label: string } | null>(null);
   const [comment, setComment] = useState('');
 
-  const targets = allowedTransitions(post.status, role);
+  const targets = allowedTransitions(post.status, role, workflow);
 
   function run(to: PostStatus) {
     const label = actionLabel(post.status, to);

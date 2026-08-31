@@ -70,6 +70,11 @@ export function HelpPage() {
             commentaire quand c'est un renvoi). Tout changement est tracé dans l'onglet
             <strong className="text-foreground"> Historique</strong> du post.
           </p>
+          <p className="text-muted-foreground">
+            Un Admin peut activer le mode <strong className="text-foreground">« CM seul »</strong>{' '}
+            (<NavRef to="/app/parametres/workflow">Paramètres → Circuit de validation</NavRef>) :
+            le CM envoie alors le brouillon directement au client, sans validation interne.
+          </p>
         </section>
 
         <section className="space-y-3">

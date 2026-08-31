@@ -10,6 +10,11 @@ const LINKS = [
     desc: 'Comptes internes, rôles, clients assignés.',
   },
   {
+    to: '/app/parametres/workflow',
+    label: 'Circuit de validation',
+    desc: 'Mode « CM seul » : validation interne optionnelle.',
+  },
+  {
     to: '/app/parametres/alertes',
     label: 'Seuils des alertes',
     desc: 'Réglage du moteur de détection.',

@@ -20,6 +20,9 @@ const UsersPage = lazy(() =>
 const AlertSettingsPage = lazy(() =>
   import('@/app/settings/AlertSettingsPage').then((m) => ({ default: m.AlertSettingsPage })),
 );
+const WorkflowSettingsPage = lazy(() =>
+  import('@/app/settings/WorkflowSettingsPage').then((m) => ({ default: m.WorkflowSettingsPage })),
+);
 const SettingsHome = lazy(() =>
   import('@/app/settings/SettingsHome').then((m) => ({ default: m.SettingsHome })),
 );
@@ -128,6 +131,12 @@ export const router = createBrowserRouter(
         {
           path: 'parametres/utilisateurs',
           element: <RequireRole roles={['admin']}>{lazyRoute(<UsersPage />)}</RequireRole>,
+        },
+        {
+          path: 'parametres/workflow',
+          element: (
+            <RequireRole roles={['admin']}>{lazyRoute(<WorkflowSettingsPage />)}</RequireRole>
+          ),
         },
         {
           path: 'parametres/alertes',

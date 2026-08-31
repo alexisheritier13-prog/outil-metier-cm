@@ -42,16 +42,60 @@ export interface TransitionCheck {
   reason?: string;
 }
 
+/**
+ * Options de circuit (mode « CM seul », réglage `app_settings.workflow`). Quand
+ * `skipInternalReview` est vrai, un rôle interne peut envoyer un brouillon
+ * directement en « à valider client ». Miroir de `workflow_skips_internal()` SQL.
+ */
+export interface WorkflowOptions {
+  skipInternalReview?: boolean;
+}
+
+const INTERNAL: readonly Role[] = ['cm', 'lead', 'admin'];
+
+/** Règle dynamique du mode « CM seul » : draft → client_review. */
+function skipRuleApplies(
+  from: PostStatus,
+  to: PostStatus,
+  role: Role,
+  opts?: WorkflowOptions,
+): boolean {
+  return (
+    Boolean(opts?.skipInternalReview) &&
+    from === 'draft' &&
+    to === 'client_review' &&
+    INTERNAL.includes(role)
+  );
+}
+
 /** Statuts atteignables depuis `from` pour ce rôle. */
-export function allowedTransitions(from: PostStatus, role: Role): PostStatus[] {
-  return POST_TRANSITIONS.filter((t) => t.from === from && t.roles.includes(role)).map((t) => t.to);
+export function allowedTransitions(
+  from: PostStatus,
+  role: Role,
+  opts?: WorkflowOptions,
+): PostStatus[] {
+  const base = POST_TRANSITIONS.filter((t) => t.from === from && t.roles.includes(role)).map(
+    (t) => t.to,
+  );
+  if (skipRuleApplies(from, 'client_review', role, opts) && !base.includes('client_review')) {
+    base.push('client_review');
+  }
+  return base;
 }
 
 /** La transition `from → to` est-elle permise pour ce rôle ? */
-export function canTransition(from: PostStatus, to: PostStatus, role: Role): TransitionCheck {
+export function canTransition(
+  from: PostStatus,
+  to: PostStatus,
+  role: Role,
+  opts?: WorkflowOptions,
+): TransitionCheck {
   if (from === to) return { allowed: false, needsComment: false, reason: 'statut inchangé' };
   const rule = POST_TRANSITIONS.find((t) => t.from === from && t.to === to);
-  if (!rule) return { allowed: false, needsComment: false, reason: 'transition inexistante' };
+  if (!rule) {
+    if (skipRuleApplies(from, to, role, opts)) return { allowed: true, needsComment: false };
+    return { allowed: false, needsComment: false, reason: 'transition inexistante' };
+  }
   if (!rule.roles.includes(role)) {
     return { allowed: false, needsComment: false, reason: 'rôle non autorisé' };
   }

@@ -7,6 +7,7 @@ import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/shared/types';
 import { useChangePostStatus } from './usePosts';
+import { useWorkflowOptions } from './useWorkflow';
 
 interface Props {
   posts: Post[];
@@ -19,6 +20,7 @@ interface Props {
 
 export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onToggleSelect }: Props) {
   const change = useChangePostStatus();
+  const workflow = useWorkflowOptions();
   const [dragId, setDragId] = useState<string | null>(null);
   const [overCol, setOverCol] = useState<PostStatus | null>(null);
 
@@ -36,7 +38,7 @@ export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onTog
     const post = dragged;
     setDragId(null);
     if (!post || post.status === to) return;
-    if (!canTransition(post.status, to, role).allowed) return;
+    if (!canTransition(post.status, to, role, workflow).allowed) return;
     let comment: string | undefined;
     if (transitionNeedsComment(post.status, to)) {
       comment = window.prompt('Un commentaire est requis pour cette action :') ?? undefined;
@@ -52,7 +54,7 @@ export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onTog
         const droppable =
           dragged !== null &&
           dragged.status !== status &&
-          canTransition(dragged.status, status, role).allowed;
+          canTransition(dragged.status, status, role, workflow).allowed;
         return (
           <div
             key={status}

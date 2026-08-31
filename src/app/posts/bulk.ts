@@ -1,7 +1,11 @@
 import type { Post } from '@/shared/types';
 import type { Role } from '@/shared/constants/roles';
 import type { PostStatus } from '@/shared/constants/postStatus';
-import { canTransition, transitionNeedsComment } from '@/shared/utils/transitions';
+import {
+  canTransition,
+  transitionNeedsComment,
+  type WorkflowOptions,
+} from '@/shared/utils/transitions';
 
 /**
  * Actions en masse (Story 9.1). Chaque action est **atomique par post** : on itère,
@@ -38,11 +42,12 @@ export function partitionByTransition(
   posts: Post[],
   to: PostStatus,
   role: Role,
+  workflow?: WorkflowOptions,
 ): { eligible: Post[]; ineligible: Post[] } {
   const eligible: Post[] = [];
   const ineligible: Post[] = [];
   for (const p of posts) {
-    if (p.status === to || !canTransition(p.status, to, role).allowed) ineligible.push(p);
+    if (p.status === to || !canTransition(p.status, to, role, workflow).allowed) ineligible.push(p);
     else eligible.push(p);
   }
   return { eligible, ineligible };
