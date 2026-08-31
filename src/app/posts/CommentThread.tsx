@@ -58,7 +58,7 @@ export function CommentThread({ postId }: { postId: string }) {
             {editing?.id === c.id ? (
               <div className="space-y-1.5">
                 <textarea
-                  className="border-input bg-background w-full rounded border px-2 py-1 text-sm"
+                  className="border-input bg-surface w-full rounded border px-2 py-1 text-sm"
                   rows={2}
                   value={editing.body}
                   onChange={(e) => setEditing({ id: c.id, body: e.target.value })}
@@ -120,7 +120,7 @@ export function CommentThread({ postId }: { postId: string }) {
         }}
       >
         <textarea
-          className="border-input bg-background focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
           rows={2}
           placeholder="Ajouter un commentaire…"
           value={body}

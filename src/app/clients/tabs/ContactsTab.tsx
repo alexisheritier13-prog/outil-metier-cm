@@ -107,7 +107,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
           <p className="text-muted-foreground">
             Aucun email n'est envoyé : transmettez ce lien au contact.
           </p>
-          <code className="bg-background block overflow-x-auto rounded p-2 text-xs">
+          <code className="bg-surface block overflow-x-auto rounded p-2 text-xs">
             {lastLink}
           </code>
           <Button size="sm" variant="ghost" onClick={() => setLastLink(null)}>

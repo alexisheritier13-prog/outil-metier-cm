@@ -117,7 +117,7 @@ export function ClientCalendarExportPage() {
         }
       `}</style>
 
-      <div className="print-hide sticky top-0 z-10 border-b bg-background/90 backdrop-blur">
+      <div className="print-hide sticky top-0 z-10 border-b bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-4 py-3">
           <Button asChild variant="ghost" size="sm">
             <Link to={`/app/clients/${clientId}`}>

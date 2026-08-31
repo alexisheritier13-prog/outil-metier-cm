@@ -66,7 +66,7 @@ async function uploadSampleMedia(postId, index) {
   });
 }
 
-async function ensureUser(email, role, fullName) {
+async function ensureUser(email, role, fullName, avatarUrl) {
   const list = await admin.auth.admin.listUsers({ perPage: 1000 });
   let u = list.data.users.find((x) => x.email === email);
   if (!u) {
@@ -76,7 +76,10 @@ async function ensureUser(email, role, fullName) {
   } else {
     await admin.auth.admin.updateUserById(u.id, { password: PW });
   }
-  await admin.from('profiles').update({ role, is_active: true, full_name: fullName }).eq('id', u.id);
+  await admin
+    .from('profiles')
+    .update({ role, is_active: true, full_name: fullName, avatar_url: avatarUrl ?? null })
+    .eq('id', u.id);
   return u.id;
 }
 
@@ -97,10 +100,11 @@ async function ins(client, table, rows, label) {
 
 async function main() {
   console.log('→ comptes');
-  const adminId = await ensureUser('alexis.heritier13@gmail.com', 'admin', 'Alexis Heritier');
-  const leadId = await ensureUser('lead.demo@studiolumen.test', 'lead', 'Léa Blanc');
-  const cmId = await ensureUser('cm.demo@studiolumen.test', 'cm', 'Camille Roy');
-  const contactId = await ensureUser('client.demo@studiolumen.test', 'client', 'Chris (Studio Lumen)');
+  const av = (n) => `https://i.pravatar.cc/160?img=${n}`;
+  const adminId = await ensureUser('alexis.heritier13@gmail.com', 'admin', 'Alexis Heritier', av(12));
+  const leadId = await ensureUser('lead.demo@studiolumen.test', 'lead', 'Léa Blanc', av(5));
+  const cmId = await ensureUser('cm.demo@studiolumen.test', 'cm', 'Camille Roy', av(47));
+  const contactId = await ensureUser('client.demo@studiolumen.test', 'client', 'Chris (Studio Lumen)', av(33));
 
   await admin
     .from('user_clients')

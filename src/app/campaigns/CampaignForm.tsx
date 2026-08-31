@@ -58,7 +58,7 @@ export function CampaignForm({ clients, defaults, submitLabel, pending, error, o
         <Label htmlFor="cf-client">Client</Label>
         <select
           id="cf-client"
-          className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+          className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
           {...register('clientId')}
         >
           {clients.map((c) => (
@@ -89,7 +89,7 @@ export function CampaignForm({ clients, defaults, submitLabel, pending, error, o
         <textarea
           id="cf-desc"
           rows={3}
-          className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-surface focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
           {...register('description')}
         />
       </div>

@@ -70,7 +70,7 @@ export function GuidelinesTab({ clientId }: { clientId: string }) {
           <textarea
             id={`eg-${f.key}`}
             rows={f.rows}
-            className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+            className="border-input bg-surface focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
             value={form[f.key]}
             onChange={(e) => setForm((p) => ({ ...p, [f.key]: e.target.value }))}
           />

@@ -57,6 +57,26 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
   return data ? toProfile(data) : null;
 }
 
+/** Met à jour son propre profil (nom, photo). RLS `profiles_update_self` : rôle/activation exclus. */
+export async function updateMyProfile(patch: {
+  fullName?: string;
+  avatarUrl?: string | null;
+}): Promise<Profile> {
+  const userId = await getSessionUserId();
+  if (!userId) throw new Error('Aucune session.');
+  const row: { full_name?: string; avatar_url?: string | null } = {};
+  if (patch.fullName !== undefined) row.full_name = patch.fullName.trim();
+  if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl?.trim() || null;
+  const { data, error } = await getSupabase()
+    .from('profiles')
+    .update(row)
+    .eq('id', userId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return toProfile(data);
+}
+
 /** Profil de l'utilisateur connecté, ou null si pas de session / profil inactif. */
 export async function getCurrentProfile(): Promise<Profile | null> {
   const userId = await getSessionUserId();

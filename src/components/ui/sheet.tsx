@@ -16,7 +16,7 @@ export const SheetContent = forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'bg-background shadow-panel fixed inset-y-0 right-0 z-modal flex w-full max-w-[496px] flex-col border-l',
+          'bg-surface shadow-panel fixed inset-y-0 right-0 z-modal flex w-full max-w-[496px] flex-col border-l',
           'data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=open]:duration-200 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right',
           'focus:outline-none',
           className,

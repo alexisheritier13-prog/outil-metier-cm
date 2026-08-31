@@ -29,6 +29,7 @@ export interface Profile {
   email: string;
   role: Role;
   isActive: boolean;
+  avatarUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -40,6 +41,7 @@ export function toProfile(row: ProfileRow): Profile {
     email: row.email,
     role: row.role,
     isActive: row.is_active,
+    avatarUrl: row.avatar_url,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

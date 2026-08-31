@@ -32,7 +32,7 @@ export function LoginPage() {
   return (
     <main className="bg-surface-2 grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       {/* ── Formulaire ── */}
-      <div className="bg-background flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16">
+      <div className="bg-surface flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16">
         <div className="animate-in fade-in slide-in-from-bottom-2 mx-auto w-full max-w-sm space-y-8 duration-500 ease-out">
           <div className="flex items-center gap-2.5">
             <span className="bg-primary text-primary-foreground shadow-card grid h-8 w-8 place-items-center rounded-lg text-sm font-bold">
@@ -131,7 +131,7 @@ export function LoginPage() {
           <div className="relative ml-4 mt-2 max-w-sm">
             <div className="border-border/50 absolute -inset-4 rounded-[1.5rem] border" />
             <div className="border-border/25 absolute -inset-8 rounded-[2rem] border" />
-            <div className="bg-background shadow-panel relative space-y-2.5 rounded-xl border p-4">
+            <div className="bg-surface shadow-panel relative space-y-2.5 rounded-xl border p-4">
               <div className="flex items-center gap-1.5 pb-1">
                 <span className="bg-border h-2 w-2 rounded-full" />
                 <span className="bg-border h-2 w-2 rounded-full" />

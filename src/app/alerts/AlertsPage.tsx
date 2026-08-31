@@ -165,7 +165,7 @@ export function AlertsPage() {
                 className={cn('h-2 w-2 shrink-0 rounded-full', SEVERITY[a.severity].dot)}
                 aria-hidden="true"
               />
-              <span className="bg-background/70 rounded border px-1 text-xs">
+              <span className="bg-surface/70 rounded border px-1 text-xs">
                 {ALERT_TYPE_LABELS[a.type]}
               </span>
               <span className="sr-only">Sévérité : {SEVERITY[a.severity].label}.</span>

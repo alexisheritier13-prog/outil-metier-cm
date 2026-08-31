@@ -85,7 +85,7 @@ export function CreateUserDialog() {
             </Field>
             <Field label="Rôle" error={errors.role?.message}>
               <select
-                className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+                className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
                 {...register('role')}
               >
                 <option value="cm">{ROLE_LABELS.cm}</option>

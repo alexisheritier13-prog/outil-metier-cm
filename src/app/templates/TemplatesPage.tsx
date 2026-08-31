@@ -162,14 +162,14 @@ function TemplateForm({
       }}
     >
       <input
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         placeholder="Nom du template"
         value={name}
         onChange={(e) => setName(e.target.value)}
         aria-label="Nom"
       />
       <input
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         placeholder="Description courte (optionnel)"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
@@ -210,14 +210,14 @@ function TemplateForm({
       <label className="block text-sm">
         <span className="text-muted-foreground mb-1 block text-xs">Gabarit de légende</span>
         <textarea
-          className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+          className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
           rows={5}
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
         />
       </label>
       <input
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         placeholder="Tags par défaut (séparés par des virgules)"
         value={tags}
         onChange={(e) => setTags(e.target.value)}

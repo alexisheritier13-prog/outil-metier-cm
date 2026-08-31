@@ -99,7 +99,7 @@ export function SocialAccountsTab({ clientId }: { clientId: string }) {
               <Label htmlFor="sa-network">Réseau</Label>
               <select
                 id="sa-network"
-                className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                className="border-input bg-surface h-10 rounded-md border px-3 text-sm"
                 value={network}
                 onChange={(e) => setNetwork(e.target.value as Network)}
               >

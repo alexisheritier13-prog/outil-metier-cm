@@ -179,7 +179,7 @@ export function PostForm({
           <Label htmlFor="pf-template">Partir d'un template</Label>
           <select
             id="pf-template"
-            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
             defaultValue=""
             onChange={(e) => {
               applyTemplate(e.target.value);
@@ -201,7 +201,7 @@ export function PostForm({
           <Label htmlFor="pf-client">Client</Label>
           <select
             id="pf-client"
-            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('clientId')}
           >
             {clients.map((c) => (
@@ -221,7 +221,7 @@ export function PostForm({
           <Label htmlFor="pf-network">Réseau</Label>
           <select
             id="pf-network"
-            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('network')}
           >
             {NETWORKS.map((n) => (
@@ -255,7 +255,7 @@ export function PostForm({
         <textarea
           id="pf-caption"
           rows={5}
-          className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-surface focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
           {...register('caption')}
         />
       </div>
@@ -286,7 +286,7 @@ export function PostForm({
           <Label htmlFor="pf-campaign">Campagne</Label>
           <select
             id="pf-campaign"
-            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('campaignId')}
           >
             <option value="">Aucune</option>
@@ -309,7 +309,7 @@ export function PostForm({
           <Label htmlFor="pf-author">Rédacteur</Label>
           <select
             id="pf-author"
-            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
             {...register('authorId')}
           >
             {authors.map((a) => (

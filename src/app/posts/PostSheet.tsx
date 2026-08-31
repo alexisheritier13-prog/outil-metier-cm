@@ -86,7 +86,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
         </header>
 
         <Tabs defaultValue="detail" className="flex flex-1 flex-col overflow-hidden">
-          <TabsList className="px-4">
+          <TabsList className="mx-4 mb-1 mt-3">
             <TabsTrigger value="detail">Détail</TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
           </TabsList>

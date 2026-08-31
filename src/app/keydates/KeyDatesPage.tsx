@@ -178,7 +178,7 @@ function PlanButton({
   return (
     <span className="flex items-center gap-1">
       <select
-        className="border-input bg-background h-8 rounded border px-1 text-xs"
+        className="border-input bg-surface h-8 rounded border px-1 text-xs"
         value={clientId}
         onChange={(e) => setClientId(e.target.value)}
         aria-label="Client"
@@ -191,7 +191,7 @@ function PlanButton({
         ))}
       </select>
       <select
-        className="border-input bg-background h-8 rounded border px-1 text-xs"
+        className="border-input bg-surface h-8 rounded border px-1 text-xs"
         value={network}
         onChange={(e) => setNetwork(e.target.value as Network)}
         aria-label="Réseau"
@@ -267,7 +267,7 @@ function KeyDateForm({
     >
       <div className="flex flex-wrap gap-3">
         <input
-          className="border-input bg-background flex-1 rounded border px-2 py-1.5 text-sm"
+          className="border-input bg-surface flex-1 rounded border px-2 py-1.5 text-sm"
           placeholder="Nom (ex. Fête des mères)"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -328,7 +328,7 @@ function KeyDateForm({
         )}
       </div>
       <textarea
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         rows={2}
         placeholder="Note / angle (optionnel)"
         value={description}

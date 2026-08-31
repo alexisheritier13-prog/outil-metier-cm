@@ -5,21 +5,17 @@ import {
   Bell,
   CalendarDays,
   ChevronRight,
-  FileText,
-  Inbox,
   LayoutGrid,
   Library,
   LifeBuoy,
   ListChecks,
   LogOut,
-  Megaphone,
-  MessageSquareText,
   Settings,
-  Sparkles,
   Trash2,
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
@@ -46,7 +42,7 @@ export function AppSidebar() {
   const requestCount = useOpenRequestCount(Boolean(profile));
 
   return (
-    <div className="bg-background flex h-full w-[248px] shrink-0 flex-col">
+    <div className="bg-surface flex h-full w-[248px] shrink-0 flex-col">
       <div className="flex items-center gap-2.5 px-5 pb-2 pt-5">
         <span className="bg-primary text-primary-foreground shadow-card grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
           C
@@ -54,7 +50,7 @@ export function AppSidebar() {
         <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
         <Item to="/app" end icon={LayoutGrid}>
           Accueil
         </Item>
@@ -63,10 +59,10 @@ export function AppSidebar() {
         </Item>
 
         <Group label="Validation" icon={ListChecks} match={['/app/a-valider', '/app/demandes']}>
-          <SubItem to="/app/a-valider" icon={Inbox} badge={reviewCount.data}>
+          <SubItem to="/app/a-valider" badge={reviewCount.data}>
             À valider
           </SubItem>
-          <SubItem to="/app/demandes" icon={MessageSquareText} badge={requestCount.data}>
+          <SubItem to="/app/demandes" badge={requestCount.data}>
             Demandes clients
           </SubItem>
         </Group>
@@ -80,18 +76,10 @@ export function AppSidebar() {
           icon={Library}
           match={['/app/idees', '/app/templates', '/app/marronniers', '/app/campagnes']}
         >
-          <SubItem to="/app/idees" icon={Sparkles}>
-            Idées
-          </SubItem>
-          <SubItem to="/app/templates" icon={FileText}>
-            Templates
-          </SubItem>
-          <SubItem to="/app/marronniers" icon={CalendarDays}>
-            Marronniers
-          </SubItem>
-          <SubItem to="/app/campagnes" icon={Megaphone}>
-            Campagnes
-          </SubItem>
+          <SubItem to="/app/idees">Idées</SubItem>
+          <SubItem to="/app/templates">Templates</SubItem>
+          <SubItem to="/app/marronniers">Marronniers</SubItem>
+          <SubItem to="/app/campagnes">Campagnes</SubItem>
         </Group>
 
         <Item to="/app/alertes" icon={Bell} badge={alertCount.data} badgeTone="danger">
@@ -99,7 +87,7 @@ export function AppSidebar() {
         </Item>
       </nav>
 
-      <div className="border-border/70 space-y-0.5 border-t px-3 py-3">
+      <div className="border-border/70 space-y-1 border-t px-3 py-3">
         {isManager && (
           <Item to="/app/corbeille" icon={Trash2}>
             Corbeille
@@ -115,10 +103,8 @@ export function AppSidebar() {
         </Item>
       </div>
 
-      <div className="border-border/70 m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
-        <span className="bg-primary-surface text-primary-strong grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold">
-          {(profile?.fullName || profile?.email || '?').slice(0, 2).toUpperCase()}
-        </span>
+      <div className="border-border/70 bg-surface shadow-xs m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
+        <UserAvatar name={profile?.fullName || profile?.email || '?'} avatarUrl={profile?.avatarUrl} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium leading-tight">
             {profile?.fullName || profile?.email}
@@ -144,9 +130,9 @@ type IconType = typeof Bell;
 
 function itemClass(active: boolean) {
   return cn(
-    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-150',
+    'flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors duration-150',
     active
-      ? 'bg-primary text-primary-foreground shadow-card font-medium'
+      ? 'bg-primary text-primary-foreground shadow-sm'
       : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
   );
 }
@@ -171,7 +157,7 @@ function Item({
       {({ isActive }) => (
         <>
           <Icon
-            className={cn('h-[18px] w-[18px] shrink-0', !isActive && 'text-muted-foreground')}
+            className={cn('h-5 w-5 shrink-0', !isActive && 'text-muted-foreground')}
             aria-hidden="true"
             strokeWidth={2}
           />
@@ -204,33 +190,31 @@ function Group({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+          'flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors',
           containsActive && !open
-            ? 'text-foreground font-medium'
+            ? 'text-foreground'
             : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )}
         aria-expanded={open}
       >
-        <Icon className="text-muted-foreground h-[18px] w-[18px] shrink-0" aria-hidden="true" strokeWidth={2} />
+        <Icon className="text-muted-foreground h-5 w-5 shrink-0" aria-hidden="true" strokeWidth={2} />
         <span className="flex-1 text-left">{label}</span>
         <ChevronRight
-          className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-90')}
+          className={cn('h-4 w-4 shrink-0 transition-transform', open && 'rotate-90')}
           aria-hidden="true"
         />
       </button>
-      {open && <div className="mt-0.5 space-y-0.5 pl-3">{children}</div>}
+      {open && <div className="mt-1 space-y-1 pl-4">{children}</div>}
     </div>
   );
 }
 
 function SubItem({
   to,
-  icon: Icon,
   children,
   badge,
 }: {
   to: string;
-  icon: IconType;
   children: ReactNode;
   badge?: number;
 }) {
@@ -239,7 +223,7 @@ function SubItem({
       to={to}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-3 rounded-lg py-2 pl-3 pr-2 text-sm transition-colors',
+          'flex items-center gap-3 rounded-lg py-2.5 pl-3.5 pr-2 text-[0.9rem] transition-colors',
           isActive
             ? 'bg-primary-surface text-primary-strong font-medium'
             : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
@@ -248,8 +232,11 @@ function SubItem({
     >
       {({ isActive }) => (
         <>
-          <Icon
-            className={cn('h-4 w-4 shrink-0', isActive ? 'text-primary-strong' : 'text-muted-foreground')}
+          <span
+            className={cn(
+              'h-1.5 w-1.5 shrink-0 rounded-full',
+              isActive ? 'bg-primary' : 'bg-muted-foreground/50',
+            )}
             aria-hidden="true"
           />
           <span className="flex-1 truncate">{children}</span>

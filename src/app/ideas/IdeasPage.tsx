@@ -194,14 +194,14 @@ function IdeaForm({
   return (
     <form onSubmit={submit} className="surface-card mb-6 space-y-3 p-4">
       <input
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         placeholder="Titre de l'idée"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         aria-label="Titre"
       />
       <textarea
-        className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
         rows={3}
         placeholder="Description, angle, référence…"
         value={description}

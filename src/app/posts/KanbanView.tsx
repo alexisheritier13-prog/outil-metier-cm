@@ -82,7 +82,7 @@ export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onTog
                   <div
                     key={p.id}
                     className={cn(
-                      'bg-background hover:border-foreground/40 relative rounded border text-xs',
+                      'bg-surface hover:border-foreground/40 relative rounded border text-xs',
                       checked && 'border-primary ring-primary/30 ring-1',
                     )}
                   >

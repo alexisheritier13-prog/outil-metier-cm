@@ -41,7 +41,7 @@ export function RequestComments({
         }}
       >
         <textarea
-          className="border-input bg-background focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
           rows={2}
           placeholder="Répondre…"
           value={body}

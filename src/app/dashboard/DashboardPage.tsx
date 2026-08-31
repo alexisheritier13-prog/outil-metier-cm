@@ -12,8 +12,9 @@ import {
   TriangleAlert,
   Users,
 } from 'lucide-react';
-import { Page, PageHeader } from '@/components/Page';
+import { Page } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
+import { UserAvatar } from '@/components/UserAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -35,7 +36,7 @@ type IconType = typeof Inbox;
 
 const PIPELINE_STATUSES = POST_STATUSES.filter((s) => s !== 'published');
 const STATUS_BAR_COLOR: Record<PostStatus, string> = {
-  draft: 'var(--border-strong)',
+  draft: 'oklch(0.75 0.015 262)',
   internal_review: 'var(--info)',
   client_review: 'var(--warning)',
   approved: 'var(--success)',
@@ -145,7 +146,13 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <PageHeader title={`Bonjour ${firstName}`} description={today} />
+      <header className="mb-6 flex items-center gap-3">
+        <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
+        <div className="space-y-1">
+          <h1 className="text-title tracking-tight">Bonjour {firstName}</h1>
+          <p className="text-muted-foreground text-sm capitalize">{today}</p>
+        </div>
+      </header>
 
       {/* À traiter */}
       <div className="mb-6 grid gap-4 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
@@ -417,42 +424,43 @@ function ProductionPanel({
       </div>
 
       {loading ? (
-        <Skeleton className="h-2.5 w-full rounded-full" />
+        <div className="space-y-2.5">
+          {PIPELINE_STATUSES.map((s) => (
+            <Skeleton key={s} className="h-6 w-full" />
+          ))}
+        </div>
       ) : total === 0 ? (
         <p className="text-muted-foreground text-sm">Aucun post en préparation pour le moment.</p>
       ) : (
-        <>
-          <div className="bg-surface-2 flex h-2.5 overflow-hidden rounded-full">
-            {PIPELINE_STATUSES.map((s) =>
-              counts[s] > 0 ? (
-                <span
-                  key={s}
-                  className="h-full"
-                  style={{
-                    width: `${(counts[s] / total) * 100}%`,
-                    backgroundColor: STATUS_BAR_COLOR[s],
-                  }}
-                  title={`${POST_STATUS_LABELS[s]} : ${counts[s]}`}
-                />
-              ) : null,
-            )}
-          </div>
-          <ul className="mt-4 grid gap-x-5 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-3">
-            {PIPELINE_STATUSES.map((s) => (
-              <li key={s} className="flex items-center gap-2 text-sm">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                  style={{ backgroundColor: STATUS_BAR_COLOR[s] }}
-                  aria-hidden="true"
-                />
-                <span className="text-muted-foreground min-w-0 flex-1 truncate">
-                  {POST_STATUS_LABELS[s]}
+        <ul className="space-y-2">
+          {PIPELINE_STATUSES.map((s) => {
+            const n = counts[s];
+            const max = Math.max(...PIPELINE_STATUSES.map((k) => counts[k]), 1);
+            return (
+              <li key={s} className="flex items-center gap-3 text-sm">
+                <span className="text-muted-foreground flex w-40 shrink-0 items-center gap-2">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: STATUS_BAR_COLOR[s] }}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">{POST_STATUS_LABELS[s]}</span>
                 </span>
-                <span className="font-medium tabular-nums">{counts[s]}</span>
+                <span className="bg-surface-2 relative h-6 flex-1 overflow-hidden rounded-md">
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-500 ease-out"
+                    style={{
+                      width: `${Math.max((n / max) * 100, n > 0 ? 6 : 0)}%`,
+                      backgroundColor: STATUS_BAR_COLOR[s],
+                    }}
+                    aria-hidden="true"
+                  />
+                </span>
+                <span className="w-6 shrink-0 text-right font-semibold tabular-nums">{n}</span>
               </li>
-            ))}
-          </ul>
-        </>
+            );
+          })}
+        </ul>
       )}
     </section>
   );

@@ -57,7 +57,7 @@ export function PerformanceSection({ post }: { post: Post }) {
         <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Performance
       </p>
       <textarea
-        className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
+        className="border-input bg-surface focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
         rows={3}
         placeholder="Ex. 820 likes, 34 partages, +180 abonnés…"
         value={note}
