@@ -6,19 +6,9 @@ import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg, EventDropArg } from '@fullcalendar/core';
 import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
+import { NETWORK_BRAND } from '@/components/networkBrand';
 import type { Post } from '@/shared/types';
 import { useReschedulePost } from './usePosts';
-
-const NETWORK_ABBR: Record<string, string> = {
-  instagram: 'IG',
-  linkedin: 'IN',
-  facebook: 'FB',
-  tiktok: 'TT',
-  x: 'X',
-  youtube: 'YT',
-  pinterest: 'PT',
-  threads: 'TH',
-};
 
 interface KeyDateMarker {
   id: string;
@@ -114,9 +104,14 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
               title={`${clientName(post.clientId)} · ${NETWORK_LABELS[post.network]} · ${POST_STATUS_LABELS[post.status]}`}
             >
               <span className="font-medium tabular-nums">{arg.timeText}</span>
-              <span className="border-current/40 rounded border px-0.5 font-semibold">
-                {NETWORK_ABBR[post.network]}
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-3 w-3 shrink-0"
+                fill={NETWORK_BRAND[post.network].hex}
+                aria-hidden="true"
+              >
+                <path d={NETWORK_BRAND[post.network].path} />
+              </svg>
               <span className="truncate">{clientName(post.clientId)}</span>
               <StatusDot status={post.status} />
             </div>
