@@ -78,6 +78,15 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             {me && <StatusControl postId={post.id} status={post.status} role={me.role} />}
           </div>
 
+          {post.canvaThumbnailUrl && (
+            <img
+              src={post.canvaThumbnailUrl}
+              alt="Aperçu du visuel Canva"
+              className="max-h-64 w-full rounded border object-contain"
+              loading="lazy"
+            />
+          )}
+
           <dl className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">Date</dt>
             <dd>
@@ -168,6 +177,8 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
                 scheduledAt: post.scheduledAt,
                 caption: post.caption,
                 canvaUrl: post.canvaUrl,
+                canvaThumbnailUrl: post.canvaThumbnailUrl,
+                canvaThumbnailSource: post.canvaThumbnailSource,
                 authorId: post.authorId,
                 campaignId: post.campaignId,
                 tags: tagNames,

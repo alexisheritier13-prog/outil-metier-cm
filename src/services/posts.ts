@@ -45,10 +45,21 @@ export interface PostInput {
   scheduledAt: string;
   caption: string;
   canvaUrl: string | null;
+  canvaThumbnailUrl?: string | null;
+  canvaThumbnailSource?: 'auto' | 'manual' | null;
   authorId?: string;
   campaignId?: string | null;
   /** Noms de tags (créés à la volée si besoin). */
   tags?: string[];
+}
+
+function canvaFields(input: PostInput) {
+  if (input.canvaThumbnailUrl === undefined) return {};
+  return {
+    canva_thumbnail_url: input.canvaThumbnailUrl,
+    canva_thumbnail_source: input.canvaThumbnailUrl ? (input.canvaThumbnailSource ?? 'auto') : null,
+    canva_fetched_at: input.canvaThumbnailUrl ? new Date().toISOString() : null,
+  };
 }
 
 async function applyTags(postId: string, names: string[] | undefined): Promise<void> {
@@ -70,6 +81,7 @@ export async function createPost(input: PostInput): Promise<Post> {
       canva_url: input.canvaUrl,
       campaign_id: input.campaignId ?? null,
       author_id: input.authorId ?? userRes.user?.id ?? '',
+      ...canvaFields(input),
     })
     .select('*')
     .single();
@@ -89,6 +101,7 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
       canva_url: input.canvaUrl,
       campaign_id: input.campaignId ?? null,
       ...(input.authorId ? { author_id: input.authorId } : {}),
+      ...canvaFields(input),
     })
     .eq('id', id)
     .select('*')

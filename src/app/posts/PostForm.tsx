@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
@@ -10,13 +11,13 @@ import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
 import type { Client, Profile } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
+import { CanvaField } from './CanvaField';
 
 const schema = z.object({
   clientId: z.string().min(1, 'Client requis'),
   network: z.enum(NETWORKS),
   scheduledLocal: z.string().min(1, 'Date et heure requises'),
   caption: z.string(),
-  canvaUrl: z.string().trim().url('URL invalide').or(z.literal('')),
   authorId: z.string().optional(),
   campaignId: z.string().optional(),
   tagsText: z.string(),
@@ -40,6 +41,8 @@ interface Props {
     scheduledAt: string;
     caption: string;
     canvaUrl: string | null;
+    canvaThumbnailUrl: string | null;
+    canvaThumbnailSource: 'auto' | 'manual' | null;
     authorId: string;
     campaignId: string | null;
     tags: string[];
@@ -74,11 +77,16 @@ export function PostForm({
       network: defaults?.network ?? 'instagram',
       scheduledLocal: defaults?.scheduledAt ? toLocalInput(defaults.scheduledAt) : '',
       caption: defaults?.caption ?? '',
-      canvaUrl: defaults?.canvaUrl ?? '',
       authorId: defaults?.authorId,
       campaignId: defaults?.campaignId ?? '',
       tagsText: (defaults?.tags ?? []).join(', '),
     },
+  });
+
+  const [canvaUrl, setCanvaUrl] = useState(defaults?.canvaUrl ?? '');
+  const [thumb, setThumb] = useState<{ url: string | null; source: 'auto' | 'manual' | null }>({
+    url: defaults?.canvaThumbnailUrl ?? null,
+    source: defaults?.canvaThumbnailSource ?? null,
   });
 
   const clientId = watch('clientId');
@@ -108,7 +116,9 @@ export function PostForm({
           network: v.network,
           scheduledAt,
           caption: v.caption,
-          canvaUrl: v.canvaUrl || null,
+          canvaUrl: canvaUrl.trim() || null,
+          canvaThumbnailUrl: thumb.url,
+          canvaThumbnailSource: thumb.source,
           authorId: canReassign ? v.authorId : undefined,
           campaignId: v.campaignId || null,
           tags: v.tagsText
@@ -175,15 +185,13 @@ export function PostForm({
         />
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="pf-canva">Lien Canva</Label>
-        <Input id="pf-canva" placeholder="https://www.canva.com/design/…" {...register('canvaUrl')} />
-        {errors.canvaUrl && (
-          <p className="text-destructive text-sm" role="alert">
-            {errors.canvaUrl.message}
-          </p>
-        )}
-      </div>
+      <CanvaField
+        url={canvaUrl}
+        onUrlChange={setCanvaUrl}
+        thumbnailUrl={thumb.url}
+        thumbnailSource={thumb.source}
+        onThumbnail={(url, source) => setThumb({ url, source })}
+      />
 
       <div className="flex flex-wrap gap-4">
         <div className="min-w-48 flex-1 space-y-1.5">
