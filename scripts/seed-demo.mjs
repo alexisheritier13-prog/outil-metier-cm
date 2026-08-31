@@ -106,6 +106,18 @@ async function main() {
   const cmId = await ensureUser('cm.demo@studiolumen.test', 'cm', 'Camille Roy', av(47));
   const contactId = await ensureUser('client.demo@studiolumen.test', 'client', 'Chris (Studio Lumen)', av(33));
 
+  await admin.from('app_settings').upsert({
+    key: 'account',
+    value: {
+      onboarded: true,
+      team_mode: 'team',
+      default_skip_client_review: false,
+      active_networks: null,
+      agency_name: 'Studio Lumen',
+      agency_logo_url: '',
+    },
+  });
+
   await admin
     .from('user_clients')
     .upsert([

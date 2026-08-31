@@ -81,6 +81,12 @@ const AlertsPage = lazy(() =>
   import('@/app/alerts/AlertsPage').then((m) => ({ default: m.AlertsPage })),
 );
 const HelpPage = lazy(() => import('@/app/help/HelpPage').then((m) => ({ default: m.HelpPage })));
+const AccountSettingsPage = lazy(() =>
+  import('@/app/settings/AccountSettingsPage').then((m) => ({ default: m.AccountSettingsPage })),
+);
+const OnboardingWizard = lazy(() =>
+  import('@/app/account/OnboardingWizard').then((m) => ({ default: m.OnboardingWizard })),
+);
 
 function lazyRoute(node: React.ReactNode) {
   return <Suspense fallback={<FullPageSpinner />}>{node}</Suspense>;
@@ -90,6 +96,10 @@ export const router = createBrowserRouter(
   [
     { path: '/', element: <Navigate to="/app" replace /> },
     { path: '/login', element: lazyRoute(<LoginPage />) },
+    {
+      path: '/bienvenue',
+      element: <RequireRole roles={['admin']}>{lazyRoute(<OnboardingWizard />)}</RequireRole>,
+    },
     {
       // Vue imprimable autonome (hors coquille) — Story 9.3.
       path: '/app/clients/:clientId/export',
@@ -131,6 +141,12 @@ export const router = createBrowserRouter(
         {
           path: 'parametres/utilisateurs',
           element: <RequireRole roles={['admin']}>{lazyRoute(<UsersPage />)}</RequireRole>,
+        },
+        {
+          path: 'parametres/compte',
+          element: (
+            <RequireRole roles={['admin']}>{lazyRoute(<AccountSettingsPage />)}</RequireRole>
+          ),
         },
         {
           path: 'parametres/workflow',

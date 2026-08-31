@@ -8,6 +8,7 @@ import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
+import { getAccountSettings } from '@/services/accountSettings';
 import { listMyClients } from '@/services/portal';
 import { PortalClientContext } from './PortalClientContext';
 import { usePortalPendingCount } from './usePortal';
@@ -33,6 +34,12 @@ export function PortalLayout() {
   const { data: profile } = useCurrentProfile();
   const signOut = useSignOut();
   const clients = useQuery({ queryKey: ['portal', 'my-clients'], queryFn: listMyClients });
+  const account = useQuery({
+    queryKey: ['account-settings'],
+    queryFn: getAccountSettings,
+    staleTime: 5 * 60_000,
+  });
+  const agencyName = account.data?.agencyName || 'Cadence';
 
   const [clientId, setClientId] = useState<string | null>(() => readStored());
   const [logoBroken, setLogoBroken] = useState(false);
@@ -62,7 +69,7 @@ export function PortalLayout() {
     return (
       <main className="min-h-dvh p-8">
         <header className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
-          <span className="text-[15px] font-semibold tracking-tight">Espace client</span>
+          <span className="text-[15px] font-semibold tracking-tight">{agencyName}</span>
           <Button variant="outline" size="sm" onClick={() => signOut.mutate()}>
             Déconnexion
           </Button>
@@ -160,6 +167,15 @@ export function PortalLayout() {
         </header>
 
         <Outlet />
+
+        <footer className="text-muted-foreground mx-auto max-w-5xl px-4 pb-8 pt-4 text-xs sm:px-6">
+          <span className="inline-flex items-center gap-1.5">
+            {account.data?.agencyLogoUrl && (
+              <img src={account.data.agencyLogoUrl} alt="" className="h-4 w-auto" loading="lazy" />
+            )}
+            Espace client — {agencyName}
+          </span>
+        </footer>
       </div>
     </PortalClientContext.Provider>
   );

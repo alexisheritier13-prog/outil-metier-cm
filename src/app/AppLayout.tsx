@@ -1,13 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { useCurrentProfile } from '@/auth/useCurrentProfile';
+import { useAccountSettings } from '@/app/account/useAccount';
 import { AppSidebar } from './AppSidebar';
 
 export function AppLayout() {
   const [drawer, setDrawer] = useState(false);
   const { pathname } = useLocation();
+  const { data: me } = useCurrentProfile();
+  const account = useAccountSettings();
 
   useEffect(() => setDrawer(false), [pathname]);
+
+  // Admin sur un compte non configuré → assistant de bienvenue.
+  if (me?.role === 'admin' && account.data && !account.data.onboarded) {
+    return <Navigate to="/bienvenue" replace />;
+  }
 
   return (
     <div className="bg-background min-h-dvh lg:p-4">

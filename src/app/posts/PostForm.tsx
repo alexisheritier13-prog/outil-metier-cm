@@ -14,6 +14,7 @@ import {
   textareaClass,
 } from '@/components/form';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
+import { useActiveNetworks } from '@/app/account/useAccount';
 import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
@@ -132,6 +133,11 @@ export function PostForm({
   const networks = useQuery({ queryKey: ['networks'], queryFn: listNetworks, staleTime: 5 * 60_000 });
   const networkSpecs = networks.data?.find((n) => n.code === network)?.specs;
 
+  const activeNetworks = useActiveNetworks();
+  const netOptions: Network[] = activeNetworks.includes(network)
+    ? activeNetworks
+    : [network, ...activeNetworks];
+
   return (
     <form
       className="flex min-h-0 flex-1 flex-col"
@@ -216,7 +222,7 @@ export function PostForm({
             </FormField>
             <FormField label="Réseau" htmlFor="pf-network">
               <select id="pf-network" className={selectClass} {...register('network')}>
-                {NETWORKS.map((n) => (
+                {netOptions.map((n) => (
                   <option key={n} value={n}>
                     {NETWORK_LABELS[n]}
                   </option>

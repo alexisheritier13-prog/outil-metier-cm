@@ -71,6 +71,9 @@ contenu. Application web hébergée (SPA React + Vite + Supabase). Remplace Noti
 - **App renommée « Cadence »** (dépôt reste `outil-metier-cm`). Rôles : Directeur / Chef de projet / CM.
 - **Aide in-app** `/app/aide`, **marronniers pré-remplis** (~68 dates, migr 0030), **mode « CM seul »** (migr 0031, `/app/parametres/workflow`), **animations** discrètes, **vrais logos de réseaux**.
 - **Upload de visuels** (migr 0032) : `post_media` (carrousel ordonné) + bucket `post-media` public. Le champ « aperçu Canva » devient un vrai upload photo/vidéo (`MediaField` / `MediaGallery`) ; `canva_url` reste un lien de travail **interne** (masqué côté client). Nettoyage bucket via Storage API (`deletePostMedia`) ; orphelins possibles au purge d'un post. 3 tests unit + 5 d'intégration (RLS + storage).
+- **Photo de profil** (migr 0033) : `profiles.avatar_url`, `<UserAvatar>` (sidebar + accueil), section « Mon profil » dans les paramètres.
+- **Client sans validation** (migr 0034) : `clients.skip_client_review` — l'étape « à valider client » est sautée, un rôle interne passe le post directement en « validé ». `can_transition` gagne un 4e paramètre `p_client_id`. Case à cocher dans le formulaire client. 6 tests unit + 3 d'intégration.
+- **Configuration du compte** : `app_settings.account` (pas de migration). Assistant de bienvenue `/bienvenue` (Admin sur compte non configuré) + page `/app/parametres/compte` — organisation (solo / équipe), validation client par défaut, réseaux proposés (filtre le formulaire de post + le filtre planning), nom / logo de l'agence dans l'espace client. Voir `docs/stories/post-v1.account-config.md`.
 
 ### Tests
 

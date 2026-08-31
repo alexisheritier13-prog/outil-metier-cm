@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { POST_STATUSES, POST_STATUS_LABELS } from '@/shared/constants/postStatus';
-import { NETWORKS, NETWORK_LABELS } from '@/shared/constants/networks';
+import { NETWORK_LABELS } from '@/shared/constants/networks';
+import { useActiveNetworks } from '@/app/account/useAccount';
 import type { Client } from '@/shared/types';
 import type { PlanningFilters } from './useFilters';
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Props) {
+  const activeNetworks = useActiveNetworks();
   return (
     <div className="surface-card mb-4 flex flex-wrap items-center gap-2 px-3 py-2.5">
       <MultiSelect
@@ -33,7 +35,7 @@ export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Pro
       />
       <MultiSelect
         label="Réseau"
-        options={NETWORKS.map((n) => ({ value: n, label: NETWORK_LABELS[n] }))}
+        options={activeNetworks.map((n) => ({ value: n, label: NETWORK_LABELS[n] }))}
         selected={filters.networks}
         onChange={(networks) => onChange({ networks: networks as PlanningFilters['networks'] })}
       />

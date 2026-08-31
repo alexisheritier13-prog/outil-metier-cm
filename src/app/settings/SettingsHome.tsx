@@ -12,6 +12,11 @@ import { UserAvatar } from '@/components/UserAvatar';
 
 const LINKS = [
   {
+    to: '/app/parametres/compte',
+    label: 'Compte',
+    desc: 'Organisation, réseaux proposés, nom et logo dans l’espace client.',
+  },
+  {
     to: '/app/parametres/utilisateurs',
     label: 'Utilisateurs',
     desc: 'Comptes internes, rôles, clients assignés.',

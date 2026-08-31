@@ -11,6 +11,7 @@ import { TableSkeleton } from '@/components/ui/skeleton';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import type { ClientOverview } from '@/shared/types';
+import { useAccountSettings } from '@/app/account/useAccount';
 import { useClientOverview, useCreateClient } from './useClients';
 import { ClientForm } from './ClientForm';
 import { parisDateLabel } from '@/shared/utils/tz';
@@ -29,6 +30,7 @@ export function ClientsPage() {
   });
   const clients = useClientOverview(includeArchived);
   const create = useCreateClient();
+  const account = useAccountSettings();
 
   const rows = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -71,6 +73,9 @@ export function ClientsPage() {
                   submitLabel="Créer le client"
                   pending={create.isPending}
                   error={create.isError ? create.error : undefined}
+                  defaultValues={{
+                    skipClientReview: account.data?.defaultSkipClientReview ?? false,
+                  }}
                   onCancel={() => setOpen(false)}
                   onSubmit={async (input) => {
                     await create.mutateAsync(input);
