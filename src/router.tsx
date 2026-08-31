@@ -42,8 +42,11 @@ const PortalReviewPage = lazy(() =>
 const PortalPublishedPage = lazy(() =>
   import('@/portal/PortalPublishedPage').then((m) => ({ default: m.PortalPublishedPage })),
 );
-const PortalSoonPage = lazy(() =>
-  import('@/portal/PortalSoonPage').then((m) => ({ default: m.PortalSoonPage })),
+const PortalBriefsPage = lazy(() =>
+  import('@/portal/PortalBriefsPage').then((m) => ({ default: m.PortalBriefsPage })),
+);
+const RequestsPage = lazy(() =>
+  import('@/app/requests/RequestsPage').then((m) => ({ default: m.RequestsPage })),
 );
 
 function lazyRoute(node: React.ReactNode) {
@@ -62,6 +65,7 @@ export const router = createBrowserRouter(
       children: [
         { index: true, element: lazyRoute(<PlanningPage />) },
         { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
+        { path: 'demandes', element: lazyRoute(<RequestsPage />) },
         { path: 'clients', element: lazyRoute(<ClientsPage />) },
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
         { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },
@@ -85,15 +89,7 @@ export const router = createBrowserRouter(
         { index: true, element: lazyRoute(<PortalCalendarPage />) },
         { path: 'a-valider', element: lazyRoute(<PortalReviewPage />) },
         { path: 'publies', element: lazyRoute(<PortalPublishedPage />) },
-        {
-          path: 'briefs',
-          element: lazyRoute(
-            <PortalSoonPage
-              title="Briefs"
-              note="Le dépôt de demandes de contenu arrive très bientôt."
-            />,
-          ),
-        },
+        { path: 'briefs', element: lazyRoute(<PortalBriefsPage />) },
       ],
     },
     { path: '*', element: <Navigate to="/app" replace /> },

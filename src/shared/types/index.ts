@@ -291,6 +291,8 @@ type PostHistoryRow = Database['public']['Tables']['post_history']['Row'];
 type PostCommentRow = Database['public']['Tables']['post_comments']['Row'];
 type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 type ClientActivityRow = Database['public']['Views']['client_activity']['Row'];
+type ClientRequestRow = Database['public']['Tables']['client_requests']['Row'];
+type ClientRequestCommentRow = Database['public']['Tables']['client_request_comments']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -396,5 +398,57 @@ export function toClientActivityEntry(row: ClientActivityRow): ClientActivityEnt
     actorId: row.actor_id,
     actorName: row.actor_name,
     createdAt: row.created_at ?? '',
+  };
+}
+
+export type ClientRequestStatus = 'nouvelle' | 'prise_en_compte' | 'traitee';
+
+export const CLIENT_REQUEST_STATUS_LABELS: Record<ClientRequestStatus, string> = {
+  nouvelle: 'Nouvelle',
+  prise_en_compte: 'Prise en compte',
+  traitee: 'Traitée',
+};
+
+export interface ClientRequest {
+  id: string;
+  clientId: string;
+  createdBy: string;
+  title: string;
+  description: string;
+  wantedNetwork: Network | null;
+  wantedDate: string | null;
+  status: ClientRequestStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+export function toClientRequest(row: ClientRequestRow): ClientRequest {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    createdBy: row.created_by,
+    title: row.title,
+    description: row.description,
+    wantedNetwork: row.wanted_network,
+    wantedDate: row.wanted_date,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export interface ClientRequestComment {
+  id: string;
+  requestId: string;
+  authorId: string;
+  body: string;
+  createdAt: string;
+}
+export function toClientRequestComment(row: ClientRequestCommentRow): ClientRequestComment {
+  return {
+    id: row.id,
+    requestId: row.request_id,
+    authorId: row.author_id,
+    body: row.body,
+    createdAt: row.created_at,
   };
 }

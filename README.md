@@ -47,7 +47,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Stories 6.1 + 6.2** faites : espace client `/portail` — layout isolé (RLS `clients_select_contact`, migr 0021), sélecteur multi-clients, calendrier mois/liste (lecture), détail post client (`PortalPostDetail`, échanges `client` uniquement). Test d'isolation A≠B central. 171 tests.
 - **Story 6.3** faite : approbation / refus + commentaires côté client — boutons Approuver / Demander une modification (RPC 5.3), fil de commentaires client, file `/portail/a-valider` + compteur nav. 175 tests. (E2E Playwright → Epic 9.)
 - **Story 6.4** faite : historique des publiés côté client (`/portail/publies`) — recherche mot-clé + filtres réseau/période, note de perf masquée si non partagée (`redactClientPost`), accès maintenu après archivage. 181 tests.
-- Prochaine : Epic 6 (6.5 espace brief client → agence).
+- **Story 6.5** faite : espace brief client → agence — `client_requests` + commentaires (migr 0022), page client `/portail/briefs` (créer / modifier si nouvelle / suivre), page interne `/app/demandes` (statut + « Transformer en post » via RPC `request_to_post`). **Epic 6 terminé.**
+- Prochaine : Epic 7 (organisation du contenu : idées, templates, marronniers).
 
 ### Tests
 

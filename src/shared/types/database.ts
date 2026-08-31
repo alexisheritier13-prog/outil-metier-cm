@@ -151,6 +151,106 @@ export type Database = {
           },
         ]
       }
+      client_request_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          request_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          request_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_request_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_request_comments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "client_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_requests: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          status: Database["public"]["Enums"]["client_request_status_t"]
+          title: string
+          updated_at: string
+          wanted_date: string | null
+          wanted_network: Database["public"]["Enums"]["network_t"] | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by: string
+          description?: string
+          id?: string
+          status?: Database["public"]["Enums"]["client_request_status_t"]
+          title: string
+          updated_at?: string
+          wanted_date?: string | null
+          wanted_network?: Database["public"]["Enums"]["network_t"] | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          status?: Database["public"]["Enums"]["client_request_status_t"]
+          title?: string
+          updated_at?: string
+          wanted_date?: string | null
+          wanted_network?: Database["public"]["Enums"]["network_t"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_requests_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           archived_at: string | null
@@ -1046,6 +1146,7 @@ export type Database = {
       }
       auth_is_active: { Args: never; Returns: boolean }
       auth_role: { Args: never; Returns: Database["public"]["Enums"]["role_t"] }
+      can_see_client_request: { Args: { cid: string }; Returns: boolean }
       can_transition: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]
@@ -1229,6 +1330,44 @@ export type Database = {
         }
       }
       remind_client_review: { Args: { p_post_id: string }; Returns: undefined }
+      request_to_post: {
+        Args: {
+          p_network?: Database["public"]["Enums"]["network_t"]
+          p_request_id: string
+          p_scheduled_at?: string
+        }
+        Returns: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "posts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       transition_needs_comment: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]
@@ -1242,6 +1381,7 @@ export type Database = {
       }
     }
     Enums: {
+      client_request_status_t: "nouvelle" | "prise_en_compte" | "traitee"
       comment_visibility_t: "internal" | "client"
       network_t:
         | "instagram"
@@ -1387,6 +1527,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      client_request_status_t: ["nouvelle", "prise_en_compte", "traitee"],
       comment_visibility_t: ["internal", "client"],
       network_t: [
         "instagram",

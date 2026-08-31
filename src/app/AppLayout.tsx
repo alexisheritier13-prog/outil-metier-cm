@@ -7,6 +7,7 @@ import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { countReviewQueue } from '@/services/posts';
+import { useOpenRequestCount } from '@/app/requests/useRequests';
 
 export function AppLayout() {
   const { data: profile } = useCurrentProfile();
@@ -16,6 +17,7 @@ export function AppLayout() {
     queryFn: countReviewQueue,
     enabled: Boolean(profile),
   });
+  const requestCount = useOpenRequestCount(Boolean(profile));
 
   return (
     <div className="min-h-dvh">
@@ -30,6 +32,14 @@ export function AppLayout() {
             {(reviewCount.data ?? 0) > 0 && (
               <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
                 {reviewCount.data}
+              </span>
+            )}
+          </NavItem>
+          <NavItem to="/app/demandes">
+            Demandes
+            {(requestCount.data ?? 0) > 0 && (
+              <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
+                {requestCount.data}
               </span>
             )}
           </NavItem>
