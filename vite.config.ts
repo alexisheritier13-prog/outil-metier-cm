@@ -23,8 +23,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test/load-env.ts', 'src/test/setup.ts'],
     css: false,
-    // Tests d'intégration DB : lancés à part (`npm run test:rls`), en série,
-    // car ils partagent un unique projet Supabase.
-    exclude: ['node_modules/**', 'dist/**', 'tests/integration/**'],
+    // Tests d'intégration DB (`npm run test:rls`, en série) et E2E Playwright
+    // (`npm run test:e2e`) sont lancés à part, pas par Vitest.
+    exclude: ['node_modules/**', 'dist/**', 'tests/integration/**', 'e2e/**'],
   },
 });

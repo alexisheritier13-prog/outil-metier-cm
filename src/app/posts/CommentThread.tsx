@@ -10,6 +10,7 @@ import {
   updatePostComment,
 } from '@/services/postComments';
 import type { CommentVisibility } from '@/shared/types';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 const key = (postId: string) => ['post-comments', postId] as const;
 
@@ -49,7 +50,7 @@ export function CommentThread({ postId }: { postId: string }) {
           <li key={c.id} className="bg-surface-2 rounded border p-2 text-sm">
             <div className="text-muted-foreground mb-1 flex items-center gap-2 text-xs">
               <span className="font-medium">{name(c.authorId)}</span>
-              <span>{new Date(c.createdAt).toLocaleDateString('fr-FR')}</span>
+              <span>{parisDateLabel(c.createdAt)}</span>
               <span className="rounded border px-1">
                 {c.visibility === 'client' ? 'visible client' : 'interne'}
               </span>

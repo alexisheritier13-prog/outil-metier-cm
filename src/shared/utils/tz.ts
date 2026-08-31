@@ -111,6 +111,11 @@ export function parisDateLabel(
   return opts.year === false ? base : `${base} ${p.year}`;
 }
 
+/** Date + heure lisibles en français, en Europe/Paris — ex. `10 sept. 2026 à 14:30`. */
+export function parisDateTimeLabel(instant: Date | string): string {
+  return `${parisDateLabel(instant)} à ${parisTimeLabel(instant)}`;
+}
+
 function pad(n: number): string {
   return n.toString().padStart(2, '0');
 }

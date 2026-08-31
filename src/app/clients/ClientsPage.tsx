@@ -13,12 +13,13 @@ import {
 } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/EmptyState';
 import { ClientAvatar } from '@/components/ClientAvatar';
-import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { TableSkeleton } from '@/components/ui/skeleton';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import type { ClientOverview } from '@/shared/types';
 import { useClientOverview, useCreateClient } from './useClients';
 import { ClientForm } from './ClientForm';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 type SortKey = 'name' | 'onboarding' | 'lastActivity';
 
@@ -107,7 +108,7 @@ export function ClientsPage() {
       </div>
 
       {clients.isLoading ? (
-        <FullPageSpinner />
+        <TableSkeleton rows={8} />
       ) : rows.length === 0 ? (
         <EmptyState
           icon={Building2}
@@ -121,9 +122,9 @@ export function ClientsPage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-surface-2 text-left">
+            <thead className="border-border-strong border-b-2 text-left">
               <tr>
                 <Th label="Client" active={sort.key === 'name'} dir={sort.dir} onClick={() => toggleSort('name')} />
                 <th className="p-3 font-medium">Secteur</th>
@@ -146,7 +147,7 @@ export function ClientsPage() {
             </thead>
             <tbody>
               {rows.map((c) => (
-                <tr key={c.id} className="hover:bg-surface-2/60 border-t">
+                <tr key={c.id} className="hover:bg-surface-2/60 border-border/70 border-b">
                   <td className="p-3">
                     <Link
                       to={`/app/clients/${c.id}`}
@@ -176,7 +177,7 @@ export function ClientsPage() {
                   </td>
                   <td className="text-muted-foreground p-3">
                     {c.lastActivityAt
-                      ? new Date(c.lastActivityAt).toLocaleDateString('fr-FR')
+                      ? parisDateLabel(c.lastActivityAt)
                       : '—'}
                   </td>
                 </tr>

@@ -84,6 +84,10 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
         headerToolbar={{ left: 'prev,next today', center: 'title', right: '' }}
         locale="fr"
         firstDay={1}
+        // Boutons texte plutôt qu'icônes `role="img"` sans alt (a11y, Story 9.5).
+        buttonIcons={false}
+        buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
+        buttonHints={{ prev: 'Période précédente', next: 'Période suivante', today: "Aller à aujourd'hui" }}
         height="auto"
         events={events}
         editable={editable}
@@ -94,7 +98,6 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
         nowIndicator
         eventDrop={handleDrop}
         eventClick={handleClick}
-        buttonText={{ today: "Aujourd'hui" }}
         eventContent={(arg: EventContentArg) => {
           const kd = arg.event.extendedProps.keyDate as KeyDateMarker | undefined;
           if (kd) {

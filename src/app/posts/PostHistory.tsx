@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { listInternalUsers } from '@/services/users';
 import { listPostHistory } from '@/services/postHistory';
 import { POST_STATUS_LABELS, isPostStatus } from '@/shared/constants/postStatus';
+import { parisDateTimeLabel } from '@/shared/utils/tz';
 
 const FIELD_LABELS: Record<string, string> = {
   caption: 'Légende',
@@ -48,7 +49,7 @@ export function PostHistory({ postId }: { postId: string }) {
         <li key={h.id} className="flex flex-col border-b pb-2 last:border-b-0">
           <span>{describe(h.action, h.field, h.newValue)}</span>
           <span className="text-muted-foreground text-xs">
-            {name(h.actorId)} · {new Date(h.createdAt).toLocaleString('fr-FR')}
+            {name(h.actorId)} · {parisDateTimeLabel(h.createdAt)}
           </span>
         </li>
       ))}

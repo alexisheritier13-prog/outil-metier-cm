@@ -15,6 +15,7 @@ import {
   useUpdateRequest,
 } from '@/app/requests/useRequests';
 import { usePortalClient } from './PortalClientContext';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 interface Draft {
   title: string;
@@ -222,7 +223,7 @@ export function PortalBriefsPage() {
                       <dt className="text-muted-foreground">Échéance</dt>
                       <dd>
                         {open.wantedDate
-                          ? new Date(open.wantedDate).toLocaleDateString('fr-FR')
+                          ? parisDateLabel(open.wantedDate)
                           : '—'}
                       </dd>
                     </dl>

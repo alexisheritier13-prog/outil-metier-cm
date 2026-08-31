@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Segmented } from '@/components/Segmented';
 import { EmptyState } from '@/components/EmptyState';
-import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { TableSkeleton } from '@/components/ui/skeleton';
 import { Page, PageHeader } from '@/components/Page';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -75,7 +75,7 @@ export function ReviewQueuePage() {
   );
 
   if (!me || !isInternalRole(me.role)) return null;
-  if (queue.isLoading || clients.isLoading) return <FullPageSpinner />;
+  const loading = queue.isLoading || clients.isLoading;
 
   return (
     <Page>
@@ -85,12 +85,15 @@ export function ReviewQueuePage() {
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <Tabs value={kind} onValueChange={(v) => setKind(v as Kind)}>
-          <TabsList>
-            <TabsTrigger value="internal">À valider en interne</TabsTrigger>
-            <TabsTrigger value="client">En attente du client</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <Segmented
+          ariaLabel="Type de validation"
+          value={kind}
+          onChange={(v) => setKind(v as Kind)}
+          options={[
+            { value: 'internal', label: 'À valider en interne' },
+            { value: 'client', label: 'En attente du client' },
+          ]}
+        />
 
         <select
           className="field"
@@ -107,7 +110,9 @@ export function ReviewQueuePage() {
         </select>
       </div>
 
-      {rows.length === 0 ? (
+      {loading ? (
+        <TableSkeleton rows={6} />
+      ) : rows.length === 0 ? (
         <EmptyState
           title="Rien à valider"
           description={
@@ -117,22 +122,22 @@ export function ReviewQueuePage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-surface-2 text-muted-foreground">
+            <thead className="text-muted-foreground border-border-strong border-b-2">
               <tr>
-                <th className="p-3 text-left font-medium">Client</th>
-                <th className="p-3 text-left font-medium">Réseau</th>
-                <th className="p-3 text-left font-medium">Prévu le</th>
-                <th className="p-3 text-left font-medium">Légende</th>
-                <th className="p-3 text-left font-medium">Rédacteur</th>
-                <th className="p-3 text-left font-medium">En attente depuis</th>
-                <th className="p-3" />
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Client</th>
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Réseau</th>
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Prévu le</th>
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Légende</th>
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Rédacteur</th>
+                <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">En attente depuis</th>
+                <th className="px-3 py-2" />
               </tr>
             </thead>
             <tbody>
               {rows.map((p) => (
-                <tr key={p.id} className="border-t">
+                <tr key={p.id} className="border-border/70 border-b">
                   <td className="p-3">{clientName(p.clientId)}</td>
                   <td className="p-3">
                     <NetworkIcon network={p.network} />

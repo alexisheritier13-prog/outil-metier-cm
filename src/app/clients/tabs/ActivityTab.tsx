@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { listClientActivity } from '@/services/clientActivity';
 import { ACTIVITY_FILTERS, activityCategory, activityLabel } from './activity';
+import { parisDateTimeLabel } from '@/shared/utils/tz';
 
 /** Onglet « Activité » de la fiche client (Story 5.5). */
 export function ActivityTab({ clientId }: { clientId: string }) {
@@ -82,7 +83,7 @@ export function ActivityTab({ clientId }: { clientId: string }) {
               </span>
               <span className="text-muted-foreground text-xs">
                 {e.postCaption || 'Sans légende'} · {e.actorName || 'Système'} ·{' '}
-                {new Date(e.createdAt).toLocaleString('fr-FR')}
+                {parisDateTimeLabel(e.createdAt)}
               </span>
             </li>
           ))}

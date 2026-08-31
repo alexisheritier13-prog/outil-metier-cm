@@ -26,6 +26,7 @@ import { ActivityTab } from './tabs/ActivityTab';
 import { onboardingKey } from './tabs/onboardingKeys';
 import { useQuery } from '@tanstack/react-query';
 import { listOnboardingItems } from '@/services/onboarding';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 export function ClientDetailPage() {
   const { clientId = '' } = useParams();
@@ -168,7 +169,7 @@ export function ClientDetailPage() {
               )}
             </dd>
             <dt className="text-muted-foreground">Créé le</dt>
-            <dd>{new Date(c.createdAt).toLocaleDateString('fr-FR')}</dd>
+            <dd>{parisDateLabel(c.createdAt)}</dd>
           </dl>
         </TabsContent>
 

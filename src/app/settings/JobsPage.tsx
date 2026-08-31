@@ -7,6 +7,7 @@ import { Page, PageHeader } from '@/components/Page';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { listJobRuns, runPurgeTrash } from '@/services/jobs';
 import { runGenerateAlerts } from '@/services/alerts';
+import { parisDateTimeLabel } from '@/shared/utils/tz';
 
 const JOB_LABELS: Record<string, string> = {
   generate_alerts: 'Détection des alertes',
@@ -79,7 +80,7 @@ export function JobsPage() {
                 <tr key={r.id} className="border-t">
                   <td className="p-3">{JOB_LABELS[r.jobName] ?? r.jobName}</td>
                   <td className="text-muted-foreground whitespace-nowrap p-3">
-                    {new Date(r.startedAt).toLocaleString('fr-FR')}
+                    {parisDateTimeLabel(r.startedAt)}
                   </td>
                   <td className="text-muted-foreground p-3">{duration(r.startedAt, r.finishedAt)}</td>
                   <td className="p-3">

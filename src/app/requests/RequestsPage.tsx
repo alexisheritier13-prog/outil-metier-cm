@@ -14,6 +14,7 @@ import { CLIENT_REQUEST_STATUS_LABELS, type ClientRequestStatus } from '@/shared
 import { listClients } from '@/services/clients';
 import { RequestStatusBadge } from './RequestStatusBadge';
 import { RequestComments } from './RequestComments';
+import { parisDateLabel } from '@/shared/utils/tz';
 import {
   useClientRequests,
   usePostsFromRequest,
@@ -116,10 +117,10 @@ export function RequestsPage() {
                   <td className="max-w-xs truncate p-3">{r.title}</td>
                   <td className="text-muted-foreground p-3">
                     {r.wantedNetwork ? NETWORK_LABELS[r.wantedNetwork] : '—'}
-                    {r.wantedDate ? ` · ${new Date(r.wantedDate).toLocaleDateString('fr-FR')}` : ''}
+                    {r.wantedDate ? ` · ${parisDateLabel(r.wantedDate)}` : ''}
                   </td>
                   <td className="text-muted-foreground whitespace-nowrap p-3">
-                    {new Date(r.createdAt).toLocaleDateString('fr-FR')}
+                    {parisDateLabel(r.createdAt)}
                   </td>
                   <td className="p-3">
                     <RequestStatusBadge status={r.status} />
@@ -164,7 +165,7 @@ export function RequestsPage() {
                   <dt className="text-muted-foreground">Échéance souhaitée</dt>
                   <dd>
                     {open.wantedDate
-                      ? new Date(open.wantedDate).toLocaleDateString('fr-FR')
+                      ? parisDateLabel(open.wantedDate)
                       : '—'}
                   </dd>
                 </dl>

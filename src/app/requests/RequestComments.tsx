@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAddRequestComment, useRequestComments } from './useRequests';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 /** Fil de commentaires d'une demande client — partagé portail / interne. */
 export function RequestComments({
@@ -22,7 +23,7 @@ export function RequestComments({
           <li key={c.id} className="bg-surface-2 rounded border p-2 text-sm">
             <p className="text-muted-foreground mb-1 text-xs">
               {authorName ? `${authorName(c.authorId)} · ` : ''}
-              {new Date(c.createdAt).toLocaleDateString('fr-FR')}
+              {parisDateLabel(c.createdAt)}
             </p>
             <p className="whitespace-pre-wrap">{c.body}</p>
           </li>

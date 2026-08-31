@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { TableSkeleton } from '@/components/ui/skeleton';
 import { Page, PageHeader } from '@/components/Page';
 import { Segmented } from '@/components/Segmented';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -131,8 +132,8 @@ export function PlanningPage() {
   }
 
   if (!me || !isInternalRole(me.role)) return null;
-  if (posts.isLoading || clients.isLoading) return <FullPageSpinner />;
 
+  const loading = posts.isLoading || clients.isLoading;
   const rows = posts.data ?? [];
   const hasClients = (clients.data ?? []).length > 0;
 
@@ -213,7 +214,9 @@ export function PlanningPage() {
         </label>
       )}
 
-      {mode === 'list' && (
+      {loading && <TableSkeleton rows={8} />}
+
+      {!loading && mode === 'list' && (
         <PostsTable
           posts={rows}
           clientName={clientName}
@@ -224,7 +227,7 @@ export function PlanningPage() {
           onToggleAll={toggleAll}
         />
       )}
-      {mode === 'kanban' && (
+      {!loading && mode === 'kanban' && (
         <Suspense fallback={<FullPageSpinner />}>
           <KanbanView
             posts={rows}
@@ -236,7 +239,7 @@ export function PlanningPage() {
           />
         </Suspense>
       )}
-      {(mode === 'month' || mode === 'week') && (
+      {!loading && (mode === 'month' || mode === 'week') && (
         <Suspense fallback={<FullPageSpinner />}>
           <CalendarView
             posts={rows}

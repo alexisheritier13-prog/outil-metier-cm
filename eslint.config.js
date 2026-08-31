@@ -31,6 +31,11 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
   },
   {
+    // Tests E2E Playwright : environnement Node + navigateur piloté.
+    files: ['e2e/**/*.ts'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
     // Primitives shadcn/ui : co-exporter les variantes (cva) est la convention ;
     // l'association label/contrôle se fait sur le site d'utilisation (htmlFor + id).
     files: ['src/components/ui/**/*.tsx'],

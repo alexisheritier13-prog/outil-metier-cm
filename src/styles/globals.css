@@ -18,7 +18,7 @@
     --surface-2: oklch(0.976 0.003 274); /* sidebar, barres d'outils, en-têtes de tableau */
     --surface-3: oklch(0.955 0.004 274); /* survol dans la sidebar, 3e couche */
     --muted: oklch(0.968 0.003 274);
-    --muted-foreground: oklch(0.47 0.012 274); /* ~4.7:1 sur blanc — plancher AA */
+    --muted-foreground: oklch(0.446 0.014 274); /* ~5.4:1 sur blanc — tient l'AA aussi sur surface-2/3 */
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.24 0.012 274);
     --card: oklch(1 0 0);
@@ -233,4 +233,12 @@
 .fc-monochrome .fc-col-header-cell-cushion {
   color: var(--muted-foreground);
   text-decoration: none;
+}
+/* Jours hors mois : distingués par le fond de cellule, pas par une opacité
+   qui ferait chuter le contraste du numéro sous le seuil AA (Story 9.5). */
+.fc-monochrome .fc-day-other .fc-daygrid-day-top {
+  opacity: 1;
+}
+.fc-monochrome .fc-day-other {
+  background: color-mix(in oklch, var(--surface-2) 70%, transparent);
 }

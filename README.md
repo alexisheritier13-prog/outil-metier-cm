@@ -64,13 +64,16 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 9.2** faite : export `.ics` du calendrier filtré (bouton dans `/app/planning`) — générateur pur `postsToIcs` conforme RFC 5545 (VTIMEZONE Europe/Paris, échappement, pliage), `downloadTextFile`. 10 tests unitaires, zéro dépendance ajoutée.
 - **Story 9.3** faite : export PDF du calendrier client — route imprimable autonome `/app/clients/:id/export` (période dans l'URL) + « Enregistrer en PDF » du navigateur, bouton sur la fiche client. Décision (ni Edge Function ni `react-pdf`) documentée dans `docs/architecture.md`. 2 tests composant.
 - **Story 9.4** faite : note de performance éditable sur les posts publiés (panneau de détail), visibilité client explicite (interne par défaut), filtre « Avec note de perf » (`?perf=1`) + affichage dans la vue liste, note reprise dans l'espace client. Migration 0029 (journalisation de la visibilité). 10 tests unit + 4 intégration.
-- Prochaine : Story 9.5 — passe a11y AA + polish (tables, skeletons, E2E).
+- **Story 9.5** faite : passe a11y AA (audit axe sur 8 écrans via E2E Playwright, 0 violation serious/critical — `nested-interactive`, `aria-controls`, contrastes, `role-img-alt` corrigés) + polish (dates FR homogènes via `parisDateLabel`/`parisDateTimeLabel`, tableaux allégés, `TableSkeleton` par vue). `@playwright/test` + `axe-core`, `npm run test:e2e` (Chrome système, auto-skip sans `E2E_EMAIL`/`E2E_PASSWORD`). **Epic 9 terminé.**
 
 ### Tests
 
 - `npm run test` — unitaires, rapides, exécutés en CI.
 - `npm run test:rls` — intégration DB (un seul projet Supabase → **exécution en série**),
   auto-skip sans `.env.test.local`.
+- `npm run test:e2e` — E2E Playwright + audit axe (Chrome système, `channel: 'chrome'`,
+  pas de `playwright install`). Auto-skip sans `E2E_EMAIL` / `E2E_PASSWORD`
+  (+ `E2E_CLIENT_EMAIL` pour le portail). Réutilise le serveur de dev en cours.
 
 ## Documentation
 

@@ -87,9 +87,9 @@ export function PostsTable({
   const allChecked = selectable && rows.length > 0 && rows.every((p) => selectedIds!.has(p.id));
 
   return (
-    <div className="overflow-hidden rounded-md border">
+    <div>
       <div
-        className={`bg-surface-2 text-muted-foreground sticky top-0 z-10 grid ${COLS} items-center border-b text-xs font-medium uppercase tracking-wide`}
+        className={`bg-background text-muted-foreground border-border-strong sticky top-0 z-10 grid ${COLS} items-center border-b text-[11px] font-medium uppercase tracking-wide`}
       >
         <span className="grid place-items-center">
           {selectable && (
@@ -122,41 +122,40 @@ export function PostsTable({
             return (
               <div
                 key={p.id}
-                role="button"
-                tabIndex={0}
-                aria-label={`Ouvrir le post ${p.caption || 'sans légende'}`}
                 data-selected={checked || undefined}
-                className={`hover:bg-surface-2/60 data-[selected]:bg-primary-surface/60 absolute inset-x-0 grid cursor-pointer ${COLS} items-center border-b text-sm last:border-b-0`}
+                className={`hover:bg-surface-2/70 data-[selected]:bg-primary-surface/60 border-border/70 absolute inset-x-0 grid ${COLS} items-center border-b text-sm last:border-b-0`}
                 style={{ height: ROW_H, top: 0, transform: `translateY(${v.start}px)` }}
-                onClick={() => onOpen(p)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpen(p);
-                  }
-                }}
               >
-                <span className="grid place-items-center">
+                {/* Cible de clic pleine ligne, focusable au clavier, sans imbriquer d'autres contrôles.
+                    Les cellules de texte sont `pointer-events-none` → le clic traverse jusqu'ici. */}
+                <button
+                  type="button"
+                  className="focus-visible:ring-ring absolute inset-0 rounded-none focus-visible:ring-2 focus-visible:ring-inset"
+                  aria-label={`Ouvrir le post ${p.caption || 'sans légende'}`}
+                  onClick={() => onOpen(p)}
+                />
+                <span className="relative z-10 grid place-items-center">
                   {selectable && (
                     <input
                       type="checkbox"
                       className="accent-primary h-3.5 w-3.5"
                       checked={checked}
                       aria-label={`Sélectionner le post ${p.caption || 'sans légende'}`}
-                      onClick={(e) => e.stopPropagation()}
                       onChange={() => onToggleSelect!(p.id)}
                     />
                   )}
                 </span>
-                <span className="text-muted-foreground truncate px-3 text-[13px] tabular-nums">
+                <span className="text-muted-foreground pointer-events-none truncate px-3 text-[13px] tabular-nums">
                   {parisDateLabel(p.scheduledAt)}
                   <span className="text-muted-foreground/70"> · {parisTimeLabel(p.scheduledAt)}</span>
                 </span>
-                <span className="truncate px-3 font-medium">{clientName(p.clientId)}</span>
-                <span className="px-3">
+                <span className="pointer-events-none truncate px-3 font-medium">
+                  {clientName(p.clientId)}
+                </span>
+                <span className="pointer-events-none px-3">
                   <NetworkIcon network={p.network} />
                 </span>
-                <span className="text-muted-foreground flex items-center gap-1.5 truncate px-3">
+                <span className="text-muted-foreground pointer-events-none flex items-center gap-1.5 truncate px-3">
                   <span className="truncate">
                     {p.caption || <span className="italic">Sans légende</span>}
                   </span>
@@ -167,17 +166,16 @@ export function PostsTable({
                     </span>
                   )}
                 </span>
-                <span className="px-3">
+                <span className="pointer-events-none px-3">
                   <StatusBadge status={p.status} />
                 </span>
-                <span className="pr-2 text-right">
+                <span className="relative z-10 pr-2 text-right">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong h-8 w-8"
                     aria-label="Mettre à la corbeille"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       if (confirm('Mettre ce post à la corbeille ?')) trash.mutate(p.id);
                     }}
                   >
