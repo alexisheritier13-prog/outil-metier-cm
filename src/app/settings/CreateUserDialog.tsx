@@ -1,19 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  FormBody,
+  FormField,
+  FormFooter,
+  FormSection,
+  FormSheet,
+  selectClass,
+} from '@/components/form';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { useCreateUser } from './useUsersAdmin';
 
@@ -47,98 +45,77 @@ export function CreateUserDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
-      <DialogTrigger asChild>
-        <Button>Nouvel utilisateur</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Nouvel utilisateur interne</DialogTitle>
-          <DialogDescription>
-            Le compte est créé sans email envoyé. Transmettez le lien affiché à la fin pour
-            qu'il définisse son mot de passe.
-          </DialogDescription>
-        </DialogHeader>
-
+    <>
+      <Button onClick={() => setOpen(true)}>Nouvel utilisateur</Button>
+      <FormSheet
+        open={open}
+        onOpenChange={(v) => (v ? setOpen(true) : close())}
+        title="Nouvel utilisateur interne"
+        description="Le compte est créé sans email. Transmettez le lien affiché à la fin pour qu'il définisse son mot de passe."
+      >
         {link ? (
-          <div className="space-y-3">
-            <p className="text-sm">Compte créé. Lien de définition du mot de passe :</p>
-            <code className="bg-muted block overflow-x-auto rounded p-2 text-xs">{link}</code>
-            <div className="flex justify-end">
+          <>
+            <FormBody>
+              <p className="text-sm">Compte créé. Lien de définition du mot de passe :</p>
+              <code className="bg-surface-2 border-border block overflow-x-auto rounded-lg border p-3 text-xs">
+                {link}
+              </code>
+            </FormBody>
+            <FormFooter>
               <Button onClick={close}>Fermer</Button>
-            </div>
-          </div>
+            </FormFooter>
+          </>
         ) : (
           <form
-            className="space-y-4"
+            className="flex min-h-0 flex-1 flex-col"
             onSubmit={handleSubmit(async (values) => {
               const res = await create.mutateAsync(values);
               setLink(res.actionLink ?? 'Aucun lien généré — utilisez « mot de passe oublié ».');
             })}
             noValidate
           >
-            <Field label="Nom complet" error={errors.fullName?.message}>
-              <Input {...register('fullName')} autoComplete="off" />
-            </Field>
-            <Field label="Email" error={errors.email?.message}>
-              <Input type="email" {...register('email')} autoComplete="off" />
-            </Field>
-            <Field label="Rôle" error={errors.role?.message}>
-              <select
-                className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-                {...register('role')}
-              >
-                <option value="cm">{ROLE_LABELS.cm}</option>
-                <option value="lead">{ROLE_LABELS.lead}</option>
-                <option value="admin">{ROLE_LABELS.admin}</option>
-              </select>
-            </Field>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" {...register('activate')} />
-              Activer le compte immédiatement
-            </label>
+            <FormBody>
+              <FormSection title="Identité">
+                <FormField label="Nom complet" htmlFor="cu-name" error={errors.fullName?.message}>
+                  <Input id="cu-name" {...register('fullName')} autoComplete="off" />
+                </FormField>
+                <FormField label="Email" htmlFor="cu-email" error={errors.email?.message}>
+                  <Input id="cu-email" type="email" {...register('email')} autoComplete="off" />
+                </FormField>
+              </FormSection>
 
-            {create.isError && (
-              <p className="text-destructive text-sm" role="alert">
-                {create.error instanceof Error ? create.error.message : 'Échec de la création.'}
-              </p>
-            )}
+              <FormSection title="Accès">
+                <FormField label="Rôle" htmlFor="cu-role" error={errors.role?.message}>
+                  <select id="cu-role" className={selectClass} {...register('role')}>
+                    <option value="cm">{ROLE_LABELS.cm}</option>
+                    <option value="lead">{ROLE_LABELS.lead}</option>
+                    <option value="admin">{ROLE_LABELS.admin}</option>
+                  </select>
+                </FormField>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" className="accent-primary h-4 w-4" {...register('activate')} />
+                  Activer le compte immédiatement
+                </label>
+              </FormSection>
 
-            <div className="flex justify-end gap-2">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Annuler
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={create.isPending}>
-                {create.isPending ? 'Création…' : 'Créer'}
+              {create.isError && (
+                <p className="text-destructive text-sm" role="alert">
+                  {create.error instanceof Error ? create.error.message : 'Échec de la création.'}
+                </p>
+              )}
+            </FormBody>
+
+            <FormFooter>
+              <Button type="button" variant="ghost" onClick={close}>
+                Annuler
               </Button>
-            </div>
+              <Button type="submit" disabled={create.isPending}>
+                {create.isPending ? 'Création…' : "Créer l'utilisateur"}
+              </Button>
+            </FormFooter>
           </form>
         )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      {children}
-      {error && (
-        <p className="text-destructive text-sm" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
+      </FormSheet>
+    </>
   );
 }

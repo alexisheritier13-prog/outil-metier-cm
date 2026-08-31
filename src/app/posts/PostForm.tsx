@@ -5,7 +5,14 @@ import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  FormBody,
+  FormField,
+  FormFooter,
+  FormSection,
+  selectClass,
+  textareaClass,
+} from '@/components/form';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
@@ -127,7 +134,7 @@ export function PostForm({
 
   return (
     <form
-      className="space-y-4"
+      className="flex min-h-0 flex-1 flex-col"
       noValidate
       onSubmit={handleSubmit(async (v) => {
         const [datePart, timePart] = v.scheduledLocal.split('T');
@@ -174,169 +181,149 @@ export function PostForm({
         onSuccess?.();
       })}
     >
-      {isCreation && applicableTemplates.length > 0 && (
-        <div className="space-y-1.5">
-          <Label htmlFor="pf-template">Partir d'un template</Label>
-          <select
-            id="pf-template"
-            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            defaultValue=""
-            onChange={(e) => {
-              applyTemplate(e.target.value);
-              e.target.value = '';
-            }}
-          >
-            <option value="">— Aucun —</option>
-            {applicableTemplates.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-4">
-        <div className="min-w-48 flex-1 space-y-1.5">
-          <Label htmlFor="pf-client">Client</Label>
-          <select
-            id="pf-client"
-            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('clientId')}
-          >
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.clientId && (
-            <p className="text-destructive text-sm" role="alert">
-              {errors.clientId.message}
-            </p>
+      <FormBody>
+        <FormSection title="Post">
+          {isCreation && applicableTemplates.length > 0 && (
+            <FormField label="Partir d'un template" htmlFor="pf-template">
+              <select
+                id="pf-template"
+                className={selectClass}
+                defaultValue=""
+                onChange={(e) => {
+                  applyTemplate(e.target.value);
+                  e.target.value = '';
+                }}
+              >
+                <option value="">— Aucun —</option>
+                {applicableTemplates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </FormField>
           )}
-        </div>
 
-        <div className="min-w-40 flex-1 space-y-1.5">
-          <Label htmlFor="pf-network">Réseau</Label>
-          <select
-            id="pf-network"
-            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('network')}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Client" htmlFor="pf-client" error={errors.clientId?.message}>
+              <select id="pf-client" className={selectClass} {...register('clientId')}>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <FormField label="Réseau" htmlFor="pf-network">
+              <select id="pf-network" className={selectClass} {...register('network')}>
+                {NETWORKS.map((n) => (
+                  <option key={n} value={n}>
+                    {NETWORK_LABELS[n]}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          </div>
+
+          <FormField
+            label="Date et heure de publication"
+            htmlFor="pf-date"
+            hint={
+              networkSpecs ? (
+                <span className="flex gap-1.5">
+                  <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  {networkSpecs}
+                </span>
+              ) : (
+                'Fuseau Europe/Paris.'
+              )
+            }
+            error={errors.scheduledLocal?.message}
           >
-            {NETWORKS.map((n) => (
-              <option key={n} value={n}>
-                {NETWORK_LABELS[n]}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+            <Input id="pf-date" type="datetime-local" {...register('scheduledLocal')} />
+          </FormField>
+        </FormSection>
 
-      {networkSpecs && (
-        <p className="text-muted-foreground flex gap-1.5 text-xs">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          {networkSpecs}
-        </p>
-      )}
+        <FormSection title="Contenu">
+          <FormField label="Légende" htmlFor="pf-caption">
+            <textarea id="pf-caption" rows={5} className={textareaClass} {...register('caption')} />
+          </FormField>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="pf-date">Date et heure de publication (Europe/Paris)</Label>
-        <Input id="pf-date" type="datetime-local" {...register('scheduledLocal')} />
-        {errors.scheduledLocal && (
+          <div>
+            <MediaField
+              clientId={clientId}
+              postId={postId}
+              stagedFiles={postId ? undefined : staged}
+              onStagedChange={postId ? undefined : setStaged}
+            />
+            {mediaError && <p className="text-danger-strong mt-1.5 text-sm">{mediaError}</p>}
+          </div>
+
+          <FormField
+            label="Lien Canva (interne)"
+            htmlFor="pf-canva"
+            hint="Lien de travail vers le design. Jamais montré au client."
+          >
+            <Input
+              id="pf-canva"
+              placeholder="https://www.canva.com/design/…"
+              value={canvaUrl}
+              onChange={(e) => setCanvaUrl(e.target.value)}
+            />
+          </FormField>
+        </FormSection>
+
+        <FormSection title="Classement">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Campagne" htmlFor="pf-campaign">
+              <select id="pf-campaign" className={selectClass} {...register('campaignId')}>
+                <option value="">Aucune</option>
+                {(campaigns.data ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <FormField
+              label="Tags"
+              htmlFor="pf-tags"
+              hint="Séparés par des virgules. Créés à la volée."
+            >
+              <Input id="pf-tags" placeholder="urgent, promo, UGC" {...register('tagsText')} />
+            </FormField>
+          </div>
+
+          {canReassign && authors.length > 0 && (
+            <FormField label="Rédacteur" htmlFor="pf-author">
+              <select id="pf-author" className={selectClass} {...register('authorId')}>
+                {authors.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.fullName || a.email}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          )}
+        </FormSection>
+
+        {error != null && (
           <p className="text-destructive text-sm" role="alert">
-            {errors.scheduledLocal.message}
+            {error instanceof Error ? error.message : "L'enregistrement a échoué."}
           </p>
         )}
-      </div>
+      </FormBody>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="pf-caption">Légende</Label>
-        <textarea
-          id="pf-caption"
-          rows={5}
-          className="border-input bg-surface focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
-          {...register('caption')}
-        />
-      </div>
-
-      <MediaField
-        clientId={clientId}
-        postId={postId}
-        stagedFiles={postId ? undefined : staged}
-        onStagedChange={postId ? undefined : setStaged}
-      />
-      {mediaError && <p className="text-danger-strong text-sm">{mediaError}</p>}
-
-      <div className="space-y-1.5">
-        <Label htmlFor="pf-canva">Lien Canva (interne)</Label>
-        <Input
-          id="pf-canva"
-          placeholder="https://www.canva.com/design/…"
-          value={canvaUrl}
-          onChange={(e) => setCanvaUrl(e.target.value)}
-        />
-        <p className="text-muted-foreground text-xs">
-          Lien de travail vers le design. Jamais montré au client.
-        </p>
-      </div>
-
-      <div className="flex flex-wrap gap-4">
-        <div className="min-w-48 flex-1 space-y-1.5">
-          <Label htmlFor="pf-campaign">Campagne</Label>
-          <select
-            id="pf-campaign"
-            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('campaignId')}
-          >
-            <option value="">Aucune</option>
-            {(campaigns.data ?? []).map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="min-w-48 flex-1 space-y-1.5">
-          <Label htmlFor="pf-tags">Tags</Label>
-          <Input id="pf-tags" placeholder="urgent, promo, UGC" {...register('tagsText')} />
-          <p className="text-muted-foreground text-xs">Séparés par des virgules. Créés à la volée.</p>
-        </div>
-      </div>
-
-      {canReassign && authors.length > 0 && (
-        <div className="space-y-1.5">
-          <Label htmlFor="pf-author">Rédacteur</Label>
-          <select
-            id="pf-author"
-            className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
-            {...register('authorId')}
-          >
-            {authors.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.fullName || a.email}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {error != null && (
-        <p className="text-destructive text-sm" role="alert">
-          {error instanceof Error ? error.message : "L'enregistrement a échoué."}
-        </p>
-      )}
-
-      <div className="flex justify-end gap-2">
+      <FormFooter>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel}>
             Annuler
           </Button>
         )}
         <Button type="submit" disabled={pending || uploading || clients.length === 0}>
           {pending || uploading ? 'Enregistrement…' : submitLabel}
         </Button>
-      </div>
+      </FormFooter>
     </form>
   );
 }

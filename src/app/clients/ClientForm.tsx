@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FormBody, FormField, FormFooter, FormSection } from '@/components/form';
 import type { ClientInput } from '@/services/clients';
 
 const schema = z.object({
@@ -41,7 +41,7 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
 
   return (
     <form
-      className="space-y-4"
+      className="flex min-h-0 flex-1 flex-col"
       noValidate
       onSubmit={handleSubmit((v) =>
         onSubmit({
@@ -52,67 +52,63 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
         }),
       )}
     >
-      <div className="space-y-1.5">
-        <Label htmlFor="cf-name">Nom</Label>
-        <Input id="cf-name" {...register('name')} aria-invalid={errors.name ? true : undefined} />
-        {errors.name && (
+      <FormBody>
+        <FormSection title="Identité">
+          <FormField label="Nom" htmlFor="cf-name" error={errors.name?.message}>
+            <Input id="cf-name" {...register('name')} aria-invalid={errors.name ? true : undefined} />
+          </FormField>
+          <FormField label="Secteur d'activité" htmlFor="cf-sector">
+            <Input id="cf-sector" placeholder="Restauration, mode, immobilier…" {...register('sector')} />
+          </FormField>
+          <FormField
+            label="Logo (URL)"
+            htmlFor="cf-logo"
+            hint="Affiché sur la fiche et dans les listes."
+            error={errors.logoUrl?.message}
+          >
+            <Input
+              id="cf-logo"
+              placeholder="https://…"
+              {...register('logoUrl')}
+              aria-invalid={errors.logoUrl ? true : undefined}
+            />
+          </FormField>
+        </FormSection>
+
+        <FormSection title="Circuit de validation">
+          <label className="border-border bg-surface-2/60 flex items-start gap-3 rounded-lg border p-3 text-sm">
+            <input
+              type="checkbox"
+              className="accent-primary mt-0.5 h-4 w-4"
+              {...register('skipClientReview')}
+            />
+            <span>
+              <span className="font-medium">Ce client ne valide pas les posts</span>
+              <span className="text-muted-foreground block text-xs">
+                L'étape « à valider client » est sautée : un rôle interne publie sans passer par le
+                client.
+              </span>
+            </span>
+          </label>
+        </FormSection>
+
+        {error != null && (
           <p className="text-destructive text-sm" role="alert">
-            {errors.name.message}
+            {error instanceof Error ? error.message : "L'enregistrement a échoué."}
           </p>
         )}
-      </div>
+      </FormBody>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="cf-logo">Logo (URL)</Label>
-        <Input
-          id="cf-logo"
-          placeholder="https://…"
-          {...register('logoUrl')}
-          aria-invalid={errors.logoUrl ? true : undefined}
-        />
-        {errors.logoUrl && (
-          <p className="text-destructive text-sm" role="alert">
-            {errors.logoUrl.message}
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="cf-sector">Secteur d'activité</Label>
-        <Input id="cf-sector" {...register('sector')} />
-      </div>
-
-      <label className="border-border bg-surface-2/50 flex items-start gap-3 rounded-lg border p-3 text-sm">
-        <input
-          type="checkbox"
-          className="accent-primary mt-0.5 h-4 w-4"
-          {...register('skipClientReview')}
-        />
-        <span>
-          <span className="font-medium">Ce client ne valide pas les posts</span>
-          <span className="text-muted-foreground block text-xs">
-            L'étape « à valider client » est sautée : un rôle interne publie sans passer par le
-            client.
-          </span>
-        </span>
-      </label>
-
-      {error != null && (
-        <p className="text-destructive text-sm" role="alert">
-          {error instanceof Error ? error.message : "L'enregistrement a échoué."}
-        </p>
-      )}
-
-      <div className="flex justify-end gap-2">
+      <FormFooter>
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel}>
             Annuler
           </Button>
         )}
         <Button type="submit" disabled={pending}>
           {pending ? 'Enregistrement…' : submitLabel}
         </Button>
-      </div>
+      </FormFooter>
     </form>
   );
 }

@@ -4,13 +4,7 @@ import { Building2, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Page, PageHeader } from '@/components/Page';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { FormSheet } from '@/components/form';
 import { EmptyState } from '@/components/EmptyState';
 import { ClientAvatar } from '@/components/ClientAvatar';
 import { TableSkeleton } from '@/components/ui/skeleton';
@@ -63,18 +57,18 @@ export function ClientsPage() {
         description="Le référentiel des comptes clients de l'agence."
         actions={
           canWrite && (
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4" /> Nouveau client
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Nouveau client</DialogTitle>
-                </DialogHeader>
+            <>
+              <Button onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" /> Nouveau client
+              </Button>
+              <FormSheet
+                open={open}
+                onOpenChange={setOpen}
+                title="Nouveau client"
+                description="Le compte apparaît dans le référentiel et le sélecteur de posts."
+              >
                 <ClientForm
-                  submitLabel="Créer"
+                  submitLabel="Créer le client"
                   pending={create.isPending}
                   error={create.isError ? create.error : undefined}
                   onCancel={() => setOpen(false)}
@@ -83,8 +77,8 @@ export function ClientsPage() {
                     setOpen(false);
                   }}
                 />
-              </DialogContent>
-            </Dialog>
+              </FormSheet>
+            </>
           )
         }
       />

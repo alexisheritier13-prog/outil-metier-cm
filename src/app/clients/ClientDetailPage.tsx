@@ -5,12 +5,7 @@ import { trashClient } from '@/services/clients';
 import { Page } from '@/components/Page';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { FormSheet } from '@/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ClientAvatar } from '@/components/ClientAvatar';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -194,29 +189,29 @@ export function ClientDetailPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Modifier le client</DialogTitle>
-          </DialogHeader>
-          <ClientForm
-            submitLabel="Enregistrer"
-            pending={update.isPending}
-            error={update.isError ? update.error : undefined}
-            defaultValues={{
-              name: c.name,
-              logoUrl: c.logoUrl ?? '',
-              sector: c.sector ?? '',
-              skipClientReview: c.skipClientReview ?? false,
-            }}
-            onCancel={() => setEditOpen(false)}
-            onSubmit={async (input) => {
-              await update.mutateAsync(input);
-              setEditOpen(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <FormSheet
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        title="Modifier le client"
+        description={c.name}
+      >
+        <ClientForm
+          submitLabel="Enregistrer"
+          pending={update.isPending}
+          error={update.isError ? update.error : undefined}
+          defaultValues={{
+            name: c.name,
+            logoUrl: c.logoUrl ?? '',
+            sector: c.sector ?? '',
+            skipClientReview: c.skipClientReview ?? false,
+          }}
+          onCancel={() => setEditOpen(false)}
+          onSubmit={async (input) => {
+            await update.mutateAsync(input);
+            setEditOpen(false);
+          }}
+        />
+      </FormSheet>
     </Page>
   );
 }

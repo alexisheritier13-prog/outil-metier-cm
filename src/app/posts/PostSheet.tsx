@@ -3,12 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Copy, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { FormSheet } from '@/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { MediaGallery } from '@/components/MediaGallery';
@@ -204,35 +199,36 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
           </Button>
         </footer>
 
-        <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modifier le post</DialogTitle>
-            </DialogHeader>
-            <PostForm
-              clients={clients}
-              authors={authors}
-              canReassign={canReassign}
-              postId={post.id}
-              submitLabel="Enregistrer"
-              pending={update.isPending}
-              error={update.isError ? update.error : undefined}
-              defaults={{
-                clientId: post.clientId,
-                network: post.network,
-                scheduledAt: post.scheduledAt,
-                caption: post.caption,
-                canvaUrl: post.canvaUrl,
-                authorId: post.authorId,
-                campaignId: post.campaignId,
-                tags: tagNames,
-              }}
-              onCancel={() => setEditOpen(false)}
-              onSubmit={(input) => update.mutateAsync(input)}
-              onSuccess={() => setEditOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <FormSheet
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          title="Modifier le post"
+          description={client?.name}
+          wide
+        >
+          <PostForm
+            clients={clients}
+            authors={authors}
+            canReassign={canReassign}
+            postId={post.id}
+            submitLabel="Enregistrer"
+            pending={update.isPending}
+            error={update.isError ? update.error : undefined}
+            defaults={{
+              clientId: post.clientId,
+              network: post.network,
+              scheduledAt: post.scheduledAt,
+              caption: post.caption,
+              canvaUrl: post.canvaUrl,
+              authorId: post.authorId,
+              campaignId: post.campaignId,
+              tags: tagNames,
+            }}
+            onCancel={() => setEditOpen(false)}
+            onSubmit={(input) => update.mutateAsync(input)}
+            onSuccess={() => setEditOpen(false)}
+          />
+        </FormSheet>
       </SheetContent>
     </Sheet>
   );

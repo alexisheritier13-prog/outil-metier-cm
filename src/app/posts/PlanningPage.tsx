@@ -3,13 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CalendarArrowDown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { FormSheet } from '@/components/form';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { TableSkeleton } from '@/components/ui/skeleton';
 import { Page, PageHeader } from '@/components/Page';
@@ -164,30 +158,29 @@ export function PlanningPage() {
             >
               <CalendarArrowDown className="h-4 w-4" /> Exporter .ics
             </Button>
-          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-            <DialogTrigger asChild>
-              <Button disabled={!hasClients}>
-                <Plus className="h-4 w-4" /> Nouveau post
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouveau post</DialogTitle>
-              </DialogHeader>
-              <PostForm
-                clients={clients.data ?? []}
-                authors={authors.data ?? []}
-                canReassign={canReassign}
-                templates={templates.data ?? []}
-                submitLabel="Créer"
-                pending={create.isPending}
-                error={create.isError ? create.error : undefined}
-                onCancel={() => setCreateOpen(false)}
-                onSubmit={(input) => create.mutateAsync(input)}
-                onSuccess={() => setCreateOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
+          <Button disabled={!hasClients} onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4" /> Nouveau post
+          </Button>
+          <FormSheet
+            open={createOpen}
+            onOpenChange={setCreateOpen}
+            title="Nouveau post"
+            description="Programmez un post et joignez ses visuels."
+            wide
+          >
+            <PostForm
+              clients={clients.data ?? []}
+              authors={authors.data ?? []}
+              canReassign={canReassign}
+              templates={templates.data ?? []}
+              submitLabel="Créer le post"
+              pending={create.isPending}
+              error={create.isError ? create.error : undefined}
+              onCancel={() => setCreateOpen(false)}
+              onSubmit={(input) => create.mutateAsync(input)}
+              onSuccess={() => setCreateOpen(false)}
+            />
+          </FormSheet>
           </div>
         }
       />
