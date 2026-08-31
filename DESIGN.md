@@ -60,15 +60,29 @@ corps ; réservé aux badges / libellés ≤ 3 mots.
 ## Components
 
 shadcn/ui (Radix) : `button` (variantes `default` noir / `outline` / `ghost` /
-`destructive` rouge), `input`, `label`, `dialog`, `tabs`, `sheet`, `popover`. Icônes
-`lucide-react`, trait 1.5–2, 16 px en UI dense / 20 px en en-têtes — jamais mêlées aux
-logos couleur des clients.
+`success` vert / `destructive` rouge), `input`, `label`, `dialog`, `tabs`, `sheet`,
+`popover`. Icônes `lucide-react`, trait 1.5–2, 16 px en UI dense / 20 px en en-têtes —
+jamais mêlées aux logos couleur des clients.
 
-- `StatusBadge` : icône + libellé + fond teinté du statut. Jamais la couleur seule.
+**Primitives de mise en page :**
+- `<Page size="full|form">` : coquille (padding `p-6`, largeur bornée en `form`).
+- `<PageHeader title description actions aside>` : en-tête de page homogène (titre
+  `text-title tracking-tight`, description `max-w-[68ch]`, actions à droite, `aside` pour
+  un contrôle inline type sélecteur de vue).
+- `<Segmented value onChange options>` : bascule de vue (piste creusée `bg-surface-2`,
+  option active en relief `bg-background shadow-sm`).
+- `<Skeleton>` / `<TableSkeleton>` : chargement (préféré au spinner central).
+- Classe `.field` (globals.css `@layer components`) : `<select>` / `<input type=date>`
+  natifs à hauteur et style constants (`h-9`, `border-input`).
+
+**Composants métier :**
+- `StatusBadge` : icône + libellé + fond teinté du statut (`toneClasses` +
+  `POST_STATUS_TONE`). Jamais la couleur seule.
 - `RequestStatusBadge` : nouvelle → neutre · prise en compte → info · traitée → succès.
-- États : skeleton au chargement (pas de spinner central), `EmptyState` qui apprend
-  l'interface.
+- `EmptyState` qui apprend l'interface.
 - Panneau latéral droit `Sheet` (~480 px, plein écran < 768 px) pour le détail d'un post.
+- Nav `/app` : menu déroulant « Contenu » (Popover) regroupe Campagnes/Idées/Templates/
+  Marronniers pour tenir sur une ligne.
 
 ## Layout
 
