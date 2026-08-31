@@ -293,6 +293,7 @@ type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 type ClientActivityRow = Database['public']['Views']['client_activity']['Row'];
 type ClientRequestRow = Database['public']['Tables']['client_requests']['Row'];
 type ClientRequestCommentRow = Database['public']['Tables']['client_request_comments']['Row'];
+type IdeaRow = Database['public']['Tables']['ideas']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -450,5 +451,28 @@ export function toClientRequestComment(row: ClientRequestCommentRow): ClientRequ
     authorId: row.author_id,
     body: row.body,
     createdAt: row.created_at,
+  };
+}
+
+export interface Idea {
+  id: string;
+  title: string;
+  description: string;
+  clientId: string | null;
+  originRequestId: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export function toIdea(row: IdeaRow): Idea {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    clientId: row.client_id,
+    originRequestId: row.origin_request_id,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
