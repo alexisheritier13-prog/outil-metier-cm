@@ -15,6 +15,7 @@
     "db:apply": "node scripts/apply-migrations.mjs",
     "functions:deploy": "supabase functions deploy --project-ref vevdhfyyjwntxvajtlud",
     "gen:types": "node scripts/gen-types.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

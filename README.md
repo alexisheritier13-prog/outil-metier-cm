@@ -95,7 +95,25 @@ npm run dev                       # http://localhost:5173
 | `npm run typecheck` | `tsc -b --noEmit` |
 | `npm run test` | Vitest (une passe) |
 | `npm run test:watch` | Vitest en watch |
+| `npm run seed:demo` | Recrée le jeu de démo « Studio Lumen » (voir ci-dessous) |
 | `npm run format` | Prettier --write |
+
+### Jeu de démo
+
+`npm run seed:demo` (nécessite `.env.test.local`) purge et recrée toutes les données du
+client **« Studio Lumen (démo) »** : comptes sociaux, charte, onboarding, campagnes, tags,
+~17 posts à tous les statuts (dont un parcours de validation complet, un refus client, un
+renvoi rédacteur), commentaires internes/client, corbeille, 3 briefs client, 4 idées,
+3 templates, 5 marronniers, et 3 posts issus d'une idée / demande / marronnier.
+
+Comptes créés (mot de passe commun **`PleinSoleil-2026!`**) :
+
+| Email | Rôle | Vue |
+|---|---|---|
+| `alexis.heritier13@gmail.com` | admin | `/app` (tout) |
+| `lead.demo@studiolumen.test` | lead CM | `/app` |
+| `cm.demo@studiolumen.test` | CM | `/app` (client démo assigné) |
+| `client.demo@studiolumen.test` | contact client | `/portail` |
 
 ### Variables d'environnement
 
