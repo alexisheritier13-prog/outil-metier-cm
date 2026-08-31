@@ -1,8 +1,8 @@
-# outil-metier-cm
+# Cadence
 
-Outil métier de Community Management pour agence — planification multi-clients, workflow de
-validation interne puis client, organisation du contenu. Application web hébergée
-(SPA React + Vite + Supabase). Remplace Notion.
+`outil-metier-cm` (dépôt) — **Cadence**, outil métier de Community Management pour agence :
+planification multi-clients, workflow de validation interne puis client, organisation du
+contenu. Application web hébergée (SPA React + Vite + Supabase). Remplace Notion.
 
 ## État
 

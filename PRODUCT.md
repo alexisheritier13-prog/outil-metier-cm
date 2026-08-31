@@ -1,4 +1,7 @@
-# Product
+# Cadence
+
+Outil métier de Community Management pour agence (planification multi-clients,
+validation interne puis client). Le nom évoque le rythme de publication régulier.
 
 ## Register
 

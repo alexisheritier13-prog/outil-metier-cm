@@ -33,7 +33,7 @@ export function LoginPage() {
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="space-y-1 text-center">
-          <h1 className="text-xl font-semibold tracking-tight">Outil métier CM</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Cadence</h1>
           <p className="text-muted-foreground text-sm">Connectez-vous pour continuer</p>
         </div>
 

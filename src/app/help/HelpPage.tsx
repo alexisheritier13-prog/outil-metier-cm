@@ -23,14 +23,14 @@ export function HelpPage() {
     <Page>
       <PageHeader
         title="Aide"
-        description="L'essentiel pour prendre l'outil en main : le circuit d'un post, qui fait quoi, et où trouver chaque chose."
+        description="L'essentiel pour prendre Cadence en main : le circuit d'un post, qui fait quoi, et où trouver chaque chose."
       />
 
       <div className="max-w-[72ch] space-y-10 text-sm leading-relaxed">
         <section className="space-y-3">
           <h2 className="text-section">En deux mots</h2>
           <p>
-            L'outil planifie les publications réseaux sociaux de vos clients et fait circuler
+            Cadence planifie les publications réseaux sociaux de vos clients et fait circuler
             chaque post dans un <strong>circuit de validation</strong> : le Community Manager
             prépare, un Lead valide en interne, le client approuve, puis le post est planifié
             et marqué publié. Chaque client ne voit que ses propres contenus.

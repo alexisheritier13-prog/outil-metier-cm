@@ -41,7 +41,7 @@ export function AppLayout() {
           >
             {drawer ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <span className="text-sm font-semibold tracking-tight">Outil métier CM</span>
+          <span className="text-sm font-semibold tracking-tight">Cadence</span>
         </header>
 
         <main className="min-w-0 flex-1">

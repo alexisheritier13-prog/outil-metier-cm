@@ -48,10 +48,10 @@ export function AppSidebar() {
   return (
     <div className="bg-surface-2 flex h-full w-60 shrink-0 flex-col border-r">
       <div className="flex items-center gap-2.5 px-4 py-3.5">
-        <span className="bg-primary text-primary-foreground grid h-7 w-7 place-items-center rounded-lg text-xs font-bold">
-          CM
+        <span className="bg-primary text-primary-foreground grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
+          C
         </span>
-        <span className="text-[15px] font-semibold tracking-tight">Outil métier CM</span>
+        <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5 pb-4">
