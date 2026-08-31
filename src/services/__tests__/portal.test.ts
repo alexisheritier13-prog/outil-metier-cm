@@ -15,6 +15,8 @@ const base: Post = {
   status: 'published',
   authorId: 'a1',
   campaignId: null,
+  originType: null,
+  originId: null,
   performanceNote: 'CPC interne',
   performanceVisibleToClient: false,
   statusChangedAt: '',

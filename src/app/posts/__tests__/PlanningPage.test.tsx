@@ -52,6 +52,8 @@ const post: Post = {
   status: 'draft',
   authorId: 'me',
   campaignId: null,
+  originType: null,
+  originId: null,
   performanceNote: null,
   performanceVisibleToClient: false,
   statusChangedAt: '',

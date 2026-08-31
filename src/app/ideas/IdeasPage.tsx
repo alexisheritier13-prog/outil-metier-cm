@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Lightbulb, Plus, Trash2, X } from 'lucide-react';
+import { listPostsByOrigin } from '@/services/postOrigin';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { EmptyState } from '@/components/EmptyState';
@@ -261,6 +262,11 @@ function IdeaSheet({
   const [editing, setEditing] = useState(false);
   const [targetClient, setTargetClient] = useState('');
   const [network, setNetwork] = useState<Network>('instagram');
+  const linked = useQuery({
+    queryKey: ['posts-by-origin', 'idea', idea?.id],
+    queryFn: () => listPostsByOrigin('idea', idea!.id),
+    enabled: Boolean(idea),
+  });
 
   if (!idea) return null;
   const needsClient = !idea.clientId;
@@ -340,6 +346,17 @@ function IdeaSheet({
                   <p className="text-destructive text-xs">{(toPost.error as Error).message}</p>
                 )}
               </div>
+
+              {(linked.data ?? []).length > 0 && (
+                <div className="border-t pt-4">
+                  <p className="text-muted-foreground text-xs font-medium">Posts générés</p>
+                  <ul className="mt-1 list-disc pl-4 text-sm">
+                    {(linked.data ?? []).map((p) => (
+                      <li key={p.id}>{p.caption.split('\n')[0] || 'Sans légende'}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           )}
         </div>

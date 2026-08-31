@@ -37,6 +37,8 @@ const post = (over: Partial<Post>): Post => ({
   status: 'internal_review',
   authorId: 'a1',
   campaignId: null,
+  originType: null,
+  originId: null,
   performanceNote: null,
   performanceVisibleToClient: false,
   statusChangedAt: new Date(Date.now() - 3 * 24 * 3600_000).toISOString(),

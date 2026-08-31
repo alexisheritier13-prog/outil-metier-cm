@@ -16,6 +16,7 @@ import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import { getPostTagIds, listTags } from '@/services/tags';
 import { listCampaignsForClient } from '@/services/campaigns';
+import { ORIGIN_TYPE_LABELS, describeOrigin } from '@/services/postOrigin';
 import type { Client, Post, Profile } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { StatusActions } from './StatusActions';
@@ -49,6 +50,11 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
     queryKey: ['campaigns-for-client', post?.clientId],
     queryFn: () => listCampaignsForClient(post!.clientId),
     enabled: Boolean(post),
+  });
+  const origin = useQuery({
+    queryKey: ['post-origin', post?.id, post?.originType, post?.originId],
+    queryFn: () => describeOrigin(post!.originType, post!.originId),
+    enabled: Boolean(post?.originType),
   });
 
   if (!post) return null;
@@ -130,6 +136,20 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             <div>
               <p className="text-muted-foreground text-xs">Campagne</p>
               <p className="text-sm">{campaignName}</p>
+            </div>
+          )}
+
+          {post.originType && (
+            <div>
+              <p className="text-muted-foreground text-xs">Origine</p>
+              <p className="text-sm">
+                {ORIGIN_TYPE_LABELS[post.originType]}
+                {origin.data?.label ? (
+                  <span className="text-muted-foreground"> · {origin.data.label}</span>
+                ) : origin.isFetched ? (
+                  <span className="text-muted-foreground italic"> · origine supprimée</span>
+                ) : null}
+              </p>
             </div>
           )}
 

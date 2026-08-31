@@ -51,7 +51,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 7.1** faite : banque d'idées (`/app/idees`) — `ideas` + `idea_tags` (migr 0023), filtres client/tag/mot-clé, création/édition/suppression définitive, « Transformer en post » (RPC `idea_to_post`). Idée sans client visible de tous les internes.
 - **Story 7.2** faite : templates de posts (`/app/templates`) — `post_templates` (migr 0024, portée global/client), CRUD + aperçu, « Partir d'un template » dans l'éditeur (pré-remplit réseau/légende/tags).
 - **Story 7.3** faite : marronniers (`/app/marronniers`) — `key_dates` (migr 0025, portée global/secteur/client), résolution `key_dates_for_client`, surimpression discrète sur le calendrier (case à cocher), « Planifier » (RPC `key_date_to_post`).
-- Prochaine : Epic 7 (7.4 liens origine ↔ post).
+- **Story 7.4** faite : traçabilité origine ↔ post — `posts.origin_type`/`origin_id` exposés, ligne « Origine » dans le détail post + « Posts générés » côté idée/demande ; origine supprimée → « origine supprimée ». **Epic 7 terminé.**
+- Prochaine : Epic 8 (alertes in-app + jobs planifiés).
 
 ### Tests
 

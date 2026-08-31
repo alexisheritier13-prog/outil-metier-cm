@@ -216,6 +216,8 @@ export interface Post {
   status: PostStatus;
   authorId: string;
   campaignId: string | null;
+  originType: PostOriginType | null;
+  originId: string | null;
   performanceNote: string | null;
   performanceVisibleToClient: boolean;
   statusChangedAt: string;
@@ -223,6 +225,8 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
 }
+
+export type PostOriginType = 'idea' | 'key_date' | 'client_request' | 'duplicate';
 
 export function toPost(row: PostRow): Post {
   return {
@@ -238,6 +242,8 @@ export function toPost(row: PostRow): Post {
     status: row.status,
     authorId: row.author_id,
     campaignId: row.campaign_id,
+    originType: (row.origin_type as Post['originType']) ?? null,
+    originId: row.origin_id,
     performanceNote: row.performance_note,
     performanceVisibleToClient: row.performance_visible_to_client,
     statusChangedAt: row.status_changed_at,
