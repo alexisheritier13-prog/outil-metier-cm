@@ -37,15 +37,17 @@ const day = (n) => {
 };
 /** Upload un visuel d'exemple dans le bucket + crée la ligne post_media. */
 async function uploadSampleMedia(postId, index) {
+  const palette = ['EDEAFE/6366F1', 'FEF3E7/E08D3C', 'E8F5EE/3E9B6B', 'F3E8F0/9B4E86'];
   let res;
   try {
-    res = await fetch(`https://picsum.photos/seed/${postId}-${index}/1080/1080`, {
-      signal: AbortSignal.timeout(8000),
-    });
+    res = await fetch(
+      `https://placehold.co/1080x1080/${palette[index % palette.length]}/png?text=Visuel+${index + 1}`,
+      { signal: AbortSignal.timeout(10000) },
+    );
   } catch {
-    return; // picsum injoignable : on continue sans visuel
+    return; // service injoignable : on continue sans visuel
   }
-  if (!res.ok) return; // best-effort : pas de visuel si picsum indisponible
+  if (!res.ok) return; // best-effort : pas de visuel si le service est indisponible
   const buf = Buffer.from(await res.arrayBuffer());
   const path = `${CLIENT_ID}/${postId}/${crypto.randomUUID()}.jpg`;
   const up = await admin.storage
