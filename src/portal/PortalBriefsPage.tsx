@@ -72,14 +72,14 @@ export function PortalBriefsPage() {
       {creating && (
         <form onSubmit={submitNew} className="mb-6 space-y-3 rounded-md border p-4">
           <input
-            className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+            className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
             placeholder="Titre de la demande"
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             aria-label="Titre"
           />
           <textarea
-            className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+            className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
             rows={3}
             placeholder="Décrivez ce que vous souhaitez…"
             value={draft.description}
@@ -132,7 +132,7 @@ export function PortalBriefsPage() {
           description="Déposez une demande pour que votre agence prépare le contenu dont vous avez besoin."
         />
       ) : (
-        <ul className="divide-y rounded-md border">
+        <ul className="surface-card divide-y overflow-hidden">
           {(requests.data ?? []).map((r) => (
             <li key={r.id}>
               <button
@@ -141,7 +141,7 @@ export function PortalBriefsPage() {
                   setOpenId(r.id);
                   setEdit(null);
                 }}
-                className="hover:bg-surface-2/60 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3 text-left text-sm"
+                className="hover:bg-surface-2 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3.5 text-left text-sm transition-colors"
               >
                 <span className="min-w-0 flex-1 truncate font-medium">{r.title}</span>
                 {r.wantedNetwork && <NetworkIcon network={r.wantedNetwork} />}
@@ -180,13 +180,13 @@ export function PortalBriefsPage() {
                 {edit ? (
                   <div className="space-y-3">
                     <input
-                      className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+                      className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
                       value={edit.title}
                       onChange={(e) => setEdit({ ...edit, title: e.target.value })}
                       aria-label="Titre"
                     />
                     <textarea
-                      className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+                      className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
                       rows={4}
                       value={edit.description}
                       onChange={(e) => setEdit({ ...edit, description: e.target.value })}

@@ -21,7 +21,12 @@ export function PortalReviewPage() {
 
   return (
     <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
-      <h1 className="text-title mb-5 tracking-tight">À valider ({rows.length})</h1>
+      <div className="mb-5 flex items-baseline gap-2">
+        <h1 className="text-title tracking-tight">À valider</h1>
+        {rows.length > 0 && (
+          <span className="text-muted-foreground text-sm tabular-nums">{rows.length}</span>
+        )}
+      </div>
 
       {rows.length === 0 ? (
         <EmptyState
@@ -30,13 +35,13 @@ export function PortalReviewPage() {
           description="Vous êtes à jour. Les posts qui attendent votre retour apparaîtront ici."
         />
       ) : (
-        <ul className="divide-y rounded-md border">
+        <ul className="surface-card divide-y overflow-hidden">
           {rows.map((p) => (
             <li key={p.id}>
               <button
                 type="button"
                 onClick={() => setOpenId(p.id)}
-                className="hover:bg-surface-2/60 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3 text-left text-sm"
+                className="hover:bg-surface-2 group flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3.5 text-left text-sm transition-colors"
               >
                 <span className="text-muted-foreground whitespace-nowrap tabular-nums">
                   {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
@@ -45,7 +50,9 @@ export function PortalReviewPage() {
                 <span className="min-w-0 flex-1 truncate">
                   {p.caption || <span className="text-muted-foreground italic">Sans légende</span>}
                 </span>
-                <span className="text-muted-foreground text-xs">Ouvrir →</span>
+                <span className="text-primary text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                  Ouvrir →
+                </span>
               </button>
             </li>
           ))}

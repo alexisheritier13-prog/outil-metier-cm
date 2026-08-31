@@ -63,13 +63,13 @@ export function PortalCalendarPage() {
           />
         </Suspense>
       ) : (
-        <ul className="divide-y rounded-md border">
+        <ul className="surface-card divide-y overflow-hidden">
           {rows.map((p) => (
             <li key={p.id}>
               <button
                 type="button"
                 onClick={() => setOpenId(p.id)}
-                className="hover:bg-surface-2/60 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3 text-left text-sm"
+                className="hover:bg-surface-2 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3.5 text-left text-sm transition-colors"
               >
                 <span className="text-muted-foreground whitespace-nowrap tabular-nums">
                   {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}

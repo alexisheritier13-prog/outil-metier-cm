@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -21,12 +22,20 @@ function readStored(): string | null {
   }
 }
 
+const TABS = [
+  { to: '/portail', label: 'Calendrier', end: true },
+  { to: '/portail/a-valider', label: 'À valider', end: false },
+  { to: '/portail/publies', label: 'Publiés', end: false },
+  { to: '/portail/briefs', label: 'Briefs', end: false },
+] as const;
+
 export function PortalLayout() {
   const { data: profile } = useCurrentProfile();
   const signOut = useSignOut();
   const clients = useQuery({ queryKey: ['portal', 'my-clients'], queryFn: listMyClients });
 
   const [clientId, setClientId] = useState<string | null>(() => readStored());
+  const [logoBroken, setLogoBroken] = useState(false);
 
   const list = clients.data ?? [];
   const active = list.find((c) => c.id === clientId) ?? list[0] ?? null;
@@ -35,6 +44,8 @@ export function PortalLayout() {
   useEffect(() => {
     if (active && active.id !== clientId) setClientId(active.id);
   }, [active, clientId]);
+
+  useEffect(() => setLogoBroken(false), [active?.id]);
 
   function choose(id: string) {
     setClientId(id);
@@ -50,112 +61,106 @@ export function PortalLayout() {
   if (list.length === 0 || !active) {
     return (
       <main className="min-h-dvh p-8">
-        <header className="mb-8 flex items-center justify-between">
-          <h1 className="text-lg font-semibold">Espace client</h1>
-          <Button variant="outline" onClick={() => signOut.mutate()}>
+        <header className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
+          <span className="text-[15px] font-semibold tracking-tight">Espace client</span>
+          <Button variant="outline" size="sm" onClick={() => signOut.mutate()}>
             Déconnexion
           </Button>
         </header>
-        <EmptyState
-          title="Aucun client rattaché"
-          description="Votre compte n'est rattaché à aucun client actif. Contactez votre agence."
-        />
+        <div className="mx-auto max-w-3xl">
+          <EmptyState
+            title="Aucun client rattaché"
+            description="Votre compte n'est rattaché à aucun client actif. Contactez votre agence."
+          />
+        </div>
       </main>
     );
   }
 
   return (
     <PortalClientContext.Provider value={active}>
-      <div className="min-h-dvh">
-        <header className="bg-surface sticky top-0 z-sticky flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            {active.logoUrl ? (
-              <img
-                src={active.logoUrl}
-                alt=""
-                className="h-9 w-9 rounded-md border object-contain"
-                loading="lazy"
-              />
-            ) : (
-              <span className="bg-surface-2 grid h-9 w-9 place-items-center rounded-md border text-xs font-semibold">
-                {active.name.slice(0, 2).toUpperCase()}
-              </span>
-            )}
-            {list.length > 1 ? (
-              <select
-                className="field font-medium"
-                value={active.id}
-                onChange={(e) => choose(e.target.value)}
-                aria-label="Choisir le client"
-              >
-                {list.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="text-[15px] font-semibold tracking-tight">{active.name}</span>
-            )}
-          </div>
-
-          <nav className="order-3 -mx-1 flex w-full gap-1 overflow-x-auto px-1 sm:order-2 sm:mx-0 sm:w-auto sm:px-0">
-            <PortalNav to="/portail" end>
-              Calendrier
-            </PortalNav>
-            <PortalNav to="/portail/a-valider">
-              À valider
-              {(pending.data ?? 0) > 0 && (
-                <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs tabular-nums">
-                  {pending.data}
+      <div className="bg-background min-h-dvh">
+        <header className="bg-surface sticky top-0 z-sticky border-b">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2.5">
+              {active.logoUrl && !logoBroken ? (
+                <img
+                  src={active.logoUrl}
+                  alt=""
+                  onError={() => setLogoBroken(true)}
+                  className="h-9 w-9 shrink-0 rounded-lg border object-contain"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="bg-primary-surface text-primary-strong grid h-9 w-9 shrink-0 place-items-center rounded-lg text-xs font-bold">
+                  {active.name.slice(0, 2).toUpperCase()}
                 </span>
               )}
-            </PortalNav>
-            <PortalNav to="/portail/publies">Publiés</PortalNav>
-            <PortalNav to="/portail/briefs">Briefs</PortalNav>
-          </nav>
+              {list.length > 1 ? (
+                <select
+                  className="field max-w-[14rem] truncate font-semibold"
+                  value={active.id}
+                  onChange={(e) => choose(e.target.value)}
+                  aria-label="Choisir le client"
+                >
+                  {list.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="truncate text-[15px] font-semibold tracking-tight">
+                  {active.name}
+                </span>
+              )}
+            </div>
 
-          <div className="order-2 flex items-center gap-3 sm:order-3">
-            {profile && (
-              <span className="text-muted-foreground hidden text-sm sm:inline">
-                {profile.fullName || profile.email}
-              </span>
-            )}
-            <Button variant="outline" size="sm" onClick={() => signOut.mutate()}>
-              Déconnexion
-            </Button>
+            <div className="flex shrink-0 items-center gap-2">
+              {profile && (
+                <span className="text-muted-foreground hidden text-sm sm:inline">
+                  {profile.fullName || profile.email}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => signOut.mutate()}
+                aria-label="Se déconnecter"
+                className="text-muted-foreground hover:bg-surface-2 hover:text-foreground rounded-md p-2"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
+
+          <nav className="mx-auto -mb-px flex max-w-5xl gap-1 overflow-x-auto px-3 sm:px-5">
+            {TABS.map((t) => (
+              <NavLink
+                key={t.to}
+                to={t.to}
+                end={t.end}
+                className={({ isActive }) =>
+                  cn(
+                    'inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm transition-colors',
+                    isActive
+                      ? 'border-primary text-foreground font-medium'
+                      : 'hover:text-foreground border-transparent text-muted-foreground',
+                  )
+                }
+              >
+                {t.label}
+                {t.to === '/portail/a-valider' && (pending.data ?? 0) > 0 && (
+                  <span className="bg-primary text-primary-foreground rounded-full px-1.5 text-[11px] font-medium leading-5 tabular-nums">
+                    {pending.data}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
         </header>
 
         <Outlet />
       </div>
     </PortalClientContext.Provider>
-  );
-}
-
-function PortalNav({
-  to,
-  end,
-  children,
-}: {
-  to: string;
-  end?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        cn(
-          'inline-flex min-h-[36px] items-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors',
-          isActive
-            ? 'bg-muted font-medium'
-            : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
-        )
-      }
-    >
-      {children}
-    </NavLink>
   );
 }
