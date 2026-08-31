@@ -20,8 +20,8 @@ export function PortalReviewPage() {
   if (posts.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-4 sm:p-6">
-      <h1 className="text-title mb-4">À valider ({rows.length})</h1>
+    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+      <h1 className="text-title mb-5 tracking-tight">À valider ({rows.length})</h1>
 
       {rows.length === 0 ? (
         <EmptyState

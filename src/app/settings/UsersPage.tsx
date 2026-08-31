@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { Page, PageHeader } from '@/components/Page';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import type { Profile } from '@/shared/types';
@@ -18,25 +19,20 @@ export function UsersPage() {
 
   if (users.isLoading) return <FullPageSpinner />;
   if (users.isError) {
-    return <p className="text-destructive p-8">Impossible de charger les utilisateurs.</p>;
+    return <p className="text-danger-strong p-6">Impossible de charger les utilisateurs.</p>;
   }
 
   return (
-    <section className="p-8">
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Utilisateurs</h1>
-          <p className="text-muted-foreground text-sm">
-            Comptes internes de l'agence. La désactivation empêche la connexion et retire
-            l'utilisateur des sélecteurs, sans effacer son historique.
-          </p>
-        </div>
-        <CreateUserDialog />
-      </header>
+    <Page>
+      <PageHeader
+        title="Utilisateurs"
+        description="Comptes internes de l'agence. La désactivation empêche la connexion et retire l'utilisateur des sélecteurs, sans effacer son historique."
+        actions={<CreateUserDialog />}
+      />
 
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left">
+          <thead className="bg-surface-2 text-muted-foreground text-left">
             <tr>
               <th className="p-3 font-medium">Nom</th>
               <th className="p-3 font-medium">Email</th>
@@ -54,7 +50,7 @@ export function UsersPage() {
                   <td className="p-3">{u.email}</td>
                   <td className="p-3">
                     <select
-                      className="border-input bg-background h-8 rounded border px-2"
+                      className="field h-8"
                       value={u.role}
                       disabled={isSelf || updateRole.isPending}
                       onChange={(e) =>
@@ -114,6 +110,6 @@ export function UsersPage() {
       </div>
 
       <AssignClientsDialog user={assignFor} onClose={() => setAssignFor(null)} />
-    </section>
+    </Page>
   );
 }

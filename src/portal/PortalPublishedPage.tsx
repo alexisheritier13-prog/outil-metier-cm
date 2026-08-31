@@ -35,14 +35,14 @@ export function PortalPublishedPage() {
   const open = rows.find((p) => p.id === openId) ?? null;
 
   return (
-    <section className="p-4 sm:p-6">
-      <h1 className="text-title mb-4">Publiés</h1>
+    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+      <h1 className="text-title mb-5 tracking-tight">Publiés</h1>
 
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Recherche</span>
           <input
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Mot-clé dans la légende"
@@ -51,7 +51,7 @@ export function PortalPublishedPage() {
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Réseau</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={network}
             onChange={(e) => setNetwork(e.target.value as Network | '')}
           >
@@ -67,7 +67,7 @@ export function PortalPublishedPage() {
           <span className="text-muted-foreground mb-1 block text-xs">Du</span>
           <input
             type="date"
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           />
@@ -76,7 +76,7 @@ export function PortalPublishedPage() {
           <span className="text-muted-foreground mb-1 block text-xs">Au</span>
           <input
             type="date"
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={to}
             onChange={(e) => setTo(e.target.value)}
           />

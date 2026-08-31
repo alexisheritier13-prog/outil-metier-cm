@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
+import { cn } from '@/lib/utils';
 import { POST_STATUS_ORDER } from '@/shared/constants/postStatus';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { useTrashPost } from './usePosts';
 
 type SortKey = 'date' | 'client' | 'status';
-const ROW_H = 44;
+const ROW_H = 48;
+const COLS = 'grid-cols-[10.5rem_minmax(8rem,1fr)_4rem_minmax(0,2fr)_10.5rem_2.75rem]';
 
 interface Props {
   posts: Post[];
@@ -70,16 +72,18 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
   }
 
   return (
-    <div className="rounded-md border">
-      <div className="bg-surface-2 text-muted-foreground grid grid-cols-[10rem_1fr_5rem_2fr_11rem_3rem] items-center border-b text-sm">
+    <div className="overflow-hidden rounded-md border">
+      <div
+        className={`bg-surface-2 text-muted-foreground sticky top-0 z-10 grid ${COLS} items-center border-b text-xs font-medium uppercase tracking-wide`}
+      >
         <SortHead label="Date" k="date" sort={sort} onClick={toggle} />
         <SortHead label="Client" k="client" sort={sort} onClick={toggle} />
-        <span className="p-3 font-medium">Réseau</span>
-        <span className="p-3 font-medium">Légende</span>
+        <span className="px-3 py-2.5">Réseau</span>
+        <span className="px-3 py-2.5">Légende</span>
         <SortHead label="Statut" k="status" sort={sort} onClick={toggle} />
         <span />
       </div>
-      <div ref={scrollRef} className="max-h-[65vh] overflow-auto">
+      <div ref={scrollRef} className="max-h-[calc(100dvh-16rem)] overflow-auto">
         <div
           style={{
             height: virtualize ? virt.getTotalSize() : rows.length * ROW_H,
@@ -94,7 +98,7 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                 role="button"
                 tabIndex={0}
                 aria-label={`Ouvrir le post ${p.caption || 'sans légende'}`}
-                className="hover:bg-surface-2/60 focus-visible:ring-ring absolute inset-x-0 grid cursor-pointer grid-cols-[10rem_1fr_5rem_2fr_11rem_3rem] items-center border-b text-sm focus-visible:outline-none focus-visible:ring-2"
+                className={`hover:bg-surface-2/60 absolute inset-x-0 grid cursor-pointer ${COLS} items-center border-b text-sm last:border-b-0`}
                 style={{ height: ROW_H, top: 0, transform: `translateY(${v.start}px)` }}
                 onClick={() => onOpen(p)}
                 onKeyDown={(e) => {
@@ -104,10 +108,11 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                   }
                 }}
               >
-                <span className="truncate px-3">
-                  {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                <span className="text-muted-foreground truncate px-3 text-[13px] tabular-nums">
+                  {parisDateKey(p.scheduledAt)}
+                  <span className="text-muted-foreground/70"> · {parisTimeLabel(p.scheduledAt)}</span>
                 </span>
-                <span className="truncate px-3">{clientName(p.clientId)}</span>
+                <span className="truncate px-3 font-medium">{clientName(p.clientId)}</span>
                 <span className="px-3">
                   <NetworkIcon network={p.network} />
                 </span>
@@ -117,11 +122,11 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                 <span className="px-3">
                   <StatusBadge status={p.status} />
                 </span>
-                <span className="px-2 text-right">
+                <span className="pr-2 text-right">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
+                    className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong h-8 w-8"
                     aria-label="Mettre à la corbeille"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -156,14 +161,17 @@ function SortHead({
     <button
       type="button"
       onClick={() => onClick(k)}
-      className="hover:bg-surface-2 flex items-center gap-1 p-3 text-left font-medium"
+      className={cn(
+        'hover:text-foreground flex items-center gap-1 px-3 py-2.5 text-left',
+        active && 'text-foreground',
+      )}
     >
       {label}
       {active &&
         (sort.dir === 'asc' ? (
-          <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+          <ChevronUp className="h-3 w-3" aria-hidden="true" />
         ) : (
-          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+          <ChevronDown className="h-3 w-3" aria-hidden="true" />
         ))}
     </button>
   );

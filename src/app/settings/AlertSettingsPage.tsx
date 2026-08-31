@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { Page, PageHeader } from '@/components/Page';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import {
   THRESHOLD_FIELDS,
@@ -37,14 +38,11 @@ export function AlertSettingsPage() {
   }).map((f) => f.key);
 
   return (
-    <section className="max-w-xl p-6">
-      <header className="mb-4">
-        <h1 className="text-title">Seuils des alertes</h1>
-        <p className="text-muted-foreground text-sm">
-          Ces valeurs pilotent le moteur de détection. Prises en compte à la prochaine
-          exécution.
-        </p>
-      </header>
+    <Page size="form">
+      <PageHeader
+        title="Seuils des alertes"
+        description="Ces valeurs pilotent le moteur de détection. Prises en compte à la prochaine exécution."
+      />
 
       <form
         className="space-y-4"
@@ -90,6 +88,6 @@ export function AlertSettingsPage() {
           )}
         </div>
       </form>
-    </section>
+    </Page>
   );
 }

@@ -5,7 +5,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
-import { cn } from '@/lib/utils';
+import { Segmented } from '@/components/Segmented';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { listPortalPosts } from '@/services/portal';
@@ -32,24 +32,18 @@ export function PortalCalendarPage() {
   if (posts.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-4 sm:p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-title">Calendrier</h1>
-        <div className="flex rounded-md border p-0.5">
-          {(['month', 'list'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={cn(
-                'rounded px-3 py-1 text-sm',
-                mode === m ? 'bg-foreground text-background' : 'text-muted-foreground',
-              )}
-            >
-              {m === 'month' ? 'Mois' : 'Liste'}
-            </button>
-          ))}
-        </div>
+    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
+      <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-title tracking-tight">Calendrier</h1>
+        <Segmented
+          ariaLabel="Vue"
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'month', label: 'Mois' },
+            { value: 'list', label: 'Liste' },
+          ]}
+        />
       </header>
 
       {rows.length === 0 ? (

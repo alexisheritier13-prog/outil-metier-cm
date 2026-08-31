@@ -3,6 +3,7 @@ import { CheckCircle2, XCircle, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { Page, PageHeader } from '@/components/Page';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { listJobRuns, runPurgeTrash } from '@/services/jobs';
 import { runGenerateAlerts } from '@/services/alerts';
@@ -36,16 +37,13 @@ export function JobsPage() {
   if (runs.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4">
-        <h1 className="text-title">Tâches planifiées</h1>
-        <p className="text-muted-foreground text-sm">
-          Détection des alertes (chaque nuit + toutes les heures en journée) et purge de la
-          corbeille (chaque nuit). Historique des dernières exécutions.
-        </p>
-      </header>
+    <Page>
+      <PageHeader
+        title="Tâches planifiées"
+        description="Détection des alertes (chaque nuit + toutes les heures en journée) et purge de la corbeille (chaque nuit). Historique des dernières exécutions."
+      />
 
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         <Button variant="outline" size="sm" disabled={alerts.isPending} onClick={() => alerts.mutate()}>
           Lancer la détection
         </Button>
@@ -114,6 +112,6 @@ export function JobsPage() {
           </table>
         </div>
       )}
-    </section>
+    </Page>
   );
 }

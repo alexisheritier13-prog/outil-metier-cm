@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Megaphone, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import {
   Dialog,
   DialogContent,
@@ -34,36 +35,36 @@ export function CampaignsPage() {
   const rows = campaigns.data ?? [];
 
   return (
-    <section className="p-8">
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-title">Campagnes</h1>
-          <p className="text-muted-foreground text-sm">Regroupez des posts par thème ou période.</p>
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button disabled={(clients.data ?? []).length === 0}>
-              <Plus className="h-4 w-4" /> Nouvelle campagne
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nouvelle campagne</DialogTitle>
-            </DialogHeader>
-            <CampaignForm
-              clients={clients.data ?? []}
-              submitLabel="Créer"
-              pending={create.isPending}
-              error={create.isError ? create.error : undefined}
-              onCancel={() => setOpen(false)}
-              onSubmit={async (input) => {
-                await create.mutateAsync(input);
-                setOpen(false);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
-      </header>
+    <Page>
+      <PageHeader
+        title="Campagnes"
+        description="Regroupez des posts par thème ou période."
+        actions={
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button disabled={(clients.data ?? []).length === 0}>
+                <Plus className="h-4 w-4" /> Nouvelle campagne
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Nouvelle campagne</DialogTitle>
+              </DialogHeader>
+              <CampaignForm
+                clients={clients.data ?? []}
+                submitLabel="Créer"
+                pending={create.isPending}
+                error={create.isError ? create.error : undefined}
+                onCancel={() => setOpen(false)}
+                onSubmit={async (input) => {
+                  await create.mutateAsync(input);
+                  setOpen(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
       {rows.length === 0 ? (
         <EmptyState
@@ -101,6 +102,6 @@ export function CampaignsPage() {
           </table>
         </div>
       )}
-    </section>
+    </Page>
   );
 }

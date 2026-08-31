@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Page } from '@/components/Page';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -29,7 +30,7 @@ export function CampaignDetailPage() {
   if (campaign.isLoading) return <FullPageSpinner />;
   if (!campaign.data) {
     return (
-      <section className="p-8">
+      <Page>
         <EmptyState
           title="Campagne introuvable"
           action={
@@ -38,14 +39,14 @@ export function CampaignDetailPage() {
             </Button>
           }
         />
-      </section>
+      </Page>
     );
   }
 
   const c = campaign.data;
 
   return (
-    <section className="p-8">
+    <Page>
       <nav className="text-muted-foreground mb-4 flex items-center gap-1 text-sm">
         <Link to="/app/campagnes" className="hover:underline">
           Campagnes
@@ -89,6 +90,6 @@ export function CampaignDetailPage() {
           </table>
         </div>
       )}
-    </section>
+    </Page>
   );
 }

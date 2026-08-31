@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
@@ -53,13 +54,11 @@ export function TrashPage() {
   const trashedClients = clients.data ?? [];
 
   return (
-    <section className="p-8">
-      <header className="mb-6">
-        <h1 className="text-title">Corbeille</h1>
-        <p className="text-muted-foreground text-sm">
-          Les éléments sont supprimés définitivement 60 jours après leur mise à la corbeille.
-        </p>
-      </header>
+    <Page>
+      <PageHeader
+        title="Corbeille"
+        description="Les éléments sont supprimés définitivement 60 jours après leur mise à la corbeille."
+      />
 
       {trashedPosts.length === 0 && trashedClients.length === 0 ? (
         <EmptyState title="Corbeille vide" description="Rien à restaurer pour le moment." />
@@ -146,6 +145,6 @@ export function TrashPage() {
           )}
         </div>
       )}
-    </section>
+    </Page>
   );
 }

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { Input } from '@/components/ui/input';
 import {
   Dialog,
@@ -55,39 +56,37 @@ export function ClientsPage() {
   }
 
   return (
-    <section className="p-8">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-title">Clients</h1>
-          <p className="text-muted-foreground text-sm">
-            Le référentiel des comptes clients de l'agence.
-          </p>
-        </div>
-        {canWrite && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4" /> Nouveau client
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouveau client</DialogTitle>
-              </DialogHeader>
-              <ClientForm
-                submitLabel="Créer"
-                pending={create.isPending}
-                error={create.isError ? create.error : undefined}
-                onCancel={() => setOpen(false)}
-                onSubmit={async (input) => {
-                  await create.mutateAsync(input);
-                  setOpen(false);
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
-      </header>
+    <Page>
+      <PageHeader
+        title="Clients"
+        description="Le référentiel des comptes clients de l'agence."
+        actions={
+          canWrite && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4" /> Nouveau client
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nouveau client</DialogTitle>
+                </DialogHeader>
+                <ClientForm
+                  submitLabel="Créer"
+                  pending={create.isPending}
+                  error={create.isError ? create.error : undefined}
+                  onCancel={() => setOpen(false)}
+                  onSubmit={async (input) => {
+                    await create.mutateAsync(input);
+                    setOpen(false);
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          )
+        }
+      />
 
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <Input
@@ -186,7 +185,7 @@ export function ClientsPage() {
           </table>
         </div>
       )}
-    </section>
+    </Page>
   );
 }
 

@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
@@ -27,9 +29,9 @@ export function AppLayout() {
 
   return (
     <div className="min-h-dvh">
-      <header className="flex items-center justify-between border-b px-6 py-3">
-        <nav className="flex items-center gap-1">
-          <span className="mr-4 font-semibold">Outil métier CM</span>
+      <header className="bg-surface sticky top-0 z-sticky flex items-center justify-between gap-4 border-b px-6 py-2.5">
+        <nav className="flex flex-wrap items-center gap-x-0.5 gap-y-1">
+          <span className="mr-3 text-[15px] font-semibold tracking-tight">Outil métier CM</span>
           <NavItem to="/app" end>
             Calendrier
           </NavItem>
@@ -46,10 +48,15 @@ export function AppLayout() {
             <NavBadge count={requestCount.data} />
           </NavItem>
           <NavItem to="/app/clients">Clients</NavItem>
-          <NavItem to="/app/campagnes">Campagnes</NavItem>
-          <NavItem to="/app/idees">Idées</NavItem>
-          <NavItem to="/app/templates">Templates</NavItem>
-          <NavItem to="/app/marronniers">Marronniers</NavItem>
+          <NavGroup
+            label="Contenu"
+            items={[
+              { to: '/app/campagnes', label: 'Campagnes' },
+              { to: '/app/idees', label: 'Idées' },
+              { to: '/app/templates', label: 'Templates' },
+              { to: '/app/marronniers', label: 'Marronniers' },
+            ]}
+          />
           {(profile?.role === 'lead' || profile?.role === 'admin') && (
             <NavItem to="/app/corbeille">Corbeille</NavItem>
           )}
@@ -68,6 +75,45 @@ export function AppLayout() {
       </header>
       <Outlet />
     </div>
+  );
+}
+
+function NavGroup({ label, items }: { label: string; items: { to: string; label: string }[] }) {
+  const { pathname } = useLocation();
+  const active = items.some((i) => pathname.startsWith(i.to));
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            'inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-sm transition-colors',
+            active
+              ? 'bg-muted text-foreground font-medium'
+              : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
+          )}
+        >
+          {label}
+          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-44 p-1">
+        {items.map((i) => (
+          <NavLink
+            key={i.to}
+            to={i.to}
+            className={({ isActive }) =>
+              cn(
+                'block rounded px-2 py-1.5 text-sm',
+                isActive ? 'bg-muted font-medium' : 'hover:bg-surface-2',
+              )
+            }
+          >
+            {i.label}
+          </NavLink>
+        ))}
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -94,8 +140,10 @@ function NavItem({ to, end, children }: { to: string; end?: boolean; children: R
       end={end}
       className={({ isActive }) =>
         cn(
-          'rounded px-3 py-1.5 text-sm',
-          isActive ? 'bg-muted font-medium' : 'text-muted-foreground hover:text-foreground',
+          'inline-flex items-center rounded-md px-2.5 py-1.5 text-sm transition-colors',
+          isActive
+            ? 'bg-muted text-foreground font-medium'
+            : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )
       }
     >

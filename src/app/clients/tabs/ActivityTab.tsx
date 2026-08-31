@@ -33,7 +33,7 @@ export function ActivityTab({ clientId }: { clientId: string }) {
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Type d'action</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
@@ -49,7 +49,7 @@ export function ActivityTab({ clientId }: { clientId: string }) {
           <span className="text-muted-foreground mb-1 block text-xs">Du</span>
           <input
             type="date"
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           />
@@ -58,7 +58,7 @@ export function ActivityTab({ clientId }: { clientId: string }) {
           <span className="text-muted-foreground mb-1 block text-xs">Au</span>
           <input
             type="date"
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={to}
             onChange={(e) => setTo(e.target.value)}
           />

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarHeart, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -60,18 +61,16 @@ export function KeyDatesPage() {
   if (keyDates.isLoading || clients.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-title">Marronniers</h1>
-          <p className="text-muted-foreground text-sm">
-            Les temps forts à anticiper : globaux, par secteur, ou propres à un client.
-          </p>
-        </div>
-        <Button onClick={() => setEditing('new')}>
-          <Plus className="h-4 w-4" /> Nouveau marronnier
-        </Button>
-      </header>
+    <Page>
+      <PageHeader
+        title="Marronniers"
+        description="Les temps forts à anticiper : globaux, par secteur, ou propres à un client."
+        actions={
+          <Button onClick={() => setEditing('new')}>
+            <Plus className="h-4 w-4" /> Nouveau marronnier
+          </Button>
+        }
+      />
 
       {editing && (
         <KeyDateForm
@@ -141,7 +140,7 @@ export function KeyDatesPage() {
           )}
         </div>
       )}
-    </section>
+    </Page>
   );
 }
 
@@ -275,7 +274,7 @@ function KeyDateForm({
         />
         <input
           type="date"
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={eventDate}
           onChange={(e) => setEventDate(e.target.value)}
           aria-label="Date"
@@ -293,7 +292,7 @@ function KeyDateForm({
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Portée</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={scope}
             onChange={(e) => setScope(e.target.value as KeyDateScope)}
           >
@@ -304,7 +303,7 @@ function KeyDateForm({
         </label>
         {scope === 'sector' && (
           <input
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             placeholder="Secteur (ex. restauration)"
             value={sector}
             onChange={(e) => setSector(e.target.value)}
@@ -313,7 +312,7 @@ function KeyDateForm({
         )}
         {scope === 'client' && (
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             aria-label="Client"

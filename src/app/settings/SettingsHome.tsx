@@ -1,11 +1,24 @@
 import { NavLink } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { ChevronRight } from 'lucide-react';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
+import { Page, PageHeader } from '@/components/Page';
 
 const LINKS = [
-  { to: '/app/parametres/utilisateurs', label: 'Utilisateurs', desc: 'Comptes internes, rôles, clients assignés.' },
-  { to: '/app/parametres/alertes', label: 'Seuils des alertes', desc: 'Réglage du moteur de détection.' },
-  { to: '/app/parametres/jobs', label: 'Tâches planifiées', desc: 'Journal des jobs (alertes, purge).' },
+  {
+    to: '/app/parametres/utilisateurs',
+    label: 'Utilisateurs',
+    desc: 'Comptes internes, rôles, clients assignés.',
+  },
+  {
+    to: '/app/parametres/alertes',
+    label: 'Seuils des alertes',
+    desc: 'Réglage du moteur de détection.',
+  },
+  {
+    to: '/app/parametres/jobs',
+    label: 'Tâches planifiées',
+    desc: 'Journal des jobs (alertes, purge).',
+  },
 ];
 
 export function SettingsHome() {
@@ -13,23 +26,24 @@ export function SettingsHome() {
   if (!me || me.role !== 'admin') return null;
 
   return (
-    <section className="max-w-xl p-6">
-      <h1 className="text-title mb-4">Paramètres</h1>
+    <Page size="form">
+      <PageHeader title="Paramètres" />
       <ul className="divide-y rounded-md border">
         {LINKS.map((l) => (
           <li key={l.to}>
             <NavLink
               to={l.to}
-              className={({ isActive }) =>
-                cn('block p-3 text-sm hover:bg-surface-2/60', isActive && 'bg-muted')
-              }
+              className="hover:bg-surface-2/60 flex items-center justify-between gap-3 p-3.5 text-sm"
             >
-              <span className="font-medium">{l.label}</span>
-              <span className="text-muted-foreground block text-xs">{l.desc}</span>
+              <span>
+                <span className="font-medium">{l.label}</span>
+                <span className="text-muted-foreground block text-xs">{l.desc}</span>
+              </span>
+              <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
             </NavLink>
           </li>
         ))}
       </ul>
-    </section>
+    </Page>
   );
 }

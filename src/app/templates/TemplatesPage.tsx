@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -43,18 +44,16 @@ export function TemplatesPage() {
   if (templates.isLoading || clients.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-title">Templates de posts</h1>
-          <p className="text-muted-foreground text-sm">
-            Des gabarits réutilisables pour les formats récurrents.
-          </p>
-        </div>
-        <Button onClick={() => setEditing('new')}>
-          <Plus className="h-4 w-4" /> Nouveau template
-        </Button>
-      </header>
+    <Page>
+      <PageHeader
+        title="Templates de posts"
+        description="Des gabarits réutilisables pour les formats récurrents."
+        actions={
+          <Button onClick={() => setEditing('new')}>
+            <Plus className="h-4 w-4" /> Nouveau template
+          </Button>
+        }
+      />
 
       {editing && (
         <TemplateForm
@@ -114,7 +113,7 @@ export function TemplatesPage() {
           ))}
         </ul>
       )}
-    </section>
+    </Page>
   );
 }
 
@@ -180,7 +179,7 @@ function TemplateForm({
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Réseau</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={network}
             onChange={(e) => setNetwork(e.target.value as Network | '')}
           >
@@ -195,7 +194,7 @@ function TemplateForm({
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Portée</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
           >

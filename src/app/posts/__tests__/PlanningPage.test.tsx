@@ -75,10 +75,10 @@ describe('PlanningPage', () => {
     // Vue mois par défaut → CalendarView mocké
     expect(await screen.findByText('calendrier (1)')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Liste' }));
+    await userEvent.click(screen.getByRole('tab', { name: 'Liste' }));
     expect(await screen.findByText('Bonjour le monde')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Kanban' }));
+    await userEvent.click(screen.getByRole('tab', { name: 'Kanban' }));
     expect(await screen.findAllByText('Brouillon')).not.toHaveLength(0);
   });
 

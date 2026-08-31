@@ -61,9 +61,9 @@ export function PortalBriefsPage() {
   }
 
   return (
-    <section className="p-4 sm:p-6">
+    <section className="mx-auto max-w-5xl p-4 sm:p-6 lg:py-8">
       <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-title">Briefs</h1>
+        <h1 className="text-title tracking-tight">Briefs</h1>
         <Button onClick={() => setCreating((v) => !v)}>
           <Plus className="h-4 w-4" /> Nouvelle demande
         </Button>
@@ -90,7 +90,7 @@ export function PortalBriefsPage() {
             <label className="text-sm">
               <span className="text-muted-foreground mb-1 block text-xs">Réseau souhaité</span>
               <select
-                className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+                className="field"
                 value={draft.wantedNetwork}
                 onChange={(e) =>
                   setDraft({ ...draft, wantedNetwork: e.target.value as Network | '' })
@@ -108,7 +108,7 @@ export function PortalBriefsPage() {
               <span className="text-muted-foreground mb-1 block text-xs">Échéance souhaitée</span>
               <input
                 type="date"
-                className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+                className="field"
                 value={draft.wantedDate}
                 onChange={(e) => setDraft({ ...draft, wantedDate: e.target.value })}
               />

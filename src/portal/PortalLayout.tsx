@@ -67,23 +67,23 @@ export function PortalLayout() {
   return (
     <PortalClientContext.Provider value={active}>
       <div className="min-h-dvh">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
+        <header className="bg-surface sticky top-0 z-sticky flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
             {active.logoUrl ? (
               <img
                 src={active.logoUrl}
                 alt=""
-                className="h-8 w-8 rounded object-contain"
+                className="h-9 w-9 rounded-md border object-contain"
                 loading="lazy"
               />
             ) : (
-              <span className="bg-surface-2 grid h-8 w-8 place-items-center rounded text-xs font-semibold">
+              <span className="bg-surface-2 grid h-9 w-9 place-items-center rounded-md border text-xs font-semibold">
                 {active.name.slice(0, 2).toUpperCase()}
               </span>
             )}
             {list.length > 1 ? (
               <select
-                className="border-input bg-background h-9 rounded-md border px-2 text-sm font-medium"
+                className="field font-medium"
                 value={active.id}
                 onChange={(e) => choose(e.target.value)}
                 aria-label="Choisir le client"
@@ -95,18 +95,18 @@ export function PortalLayout() {
                 ))}
               </select>
             ) : (
-              <span className="font-semibold">{active.name}</span>
+              <span className="text-[15px] font-semibold tracking-tight">{active.name}</span>
             )}
           </div>
 
-          <nav className="order-3 flex w-full gap-1 overflow-x-auto sm:order-2 sm:w-auto">
+          <nav className="order-3 -mx-1 flex w-full gap-1 overflow-x-auto px-1 sm:order-2 sm:mx-0 sm:w-auto sm:px-0">
             <PortalNav to="/portail" end>
               Calendrier
             </PortalNav>
             <PortalNav to="/portail/a-valider">
               À valider
               {(pending.data ?? 0) > 0 && (
-                <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
+                <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs tabular-nums">
                   {pending.data}
                 </span>
               )}
@@ -148,8 +148,10 @@ function PortalNav({
       end={end}
       className={({ isActive }) =>
         cn(
-          'whitespace-nowrap rounded px-3 py-1.5 text-sm',
-          isActive ? 'bg-muted font-medium' : 'text-muted-foreground hover:text-foreground',
+          'inline-flex min-h-[36px] items-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors',
+          isActive
+            ? 'bg-muted font-medium'
+            : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )
       }
     >

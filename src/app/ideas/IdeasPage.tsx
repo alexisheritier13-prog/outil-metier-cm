@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Lightbulb, Plus, Trash2, X } from 'lucide-react';
 import { listPostsByOrigin } from '@/services/postOrigin';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -51,18 +52,16 @@ export function IdeasPage() {
   if (ideas.isLoading || clients.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-title">Banque d'idées</h1>
-          <p className="text-muted-foreground text-sm">
-            Des idées non datées, à transformer en posts quand le moment vient.
-          </p>
-        </div>
-        <Button onClick={() => setCreating((v) => !v)}>
-          <Plus className="h-4 w-4" /> Nouvelle idée
-        </Button>
-      </header>
+    <Page>
+      <PageHeader
+        title="Banque d'idées"
+        description="Des idées non datées, à transformer en posts quand le moment vient."
+        actions={
+          <Button onClick={() => setCreating((v) => !v)}>
+            <Plus className="h-4 w-4" /> Nouvelle idée
+          </Button>
+        }
+      />
 
       {creating && (
         <IdeaForm
@@ -74,14 +73,14 @@ export function IdeasPage() {
 
       <div className="mb-4 flex flex-wrap gap-3">
         <input
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           placeholder="Rechercher…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           aria-label="Rechercher une idée"
         />
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}
           aria-label="Filtrer par client"
@@ -95,7 +94,7 @@ export function IdeasPage() {
           ))}
         </select>
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={tagFilter}
           onChange={(e) => setTagFilter(e.target.value)}
           aria-label="Filtrer par tag"
@@ -143,7 +142,7 @@ export function IdeasPage() {
         clientName={clientName}
         onClose={() => setOpenId(null)}
       />
-    </section>
+    </Page>
   );
 }
 
@@ -213,7 +212,7 @@ function IdeaForm({
         <label className="text-sm">
           <span className="text-muted-foreground mb-1 block text-xs">Client</span>
           <select
-            className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            className="field"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
           >
@@ -228,7 +227,7 @@ function IdeaForm({
         <label className="text-sm flex-1">
           <span className="text-muted-foreground mb-1 block text-xs">Tags (séparés par des virgules)</span>
           <input
-            className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
+            className="field w-full"
             value={tagsValue}
             onChange={(e) => setTagsText(e.target.value)}
           />
@@ -305,7 +304,7 @@ function IdeaSheet({
                 <p className="text-muted-foreground text-xs font-medium">Transformer en post</p>
                 {needsClient && (
                   <select
-                    className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
+                    className="field w-full"
                     value={targetClient}
                     onChange={(e) => setTargetClient(e.target.value)}
                     aria-label="Client du post"
@@ -319,7 +318,7 @@ function IdeaSheet({
                   </select>
                 )}
                 <select
-                  className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
+                  className="field w-full"
                   value={network}
                   onChange={(e) => setNetwork(e.target.value as Network)}
                   aria-label="Réseau"

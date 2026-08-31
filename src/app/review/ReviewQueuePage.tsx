@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { Page, PageHeader } from '@/components/Page';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
@@ -77,13 +78,11 @@ export function ReviewQueuePage() {
   if (queue.isLoading || clients.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4">
-        <h1 className="text-title">À valider</h1>
-        <p className="text-muted-foreground text-sm">
-          Les posts en attente de validation, du plus ancien au plus récent.
-        </p>
-      </header>
+    <Page>
+      <PageHeader
+        title="À valider"
+        description="Les posts en attente de validation, du plus ancien au plus récent."
+      />
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Tabs value={kind} onValueChange={(v) => setKind(v as Kind)}>
@@ -94,7 +93,7 @@ export function ReviewQueuePage() {
         </Tabs>
 
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}
           aria-label="Filtrer par client"
@@ -187,6 +186,6 @@ export function ReviewQueuePage() {
         authors={authors.data ?? []}
         onClose={() => setOpenPost(null)}
       />
-    </section>
+    </Page>
   );
 }

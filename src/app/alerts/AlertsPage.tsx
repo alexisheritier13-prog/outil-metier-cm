@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { BellRing, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { cn } from '@/lib/utils';
@@ -74,32 +75,30 @@ export function AlertsPage() {
   }
 
   return (
-    <section className="p-6">
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-title">Alertes</h1>
-          <p className="text-muted-foreground text-sm">
-            Les points de vigilance détectés automatiquement.
-          </p>
-        </div>
-        {canRun && (
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={run.isPending}
-            onClick={() => run.mutate()}
-          >
-            <RefreshCw className={cn('h-4 w-4', run.isPending && 'animate-spin')} />
-            {run.isSuccess && !run.isPending
-              ? `${run.data.created} créées · ${run.data.dismissed} fermées`
-              : 'Lancer la détection'}
-          </Button>
-        )}
-      </header>
+    <Page>
+      <PageHeader
+        title="Alertes"
+        description="Les points de vigilance détectés automatiquement."
+        actions={
+          canRun && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={run.isPending}
+              onClick={() => run.mutate()}
+            >
+              <RefreshCw className={cn('h-4 w-4', run.isPending && 'animate-spin')} />
+              {run.isSuccess && !run.isPending
+                ? `${run.data.created} créées · ${run.data.dismissed} fermées`
+                : 'Lancer la détection'}
+            </Button>
+          )
+        }
+      />
 
       <div className="mb-4 flex flex-wrap gap-3">
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as AlertType | '')}
           aria-label="Filtrer par type"
@@ -112,7 +111,7 @@ export function AlertsPage() {
           ))}
         </select>
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}
           aria-label="Filtrer par client"
@@ -125,7 +124,7 @@ export function AlertsPage() {
           ))}
         </select>
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={sevFilter}
           onChange={(e) => setSevFilter(e.target.value as AlertSeverity | '')}
           aria-label="Filtrer par sévérité"
@@ -206,6 +205,6 @@ export function AlertsPage() {
           ))}
         </ul>
       )}
-    </section>
+    </Page>
   );
 }

@@ -11,7 +11,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
-import { cn } from '@/lib/utils';
+import { Page, PageHeader } from '@/components/Page';
+import { Segmented } from '@/components/Segmented';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { listClients } from '@/services/clients';
@@ -33,12 +34,6 @@ const CalendarView = lazy(() =>
 const KanbanView = lazy(() => import('./KanbanView').then((m) => ({ default: m.KanbanView })));
 
 type ViewMode = 'month' | 'week' | 'list' | 'kanban';
-const VIEW_LABEL: Record<ViewMode, string> = {
-  month: 'Mois',
-  week: 'Semaine',
-  list: 'Liste',
-  kanban: 'Kanban',
-};
 
 export function PlanningPage() {
   const { data: me } = useCurrentProfile();
@@ -109,53 +104,51 @@ export function PlanningPage() {
   const hasClients = (clients.data ?? []).length > 0;
 
   return (
-    <section className="p-6">
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-title">Planning</h1>
-          <div className="flex rounded-md border p-0.5">
-            {(['month', 'week', 'list', 'kanban'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMode(m)}
-                className={cn(
-                  'rounded px-3 py-1 text-sm',
-                  mode === m ? 'bg-foreground text-background' : 'text-muted-foreground',
-                )}
-              >
-                {VIEW_LABEL[m]}
-              </button>
-            ))}
-          </div>
-        </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button disabled={!hasClients}>
-              <Plus className="h-4 w-4" /> Nouveau post
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nouveau post</DialogTitle>
-            </DialogHeader>
-            <PostForm
-              clients={clients.data ?? []}
-              authors={authors.data ?? []}
-              canReassign={canReassign}
-              templates={templates.data ?? []}
-              submitLabel="Créer"
-              pending={create.isPending}
-              error={create.isError ? create.error : undefined}
-              onCancel={() => setCreateOpen(false)}
-              onSubmit={async (input) => {
-                await create.mutateAsync(input);
-                setCreateOpen(false);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
-      </header>
+    <Page>
+      <PageHeader
+        title="Planning"
+        aside={
+          <Segmented
+            ariaLabel="Vue du calendrier"
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'month', label: 'Mois' },
+              { value: 'week', label: 'Semaine' },
+              { value: 'list', label: 'Liste' },
+              { value: 'kanban', label: 'Kanban' },
+            ]}
+          />
+        }
+        actions={
+          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+            <DialogTrigger asChild>
+              <Button disabled={!hasClients}>
+                <Plus className="h-4 w-4" /> Nouveau post
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Nouveau post</DialogTitle>
+              </DialogHeader>
+              <PostForm
+                clients={clients.data ?? []}
+                authors={authors.data ?? []}
+                canReassign={canReassign}
+                templates={templates.data ?? []}
+                submitLabel="Créer"
+                pending={create.isPending}
+                error={create.isError ? create.error : undefined}
+                onCancel={() => setCreateOpen(false)}
+                onSubmit={async (input) => {
+                  await create.mutateAsync(input);
+                  setCreateOpen(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
       <FiltersBar
         clients={clients.data ?? []}
@@ -166,9 +159,10 @@ export function PlanningPage() {
       />
 
       {(mode === 'month' || mode === 'week') && (
-        <label className="text-muted-foreground mb-2 flex items-center gap-1.5 text-sm">
+        <label className="text-muted-foreground mb-3 mt-1 flex w-fit cursor-pointer items-center gap-2 text-sm">
           <input
             type="checkbox"
+            className="accent-foreground"
             checked={showKeyDates}
             onChange={(e) => setShowKeyDates(e.target.checked)}
           />
@@ -208,6 +202,6 @@ export function PlanningPage() {
         authors={authors.data ?? []}
         onClose={closeSheet}
       />
-    </section>
+    </Page>
   );
 }

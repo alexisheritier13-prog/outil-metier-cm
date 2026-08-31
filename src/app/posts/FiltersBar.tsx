@@ -18,7 +18,7 @@ interface Props {
 
 export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Props) {
   return (
-    <div className="bg-background sticky top-0 z-sticky mb-4 flex flex-wrap items-center gap-2 border-b py-2">
+    <div className="bg-background sticky top-0 z-sticky mb-4 flex flex-wrap items-center gap-2 border-b pb-3 pt-1">
       <MultiSelect
         label="Client"
         options={clients.map((c) => ({ value: c.id, label: c.name }))}
@@ -38,19 +38,21 @@ export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Pro
         onChange={(networks) => onChange({ networks: networks as PlanningFilters['networks'] })}
       />
 
-      <div className="flex items-center gap-1 text-sm">
+      <div className="flex items-center gap-1.5 text-sm">
         <input
           type="date"
           aria-label="Du"
-          className="border-input bg-background h-9 rounded-md border px-2"
+          className="field"
           value={filters.from ?? ''}
           onChange={(e) => onChange({ from: e.target.value || null })}
         />
-        <span className="text-muted-foreground">→</span>
+        <span className="text-muted-foreground" aria-hidden="true">
+          →
+        </span>
         <input
           type="date"
           aria-label="Au"
-          className="border-input bg-background h-9 rounded-md border px-2"
+          className="field"
           value={filters.to ?? ''}
           onChange={(e) => onChange({ to: e.target.value || null })}
         />
@@ -58,7 +60,7 @@ export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Pro
 
       <Input
         placeholder="Rechercher dans les légendes…"
-        className="h-9 max-w-xs"
+        className="h-9 w-full max-w-xs sm:w-auto"
         aria-label="Rechercher dans les légendes"
         value={filters.q}
         onChange={(e) => onChange({ q: e.target.value })}

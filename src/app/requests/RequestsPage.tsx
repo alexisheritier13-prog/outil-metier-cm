@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Inbox, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Page, PageHeader } from '@/components/Page';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -55,17 +56,15 @@ export function RequestsPage() {
   if (requests.isLoading) return <FullPageSpinner />;
 
   return (
-    <section className="p-6">
-      <header className="mb-4">
-        <h1 className="text-title">Demandes clients</h1>
-        <p className="text-muted-foreground text-sm">
-          Les briefs déposés par les clients dans leur espace.
-        </p>
-      </header>
+    <Page>
+      <PageHeader
+        title="Demandes clients"
+        description="Les briefs déposés par les clients dans leur espace."
+      />
 
       <div className="mb-4 flex flex-wrap gap-3">
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={clientFilter}
           onChange={(e) => setClientFilter(e.target.value)}
           aria-label="Filtrer par client"
@@ -78,7 +77,7 @@ export function RequestsPage() {
           ))}
         </select>
         <select
-          className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+          className="field"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as ClientRequestStatus | '')}
           aria-label="Filtrer par statut"
@@ -176,7 +175,7 @@ export function RequestsPage() {
                   </label>
                   <select
                     id="req-status"
-                    className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+                    className="field"
                     value={open.status}
                     disabled={setStatus.isPending}
                     onChange={(e) =>
@@ -218,6 +217,6 @@ export function RequestsPage() {
           )}
         </SheetContent>
       </Sheet>
-    </section>
+    </Page>
   );
 }

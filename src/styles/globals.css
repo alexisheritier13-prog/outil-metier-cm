@@ -97,6 +97,13 @@
     text-wrap: balance;
   }
 
+  /* Anneau de focus homogène sur tout ce qui est focusable au clavier. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -106,6 +113,16 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /* Contrôle de formulaire natif (select, input date) — hauteur et style homogènes. */
+  .field {
+    @apply border-input bg-background h-9 rounded-md border px-2.5 text-sm;
+  }
+  .field:focus-visible {
+    outline-offset: 0;
   }
 }
 
@@ -127,16 +144,51 @@
   --fc-button-active-border-color: var(--foreground);
   font-size: 0.8125rem;
 }
+.fc-monochrome .fc-button {
+  padding: 0.3rem 0.6rem;
+  font-weight: 500;
+  box-shadow: none !important;
+}
 .fc-monochrome .fc-button.fc-button-active {
   color: var(--background);
 }
+.fc-monochrome .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0.75rem;
+}
 .fc-monochrome .fc-toolbar-title {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+}
+/* Cases du mois : hauteur mini + libellé de jour plus discret */
+.fc-monochrome .fc-daygrid-day-frame {
+  min-height: 5.5rem;
+}
+.fc-monochrome .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  background: var(--foreground);
+  color: var(--background);
+  border-radius: 999px;
+  padding: 0 0.35rem;
+  font-weight: 600;
+}
+.fc-monochrome .fc-day-sat,
+.fc-monochrome .fc-day-sun {
+  background: color-mix(in oklch, var(--surface-2) 55%, transparent);
 }
 .fc-monochrome .fc-event {
   cursor: pointer;
   box-shadow: none;
+  border-radius: 5px;
+  padding: 1px 0;
+  margin-block: 1px;
+}
+.fc-monochrome .fc-daygrid-more-link {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.fc-monochrome .fc-daygrid-more-link:hover {
+  color: var(--foreground);
 }
 /* Teinte de statut sur l'événement (fond léger + contour plein, jamais une bande) */
 .fc-monochrome .fc-status-internal_review {

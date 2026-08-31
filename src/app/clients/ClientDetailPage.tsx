@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { trashClient } from '@/services/clients';
+import { Page } from '@/components/Page';
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,7 +53,7 @@ export function ClientDetailPage() {
   if (client.isLoading) return <FullPageSpinner />;
   if (!client.data) {
     return (
-      <section className="p-8">
+      <Page>
         <EmptyState
           title="Client introuvable"
           description="Ce client n'existe pas ou ne vous est pas accessible."
@@ -62,33 +63,43 @@ export function ClientDetailPage() {
             </Button>
           }
         />
-      </section>
+      </Page>
     );
   }
 
   const c = client.data;
 
   return (
-    <section className="p-8">
-      <nav className="text-muted-foreground mb-4 flex items-center gap-1 text-sm" aria-label="Fil d'Ariane">
-        <Link to="/app/clients" className="hover:underline">
+    <Page>
+      <nav
+        className="text-muted-foreground mb-3 flex items-center gap-1 text-xs"
+        aria-label="Fil d'Ariane"
+      >
+        <Link to="/app/clients" className="hover:text-foreground">
           Clients
         </Link>
-        <ChevronRight className="h-4 w-4" aria-hidden="true" />
-        <span className="text-foreground">{c.name}</span>
+        <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+        <span className="text-foreground font-medium">{c.name}</span>
       </nav>
 
       <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <ClientAvatar name={c.name} logoUrl={c.logoUrl} size="lg" />
-          <div>
-            <h1 className="text-title">{c.name}</h1>
-            <p className="text-muted-foreground text-sm">
-              {c.sector || 'Secteur non renseigné'} · {c.isArchived ? 'Archivé' : 'Actif'}
+          <div className="space-y-1">
+            <h1 className="text-title tracking-tight">{c.name}</h1>
+            <p className="text-muted-foreground flex flex-wrap items-center gap-x-2 text-sm">
+              <span>{c.sector || 'Secteur non renseigné'}</span>
+              <span aria-hidden="true">·</span>
+              <span className={c.isArchived ? 'text-warning-strong' : 'text-success-strong'}>
+                {c.isArchived ? 'Archivé' : 'Actif'}
+              </span>
               {onboarding.data && onboarding.data.length > 0 && (
                 <>
-                  {' · '}Onboarding {onboarding.data.filter((i) => i.isDone).length}/
-                  {onboarding.data.length}
+                  <span aria-hidden="true">·</span>
+                  <span>
+                    Onboarding {onboarding.data.filter((i) => i.isDone).length}/
+                    {onboarding.data.length}
+                  </span>
                 </>
               )}
             </p>
@@ -195,6 +206,6 @@ export function ClientDetailPage() {
           />
         </DialogContent>
       </Dialog>
-    </section>
+    </Page>
   );
 }
