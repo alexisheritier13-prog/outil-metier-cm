@@ -43,29 +43,38 @@ export interface TransitionCheck {
 }
 
 /**
- * Options de circuit (mode « CM seul », réglage `app_settings.workflow`). Quand
- * `skipInternalReview` est vrai, un rôle interne peut envoyer un brouillon
- * directement en « à valider client ». Miroir de `workflow_skips_internal()` SQL.
+ * Options de circuit. Miroir des règles dynamiques SQL (`can_transition`) :
+ * - `skipInternalReview` (mode « CM seul », `app_settings.workflow`) : un rôle
+ *   interne envoie un brouillon directement en « à valider client ».
+ * - `skipClientReview` (`clients.skip_client_review`) : ce client ne valide pas
+ *   les posts — l'étape `client_review` est sautée, un rôle interne passe
+ *   directement à `approved`.
  */
 export interface WorkflowOptions {
   skipInternalReview?: boolean;
+  skipClientReview?: boolean;
 }
 
 const INTERNAL: readonly Role[] = ['cm', 'lead', 'admin'];
 
-/** Règle dynamique du mode « CM seul » : draft → client_review. */
-function skipRuleApplies(
+/** Règles dynamiques (hors table statique) autorisées par les options de circuit. */
+function dynamicRuleApplies(
   from: PostStatus,
   to: PostStatus,
   role: Role,
   opts?: WorkflowOptions,
 ): boolean {
-  return (
-    Boolean(opts?.skipInternalReview) &&
-    from === 'draft' &&
-    to === 'client_review' &&
-    INTERNAL.includes(role)
-  );
+  if (!INTERNAL.includes(role)) return false;
+  const skipInternal = Boolean(opts?.skipInternalReview);
+  const skipClient = Boolean(opts?.skipClientReview);
+  // CM seul : draft → client_review (ou → approved si le client ne valide pas)
+  if (skipInternal && from === 'draft' && to === 'client_review') return true;
+  if (skipInternal && skipClient && from === 'draft' && to === 'approved') return true;
+  // Client sans validation : (internal|client)_review → approved
+  if (skipClient && to === 'approved' && (from === 'internal_review' || from === 'client_review')) {
+    return true;
+  }
+  return false;
 }
 
 /** Statuts atteignables depuis `from` pour ce rôle. */
@@ -77,10 +86,11 @@ export function allowedTransitions(
   const base = POST_TRANSITIONS.filter((t) => t.from === from && t.roles.includes(role)).map(
     (t) => t.to,
   );
-  if (skipRuleApplies(from, 'client_review', role, opts) && !base.includes('client_review')) {
-    base.push('client_review');
+  for (const to of ['client_review', 'approved'] as const) {
+    if (dynamicRuleApplies(from, to, role, opts) && !base.includes(to)) base.push(to);
   }
-  return base;
+  // Quand le client ne valide pas, « à valider client » n'est jamais une cible utile.
+  return opts?.skipClientReview ? base.filter((s) => s !== 'client_review') : base;
 }
 
 /** La transition `from → to` est-elle permise pour ce rôle ? */
@@ -92,14 +102,16 @@ export function canTransition(
 ): TransitionCheck {
   if (from === to) return { allowed: false, needsComment: false, reason: 'statut inchangé' };
   const rule = POST_TRANSITIONS.find((t) => t.from === from && t.to === to);
-  if (!rule) {
-    if (skipRuleApplies(from, to, role, opts)) return { allowed: true, needsComment: false };
-    return { allowed: false, needsComment: false, reason: 'transition inexistante' };
+  if (rule?.roles.includes(role)) {
+    return { allowed: true, needsComment: rule.needsComment ?? false };
   }
-  if (!rule.roles.includes(role)) {
-    return { allowed: false, needsComment: false, reason: 'rôle non autorisé' };
-  }
-  return { allowed: true, needsComment: rule.needsComment ?? false };
+  // La table statique ne couvre pas : la règle dynamique peut quand même autoriser.
+  if (dynamicRuleApplies(from, to, role, opts)) return { allowed: true, needsComment: false };
+  return {
+    allowed: false,
+    needsComment: false,
+    reason: rule ? 'rôle non autorisé' : 'transition inexistante',
+  };
 }
 
 export function transitionNeedsComment(from: PostStatus, to: PostStatus): boolean {

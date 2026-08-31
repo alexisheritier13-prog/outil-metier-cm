@@ -53,6 +53,8 @@ export interface Client {
   logoUrl: string | null;
   sector: string | null;
   isArchived: boolean;
+  /** Ce client ne valide pas les posts : l'étape « à valider client » est sautée. */
+  skipClientReview?: boolean;
   archivedAt: string | null;
   deletedAt: string | null;
   createdAt: string;
@@ -66,6 +68,7 @@ export function toClient(row: ClientRow): Client {
     logoUrl: row.logo_url,
     sector: row.sector,
     isArchived: row.is_archived,
+    skipClientReview: row.skip_client_review,
     archivedAt: row.archived_at,
     deletedAt: row.deleted_at,
     createdAt: row.created_at,

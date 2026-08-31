@@ -18,7 +18,7 @@ import {
   type BulkFailure,
   type BulkReport,
 } from './bulk';
-import { useWorkflowOptions } from './useWorkflow';
+import { useClientSkipReview, useWorkflowOptions } from './useWorkflow';
 
 interface RunContext {
   posts: Post[];
@@ -32,7 +32,8 @@ interface RunContext {
  */
 export function useBulkActions({ posts, clientName, role }: RunContext) {
   const qc = useQueryClient();
-  const workflow = useWorkflowOptions();
+  const globalWorkflow = useWorkflowOptions();
+  const skipReview = useClientSkipReview();
   const [running, setRunning] = useState<BulkActionKind | null>(null);
   const [report, setReport] = useState<BulkReport | null>(null);
 
@@ -87,7 +88,10 @@ export function useBulkActions({ posts, clientName, role }: RunContext) {
 
     changeStatus: (ids: string[], to: PostStatus, comment?: string) => {
       const selected = posts.filter((p) => ids.includes(p.id));
-      const { eligible, ineligible } = partitionByTransition(selected, to, role, workflow);
+      const { eligible, ineligible } = partitionByTransition(selected, to, role, (p) => ({
+        ...globalWorkflow,
+        skipClientReview: skipReview(p.clientId),
+      }));
       const seed: BulkFailure[] = ineligible.map((p) => ({
         postId: p.id,
         label: postLabel(p, clientName),

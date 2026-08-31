@@ -5,6 +5,7 @@ export interface ClientInput {
   name: string;
   logoUrl: string | null;
   sector: string | null;
+  skipClientReview: boolean;
 }
 
 /** Clients visibles par l'utilisateur (RLS). `includeArchived` inclut les archivés. */
@@ -39,7 +40,12 @@ export async function getClient(id: string): Promise<Client | null> {
 export async function createClient(input: ClientInput): Promise<Client> {
   const { data, error } = await getSupabase()
     .from('clients')
-    .insert({ name: input.name, logo_url: input.logoUrl, sector: input.sector })
+    .insert({
+      name: input.name,
+      logo_url: input.logoUrl,
+      sector: input.sector,
+      skip_client_review: input.skipClientReview,
+    })
     .select('*')
     .single();
   if (error) throw error;
@@ -49,7 +55,12 @@ export async function createClient(input: ClientInput): Promise<Client> {
 export async function updateClient(id: string, input: ClientInput): Promise<Client> {
   const { data, error } = await getSupabase()
     .from('clients')
-    .update({ name: input.name, logo_url: input.logoUrl, sector: input.sector })
+    .update({
+      name: input.name,
+      logo_url: input.logoUrl,
+      sector: input.sector,
+      skip_client_review: input.skipClientReview,
+    })
     .eq('id', id)
     .select('*')
     .single();

@@ -336,6 +336,7 @@ export type Database = {
           logo_url: string | null
           name: string
           sector: string | null
+          skip_client_review: boolean
           updated_at: string
         }
         Insert: {
@@ -348,6 +349,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           sector?: string | null
+          skip_client_review?: boolean
           updated_at?: string
         }
         Update: {
@@ -360,6 +362,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           sector?: string | null
+          skip_client_review?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -1492,6 +1495,7 @@ export type Database = {
       can_see_scoped: { Args: { p_client_id: string }; Returns: boolean }
       can_transition: {
         Args: {
+          p_client_id?: string
           p_from: Database["public"]["Enums"]["post_status_t"]
           p_role: Database["public"]["Enums"]["role_t"]
           p_to: Database["public"]["Enums"]["post_status_t"]

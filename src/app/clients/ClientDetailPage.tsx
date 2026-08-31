@@ -203,7 +203,12 @@ export function ClientDetailPage() {
             submitLabel="Enregistrer"
             pending={update.isPending}
             error={update.isError ? update.error : undefined}
-            defaultValues={{ name: c.name, logoUrl: c.logoUrl ?? '', sector: c.sector ?? '' }}
+            defaultValues={{
+              name: c.name,
+              logoUrl: c.logoUrl ?? '',
+              sector: c.sector ?? '',
+              skipClientReview: c.skipClientReview ?? false,
+            }}
             onCancel={() => setEditOpen(false)}
             onSubmit={async (input) => {
               await update.mutateAsync(input);

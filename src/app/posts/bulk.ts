@@ -42,12 +42,13 @@ export function partitionByTransition(
   posts: Post[],
   to: PostStatus,
   role: Role,
-  workflow?: WorkflowOptions,
+  workflow?: WorkflowOptions | ((post: Post) => WorkflowOptions),
 ): { eligible: Post[]; ineligible: Post[] } {
+  const optsFor = typeof workflow === 'function' ? workflow : () => workflow;
   const eligible: Post[] = [];
   const ineligible: Post[] = [];
   for (const p of posts) {
-    if (p.status === to || !canTransition(p.status, to, role, workflow).allowed) ineligible.push(p);
+    if (p.status === to || !canTransition(p.status, to, role, optsFor(p)).allowed) ineligible.push(p);
     else eligible.push(p);
   }
   return { eligible, ineligible };

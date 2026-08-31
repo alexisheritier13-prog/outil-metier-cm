@@ -11,7 +11,7 @@ import {
 } from '@/shared/utils/transitions';
 import type { Post } from '@/shared/types';
 import { useChangePostStatus } from './usePosts';
-import { useWorkflowOptions } from './useWorkflow';
+import { useWorkflowForClient } from './useWorkflow';
 
 /**
  * Actions de workflow d'un post (Story 5.1) : boutons nommés pour chaque transition
@@ -41,7 +41,7 @@ const actionLabel = (from: PostStatus, to: PostStatus) =>
 
 export function StatusActions({ post, role }: { post: Post; role: Role }) {
   const change = useChangePostStatus();
-  const workflow = useWorkflowOptions();
+  const workflow = useWorkflowForClient(post.clientId);
   const [ask, setAsk] = useState<{ to: PostStatus; label: string } | null>(null);
   const [comment, setComment] = useState('');
 

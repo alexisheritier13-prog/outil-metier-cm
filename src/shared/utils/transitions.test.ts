@@ -102,6 +102,43 @@ describe('canTransition — mode « CM seul »', () => {
   });
 });
 
+describe('canTransition — client sans validation (skipClientReview)', () => {
+  it('internal_review → approved permis pour un rôle interne', () => {
+    expect(canTransition('internal_review', 'approved', 'cm').allowed).toBe(false);
+    expect(
+      canTransition('internal_review', 'approved', 'lead', { skipClientReview: true }).allowed,
+    ).toBe(true);
+    expect(
+      canTransition('internal_review', 'approved', 'cm', { skipClientReview: true }).allowed,
+    ).toBe(true);
+  });
+  it('client_review → approved permis (post déjà en file client)', () => {
+    expect(
+      canTransition('client_review', 'approved', 'lead', { skipClientReview: true }).allowed,
+    ).toBe(true);
+  });
+  it('un contact client ne gagne aucun droit', () => {
+    expect(
+      canTransition('internal_review', 'approved', 'client', { skipClientReview: true }).allowed,
+    ).toBe(false);
+  });
+  it('draft → approved seulement si CM seul est aussi actif', () => {
+    expect(canTransition('draft', 'approved', 'cm', { skipClientReview: true }).allowed).toBe(false);
+    expect(
+      canTransition('draft', 'approved', 'cm', {
+        skipClientReview: true,
+        skipInternalReview: true,
+      }).allowed,
+    ).toBe(true);
+  });
+  it('allowedTransitions retire client_review et ajoute approved', () => {
+    expect(allowedTransitions('internal_review', 'lead', { skipClientReview: true }).sort()).toEqual([
+      'approved',
+      'draft',
+    ]);
+  });
+});
+
 describe('transitionDirection', () => {
   it('classe avant / arrière / inexistant', () => {
     expect(transitionDirection('draft', 'internal_review')).toBe('forward');

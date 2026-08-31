@@ -10,6 +10,7 @@ const schema = z.object({
   name: z.string().trim().min(1, 'Nom requis'),
   logoUrl: z.string().trim().url('URL invalide').or(z.literal('')),
   sector: z.string().trim(),
+  skipClientReview: z.boolean(),
 });
 type Values = z.infer<typeof schema>;
 
@@ -29,7 +30,13 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
     formState: { errors },
   } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', logoUrl: '', sector: '', ...defaultValues },
+    defaultValues: {
+      name: '',
+      logoUrl: '',
+      sector: '',
+      skipClientReview: false,
+      ...defaultValues,
+    },
   });
 
   return (
@@ -37,7 +44,12 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
       className="space-y-4"
       noValidate
       onSubmit={handleSubmit((v) =>
-        onSubmit({ name: v.name, logoUrl: v.logoUrl || null, sector: v.sector || null }),
+        onSubmit({
+          name: v.name,
+          logoUrl: v.logoUrl || null,
+          sector: v.sector || null,
+          skipClientReview: v.skipClientReview,
+        }),
       )}
     >
       <div className="space-y-1.5">
@@ -69,6 +81,21 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
         <Label htmlFor="cf-sector">Secteur d'activité</Label>
         <Input id="cf-sector" {...register('sector')} />
       </div>
+
+      <label className="border-border bg-surface-2/50 flex items-start gap-3 rounded-lg border p-3 text-sm">
+        <input
+          type="checkbox"
+          className="accent-primary mt-0.5 h-4 w-4"
+          {...register('skipClientReview')}
+        />
+        <span>
+          <span className="font-medium">Ce client ne valide pas les posts</span>
+          <span className="text-muted-foreground block text-xs">
+            L'étape « à valider client » est sautée : un rôle interne publie sans passer par le
+            client.
+          </span>
+        </span>
+      </label>
 
       {error != null && (
         <p className="text-destructive text-sm" role="alert">
