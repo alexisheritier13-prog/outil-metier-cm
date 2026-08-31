@@ -51,6 +51,9 @@ const RequestsPage = lazy(() =>
 const IdeasPage = lazy(() =>
   import('@/app/ideas/IdeasPage').then((m) => ({ default: m.IdeasPage })),
 );
+const TemplatesPage = lazy(() =>
+  import('@/app/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
+);
 
 function lazyRoute(node: React.ReactNode) {
   return <Suspense fallback={<FullPageSpinner />}>{node}</Suspense>;
@@ -70,6 +73,7 @@ export const router = createBrowserRouter(
         { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
         { path: 'demandes', element: lazyRoute(<RequestsPage />) },
         { path: 'idees', element: lazyRoute(<IdeasPage />) },
+        { path: 'templates', element: lazyRoute(<TemplatesPage />) },
         { path: 'clients', element: lazyRoute(<ClientsPage />) },
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
         { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },

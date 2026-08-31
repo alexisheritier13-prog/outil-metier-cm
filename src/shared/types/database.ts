@@ -749,6 +749,67 @@ export type Database = {
           },
         ]
       }
+      post_templates: {
+        Row: {
+          caption_template: string
+          client_id: string | null
+          created_at: string
+          created_by: string
+          default_tags: string[]
+          description: string
+          id: string
+          name: string
+          network: Database["public"]["Enums"]["network_t"] | null
+          updated_at: string
+        }
+        Insert: {
+          caption_template?: string
+          client_id?: string | null
+          created_at?: string
+          created_by: string
+          default_tags?: string[]
+          description?: string
+          id?: string
+          name: string
+          network?: Database["public"]["Enums"]["network_t"] | null
+          updated_at?: string
+        }
+        Update: {
+          caption_template?: string
+          client_id?: string | null
+          created_at?: string
+          created_by?: string
+          default_tags?: string[]
+          description?: string
+          id?: string
+          name?: string
+          network?: Database["public"]["Enums"]["network_t"] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_templates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_templates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_transitions: {
         Row: {
           from_status: Database["public"]["Enums"]["post_status_t"]
@@ -1240,6 +1301,7 @@ export type Database = {
       auth_role: { Args: never; Returns: Database["public"]["Enums"]["role_t"] }
       can_see_client_request: { Args: { cid: string }; Returns: boolean }
       can_see_idea: { Args: { p_client_id: string }; Returns: boolean }
+      can_see_scoped: { Args: { p_client_id: string }; Returns: boolean }
       can_transition: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]

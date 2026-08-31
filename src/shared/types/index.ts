@@ -294,6 +294,7 @@ type ClientActivityRow = Database['public']['Views']['client_activity']['Row'];
 type ClientRequestRow = Database['public']['Tables']['client_requests']['Row'];
 type ClientRequestCommentRow = Database['public']['Tables']['client_request_comments']['Row'];
 type IdeaRow = Database['public']['Tables']['ideas']['Row'];
+type PostTemplateRow = Database['public']['Tables']['post_templates']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -471,6 +472,33 @@ export function toIdea(row: IdeaRow): Idea {
     description: row.description,
     clientId: row.client_id,
     originRequestId: row.origin_request_id,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export interface PostTemplate {
+  id: string;
+  name: string;
+  description: string;
+  network: Network | null;
+  captionTemplate: string;
+  defaultTags: string[];
+  clientId: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export function toPostTemplate(row: PostTemplateRow): PostTemplate {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    network: row.network,
+    captionTemplate: row.caption_template,
+    defaultTags: row.default_tags ?? [],
+    clientId: row.client_id,
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

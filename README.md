@@ -49,7 +49,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 6.4** faite : historique des publiés côté client (`/portail/publies`) — recherche mot-clé + filtres réseau/période, note de perf masquée si non partagée (`redactClientPost`), accès maintenu après archivage. 181 tests.
 - **Story 6.5** faite : espace brief client → agence — `client_requests` + commentaires (migr 0022), page client `/portail/briefs` (créer / modifier si nouvelle / suivre), page interne `/app/demandes` (statut + « Transformer en post » via RPC `request_to_post`). **Epic 6 terminé.**
 - **Story 7.1** faite : banque d'idées (`/app/idees`) — `ideas` + `idea_tags` (migr 0023), filtres client/tag/mot-clé, création/édition/suppression définitive, « Transformer en post » (RPC `idea_to_post`). Idée sans client visible de tous les internes.
-- Prochaine : Epic 7 (7.2 templates, 7.3 marronniers, 7.4 liens origine ↔ post).
+- **Story 7.2** faite : templates de posts (`/app/templates`) — `post_templates` (migr 0024, portée global/client), CRUD + aperçu, « Partir d'un template » dans l'éditeur (pré-remplit réseau/légende/tags).
+- Prochaine : Epic 7 (7.3 marronniers, 7.4 liens origine ↔ post).
 
 ### Tests
 

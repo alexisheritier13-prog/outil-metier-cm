@@ -11,9 +11,10 @@ import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
 import { listNetworks } from '@/services/socialAccounts';
-import type { Client, Profile } from '@/shared/types';
+import type { Client, PostTemplate, Profile } from '@/shared/types';
 import type { PostInput } from '@/services/posts';
 import { CanvaField } from './CanvaField';
+import { templatePrefill } from './applyTemplate';
 
 const schema = z.object({
   clientId: z.string().min(1, 'Client requis'),
@@ -37,6 +38,8 @@ interface Props {
   clients: Client[];
   authors?: Profile[];
   canReassign?: boolean;
+  /** Templates disponibles — affiche « Partir d'un template » en création (Story 7.2). */
+  templates?: PostTemplate[];
   defaults?: Partial<{
     clientId: string;
     network: Network;
@@ -60,6 +63,7 @@ export function PostForm({
   clients,
   authors = [],
   canReassign = false,
+  templates = [],
   defaults,
   submitLabel,
   pending,
@@ -71,6 +75,7 @@ export function PostForm({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -93,6 +98,20 @@ export function PostForm({
 
   const clientId = watch('clientId');
   const network = watch('network');
+
+  const isCreation = !defaults;
+  const applicableTemplates = templates.filter(
+    (t) => t.clientId === null || t.clientId === clientId,
+  );
+
+  function applyTemplate(id: string) {
+    const t = templates.find((tpl) => tpl.id === id);
+    if (!t) return;
+    const pre = templatePrefill(t);
+    if (pre.network) setValue('network', pre.network);
+    if (pre.caption) setValue('caption', pre.caption);
+    if (pre.tagsText) setValue('tagsText', pre.tagsText);
+  }
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', clientId],
     queryFn: () => listCampaignsForClient(clientId),
@@ -133,6 +152,28 @@ export function PostForm({
         });
       })}
     >
+      {isCreation && applicableTemplates.length > 0 && (
+        <div className="space-y-1.5">
+          <Label htmlFor="pf-template">Partir d'un template</Label>
+          <select
+            id="pf-template"
+            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            defaultValue=""
+            onChange={(e) => {
+              applyTemplate(e.target.value);
+              e.target.value = '';
+            }}
+          >
+            <option value="">— Aucun —</option>
+            {applicableTemplates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-4">
         <div className="min-w-48 flex-1 space-y-1.5">
           <Label htmlFor="pf-client">Client</Label>

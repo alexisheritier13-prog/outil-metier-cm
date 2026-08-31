@@ -15,6 +15,7 @@ import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { listClients } from '@/services/clients';
 import { listInternalUsers } from '@/services/users';
+import { listPostTemplates } from '@/services/postTemplates';
 import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { PostsTable } from './PostsTable';
@@ -55,6 +56,7 @@ export function PlanningPage() {
     queryFn: listInternalUsers,
     enabled: canReassign,
   });
+  const templates = useQuery({ queryKey: ['post-templates'], queryFn: listPostTemplates });
   const create = useCreatePost();
 
   const clientName = useMemo(() => {
@@ -109,6 +111,7 @@ export function PlanningPage() {
               clients={clients.data ?? []}
               authors={authors.data ?? []}
               canReassign={canReassign}
+              templates={templates.data ?? []}
               submitLabel="Créer"
               pending={create.isPending}
               error={create.isError ? create.error : undefined}
