@@ -76,7 +76,11 @@ export function useChangePostStatus() {
   return useMutation({
     mutationFn: ({ id, to, comment }: { id: string; to: PostStatus; comment?: string }) =>
       changePostStatus(id, to, comment),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['posts'] }),
+    onSuccess: (_data, { id }) => {
+      qc.invalidateQueries({ queryKey: ['posts'] });
+      qc.invalidateQueries({ queryKey: ['post-history', id] });
+      qc.invalidateQueries({ queryKey: ['review-queue'] });
+    },
   });
 }
 

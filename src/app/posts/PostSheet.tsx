@@ -18,7 +18,7 @@ import { getPostTagIds, listTags } from '@/services/tags';
 import { listCampaignsForClient } from '@/services/campaigns';
 import type { Client, Post, Profile } from '@/shared/types';
 import { PostForm } from './PostForm';
-import { StatusControl } from './StatusControl';
+import { StatusActions } from './StatusActions';
 import { CommentThread } from './CommentThread';
 import { PostHistory } from './PostHistory';
 import { useDuplicatePost, useTrashPost, useUpdatePost } from './usePosts';
@@ -87,8 +87,8 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
 
           <TabsContent value="detail" className="flex-1 space-y-5 overflow-y-auto p-4 pt-4">
           <div>
-            <p className="text-muted-foreground text-xs">Statut</p>
-            {me && <StatusControl postId={post.id} status={post.status} role={me.role} />}
+            <p className="text-muted-foreground mb-1 text-xs">Statut</p>
+            {me && <StatusActions post={post} role={me.role} />}
           </div>
 
           {post.canvaThumbnailUrl && (

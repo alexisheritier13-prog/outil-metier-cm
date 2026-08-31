@@ -289,6 +289,7 @@ export function toCampaignOverview(row: CampaignOverviewRow): Campaign {
 
 type PostHistoryRow = Database['public']['Tables']['post_history']['Row'];
 type PostCommentRow = Database['public']['Tables']['post_comments']['Row'];
+type NotificationRow = Database['public']['Tables']['notifications']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -330,5 +331,36 @@ export function toPostComment(row: PostCommentRow): PostComment {
     visibility: row.visibility,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export type NotificationType =
+  | 'post_submitted'
+  | 'post_internal_approved'
+  | 'post_returned'
+  | 'post_client_approved'
+  | 'post_client_rejected'
+  | (string & {});
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  postId: string | null;
+  clientId: string | null;
+  actorId: string | null;
+  body: string;
+  readAt: string | null;
+  createdAt: string;
+}
+export function toNotification(row: NotificationRow): AppNotification {
+  return {
+    id: row.id,
+    type: row.type,
+    postId: row.post_id,
+    clientId: row.client_id,
+    actorId: row.actor_id,
+    body: row.body,
+    readAt: row.read_at,
+    createdAt: row.created_at,
   };
 }
