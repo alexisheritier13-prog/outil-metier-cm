@@ -104,15 +104,23 @@ export function AppSidebar() {
       </div>
 
       <div className="border-border/70 bg-surface shadow-xs m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
-        <UserAvatar name={profile?.fullName || profile?.email || '?'} avatarUrl={profile?.avatarUrl} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium leading-tight">
-            {profile?.fullName || profile?.email}
-          </p>
-          <p className="text-muted-foreground truncate text-xs">
-            {profile && ROLE_LABELS[profile.role]}
-          </p>
-        </div>
+        <NavLink
+          to="/app/mon-compte"
+          className="hover:bg-surface-2 -m-1 flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors"
+        >
+          <UserAvatar
+            name={profile?.fullName || profile?.email || '?'}
+            avatarUrl={profile?.avatarUrl}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium leading-tight">
+              {profile?.fullName || profile?.email}
+            </p>
+            <p className="text-muted-foreground truncate text-xs">
+              {profile && ROLE_LABELS[profile.role]}
+            </p>
+          </div>
+        </NavLink>
         <button
           type="button"
           onClick={() => signOut.mutate()}

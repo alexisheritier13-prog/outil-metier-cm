@@ -1,4 +1,5 @@
 import { getSupabase } from '@/lib/supabase';
+import { setPasswordRedirectUrl } from '@/lib/authRedirect';
 import { toProfile, toClient, type Profile, type Client } from '@/shared/types';
 import type { Role } from '@/shared/constants/roles';
 
@@ -52,7 +53,7 @@ export interface CreateUserResult {
 /** Crée un compte interne via l'Edge Function `admin-users` (service_role côté serveur). */
 export async function createInternalUser(input: CreateUserInput): Promise<CreateUserResult> {
   const { data, error } = await getSupabase().functions.invoke('admin-users', {
-    body: { action: 'create', ...input },
+    body: { action: 'create', ...input, redirectTo: setPasswordRedirectUrl() },
   });
   if (error) {
     // supabase-js renvoie une FunctionsHttpError ; on tente de lire le corps.
@@ -61,6 +62,45 @@ export async function createInternalUser(input: CreateUserInput): Promise<Create
   }
   const res = data as { profile: unknown; actionLink: string | null };
   return { profile: toProfile(res.profile as never), actionLink: res.actionLink };
+}
+
+/** Change l'email et/ou le mot de passe d'un compte (Admin). `sendLink` renvoie un lien de définition. */
+export async function updateUserCredentials(input: {
+  userId: string;
+  email?: string;
+  password?: string;
+  sendLink?: boolean;
+}): Promise<{ actionLink: string | null }> {
+  const { data, error } = await getSupabase().functions.invoke('admin-users', {
+    body: {
+      action: 'update_user',
+      userId: input.userId,
+      email: input.email?.trim().toLowerCase(),
+      password: input.password,
+      sendLink: input.sendLink ?? false,
+      redirectTo: setPasswordRedirectUrl(),
+    },
+  });
+  if (error) {
+    const body = (await tryReadError(error)) as { error?: string } | null;
+    throw new Error(mapUpdateError(body?.error));
+  }
+  return { actionLink: (data as { actionLink: string | null }).actionLink };
+}
+
+function mapUpdateError(code: string | undefined): string {
+  switch (code) {
+    case 'email_taken':
+      return 'Un compte existe déjà avec cet email.';
+    case 'invalid_email':
+      return 'Email invalide.';
+    case 'weak_password':
+      return 'Le mot de passe doit faire au moins 8 caractères.';
+    case 'forbidden':
+      return 'Action réservée à un directeur.';
+    default:
+      return 'La mise à jour a échoué.';
+  }
 }
 
 export async function updateUserRole(id: string, role: InternalRole): Promise<void> {

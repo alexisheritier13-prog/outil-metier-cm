@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { EmptyState } from '@/components/EmptyState';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
+import { CredentialsSheet } from '@/app/settings/CredentialsSheet';
 import type { ClientContact } from '@/shared/types';
 import {
   useAddClientContact,
@@ -17,6 +18,8 @@ import {
 export function ContactsTab({ clientId }: { clientId: string }) {
   const { data: me } = useCurrentProfile();
   const canWrite = me?.role === 'lead' || me?.role === 'admin';
+  const isAdmin = me?.role === 'admin';
+  const [credsFor, setCredsFor] = useState<ClientContact | null>(null);
   const contacts = useClientContacts(clientId);
   const add = useAddClientContact(clientId);
   const invite = useInviteClientContact(clientId);
@@ -80,6 +83,8 @@ export function ContactsTab({ clientId }: { clientId: string }) {
                   key={c.id}
                   contact={c}
                   canWrite={canWrite}
+                  canManageCreds={isAdmin && Boolean(c.authUserId)}
+                  onCreds={() => setCredsFor(c)}
                   onToggleActive={() => setActive.mutate({ id: c.id, isActive: !c.isActive })}
                   onInvite={async () => {
                     const res = await invite.mutateAsync({ fullName: c.fullName, email: c.email });
@@ -100,6 +105,15 @@ export function ContactsTab({ clientId }: { clientId: string }) {
           )}
         </div>
       )}
+
+      <CredentialsSheet
+        userId={credsFor?.authUserId ?? null}
+        currentEmail={credsFor?.email ?? ''}
+        personLabel={credsFor?.fullName || credsFor?.email || ''}
+        invalidateKeys={[['client-contacts', clientId]]}
+        open={Boolean(credsFor)}
+        onOpenChange={(v) => !v && setCredsFor(null)}
+      />
 
       {lastLink && (
         <div className="surface-card space-y-2 p-4 text-sm">
@@ -176,6 +190,8 @@ export function ContactsTab({ clientId }: { clientId: string }) {
 function ContactRow({
   contact: c,
   canWrite,
+  canManageCreds,
+  onCreds,
   onToggleActive,
   onInvite,
   onRemove,
@@ -183,6 +199,8 @@ function ContactRow({
 }: {
   contact: ClientContact;
   canWrite: boolean;
+  canManageCreds: boolean;
+  onCreds: () => void;
   onToggleActive: () => void;
   onInvite: () => void;
   onRemove: () => void;
@@ -209,6 +227,11 @@ function ContactRow({
       <td className="py-2 text-right">
         {canWrite && (
           <div className="flex justify-end gap-1">
+            {canManageCreds && (
+              <Button variant="ghost" size="sm" onClick={onCreds}>
+                E-mail / mdp
+              </Button>
+            )}
             <Button variant="ghost" size="sm" onClick={onToggleActive}>
               {c.isActive ? 'Désactiver' : 'Activer'}
             </Button>

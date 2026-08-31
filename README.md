@@ -74,6 +74,7 @@ contenu. Application web hébergée (SPA React + Vite + Supabase). Remplace Noti
 - **Photo de profil** (migr 0033) : `profiles.avatar_url`, `<UserAvatar>` (sidebar + accueil), section « Mon profil » dans les paramètres.
 - **Client sans validation** (migr 0034) : `clients.skip_client_review` — l'étape « à valider client » est sautée, un rôle interne passe le post directement en « validé ». `can_transition` gagne un 4e paramètre `p_client_id`. Case à cocher dans le formulaire client. 6 tests unit + 3 d'intégration.
 - **Configuration du compte** : `app_settings.account` (pas de migration). Assistant de bienvenue `/bienvenue` (Admin sur compte non configuré) + page `/app/parametres/compte` — organisation (solo / équipe), validation client par défaut, réseaux proposés (filtre le formulaire de post + le filtre planning), nom / logo de l'agence dans l'espace client. Voir `docs/stories/post-v1.account-config.md`.
+- **Gestion e-mail / mot de passe** : Edge Function `admin-users` action `update_user` (Admin change l'e-mail et le mot de passe d'un compte ; « Générer un lien » = URL de définition à transmettre). Page `/app/mon-compte` + `/portail/mon-compte` (chacun change son mot de passe). Page publique `/definir-mot-de-passe` (atterrissage des liens `recovery`). « Mot de passe oublié ? » sur la connexion. **Config Supabase requise** : ajouter `<domaine>/definir-mot-de-passe` aux Redirect URLs autorisées ; « mot de passe oublié » nécessite un SMTP. Voir `docs/stories/post-v1.credentials-management.md`.
 
 ### Tests
 

@@ -7,6 +7,8 @@
 // Actions :
 //   - "create"          : créer un compte interne (cm/lead/admin) — appelant = admin
 //   - "invite_contact"  : créer/lier un compte pour un contact client — appelant = lead/admin
+//   - "update_user"     : changer l'email et/ou le mot de passe d'un compte — appelant = admin
+//                         (option `sendLink` : renvoie un lien de définition de mot de passe)
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { corsHeaders, json } from '../_shared/cors.ts';
 
@@ -85,8 +87,68 @@ Deno.serve(async (req) => {
       await admin.auth.admin.deleteUser(id);
       return json(500, { error: 'profile_update_failed', detail: updErr.message });
     }
-    const { data: link } = await admin.auth.admin.generateLink({ type: 'recovery', email });
+    const redirectTo = payload.redirectTo ? String(payload.redirectTo) : undefined;
+    const { data: link } = await admin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: redirectTo ? { redirectTo } : undefined,
+    });
     return json(201, { profile: updated, actionLink: link?.properties?.action_link ?? null });
+  }
+
+  // ───────────────────────── update_user (email / mot de passe) ─────────────────────────
+  if (action === 'update_user') {
+    if (me.role !== 'admin') return json(403, { error: 'forbidden' });
+
+    const userId = String(payload.userId ?? '');
+    if (!userId) return json(400, { error: 'missing_user' });
+    const email =
+      payload.email != null ? String(payload.email).trim().toLowerCase() : undefined;
+    const password = payload.password != null ? String(payload.password) : undefined;
+    const sendLink = Boolean(payload.sendLink);
+    const redirectTo = payload.redirectTo ? String(payload.redirectTo) : undefined;
+
+    if (email !== undefined && !email.includes('@')) return json(400, { error: 'invalid_email' });
+    if (password !== undefined && password.length < 8) return json(400, { error: 'weak_password' });
+
+    const patch: Record<string, unknown> = {};
+    if (email !== undefined) {
+      patch.email = email;
+      patch.email_confirm = true;
+    }
+    if (password !== undefined) patch.password = password;
+
+    if (Object.keys(patch).length > 0) {
+      const upd = await admin.auth.admin.updateUserById(userId, patch);
+      if (upd.error) {
+        const msg = upd.error.message ?? '';
+        return json(422, {
+          error: /already registered|exists|been registered/i.test(msg)
+            ? 'email_taken'
+            : 'update_failed',
+          detail: msg,
+        });
+      }
+      if (email !== undefined) {
+        await admin.from('profiles').update({ email }).eq('id', userId);
+        await admin.from('client_contacts').update({ email }).eq('auth_user_id', userId);
+      }
+    }
+
+    let actionLink: string | null = null;
+    if (sendLink) {
+      const { data: u } = await admin.auth.admin.getUserById(userId);
+      const targetEmail = email ?? u.user?.email ?? '';
+      if (targetEmail) {
+        const { data: link } = await admin.auth.admin.generateLink({
+          type: 'recovery',
+          email: targetEmail,
+          options: redirectTo ? { redirectTo } : undefined,
+        });
+        actionLink = link?.properties?.action_link ?? null;
+      }
+    }
+    return json(200, { ok: true, actionLink });
   }
 
   // ───────────────────────── invite_contact (client) ─────────────────────────
@@ -151,7 +213,12 @@ Deno.serve(async (req) => {
       .single();
     if (cErr) return json(500, { error: 'contact_upsert_failed', detail: cErr.message });
 
-    const { data: link } = await admin.auth.admin.generateLink({ type: 'recovery', email });
+    const redirectTo = payload.redirectTo ? String(payload.redirectTo) : undefined;
+    const { data: link } = await admin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: redirectTo ? { redirectTo } : undefined,
+    });
     return json(201, {
       contact,
       isNewAccount: isNew,

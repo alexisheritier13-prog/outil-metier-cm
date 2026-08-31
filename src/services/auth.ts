@@ -1,4 +1,5 @@
 import { getSupabase } from '@/lib/supabase';
+import { setPasswordRedirectUrl } from '@/lib/authRedirect';
 import { toProfile, type Profile } from '@/shared/types';
 
 export class AccountDisabledError extends Error {
@@ -37,6 +38,22 @@ export async function signIn(email: string, password: string): Promise<Profile> 
 
 export async function signOut(): Promise<void> {
   await getSupabase().auth.signOut();
+}
+
+/** Change son propre mot de passe (session active requise). */
+export async function updateMyPassword(password: string): Promise<void> {
+  const { error } = await getSupabase().auth.updateUser({ password });
+  if (error) throw error;
+}
+
+/**
+ * Envoie un email de réinitialisation (nécessite un SMTP configuré côté Supabase).
+ * Ne lève jamais : on ne révèle pas si l'adresse existe.
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  await getSupabase().auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    redirectTo: setPasswordRedirectUrl(),
+  });
 }
 
 /** Session courante (ou null). */

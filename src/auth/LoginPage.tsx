@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignIn } from '@/auth/useAuthActions';
+import { requestPasswordReset } from '@/services/auth';
 import { homePathForRole } from '@/auth/roleRoutes';
 
 const schema = z.object({
@@ -20,6 +23,9 @@ type FormValues = z.infer<typeof schema>;
 export function LoginPage() {
   const { data: profile, isLoading } = useCurrentProfile();
   const signIn = useSignIn();
+  const [forgot, setForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const reset = useMutation({ mutationFn: () => requestPasswordReset(resetEmail) });
   const {
     register,
     handleSubmit,
@@ -100,7 +106,53 @@ export function LoginPage() {
             <Button type="submit" className="h-10 w-full" disabled={signIn.isPending}>
               {signIn.isPending ? 'Connexion…' : 'Se connecter'}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => setForgot((v) => !v)}
+              className="text-muted-foreground hover:text-foreground text-xs"
+            >
+              Mot de passe oublié ?
+            </button>
           </form>
+
+          {forgot && (
+            <div className="border-border bg-surface-2/50 space-y-2.5 rounded-lg border p-3">
+              {reset.isSuccess ? (
+                <p className="text-sm">
+                  Si un compte existe pour cette adresse, un e-mail de réinitialisation a été
+                  envoyé. Sinon, contactez votre agence.
+                </p>
+              ) : (
+                <form
+                  className="space-y-2.5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (resetEmail.includes('@')) reset.mutate();
+                  }}
+                >
+                  <label htmlFor="reset-email" className="text-sm font-medium">
+                    Recevoir un lien de réinitialisation
+                  </label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="vous@agence.fr"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    variant="outline"
+                    disabled={!resetEmail.includes('@') || reset.isPending}
+                  >
+                    {reset.isPending ? 'Envoi…' : 'Envoyer'}
+                  </Button>
+                </form>
+              )}
+            </div>
+          )}
 
           <p className="text-muted-foreground border-t pt-6 text-xs">
             Un souci d'accès ? Contactez un directeur ou un chef de projet de votre agence.

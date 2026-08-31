@@ -7,6 +7,12 @@ import { FullPageSpinner } from '@/components/FullPageSpinner';
 const LoginPage = lazy(() =>
   import('@/auth/LoginPage').then((m) => ({ default: m.LoginPage })),
 );
+const SetPasswordPage = lazy(() =>
+  import('@/auth/SetPasswordPage').then((m) => ({ default: m.SetPasswordPage })),
+);
+const MyAccountPage = lazy(() =>
+  import('@/app/account/MyAccountPage').then((m) => ({ default: m.MyAccountPage })),
+);
 const AppLayout = lazy(() => import('@/app/AppLayout').then((m) => ({ default: m.AppLayout })));
 const DashboardPage = lazy(() =>
   import('@/app/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })),
@@ -96,6 +102,7 @@ export const router = createBrowserRouter(
   [
     { path: '/', element: <Navigate to="/app" replace /> },
     { path: '/login', element: lazyRoute(<LoginPage />) },
+    { path: '/definir-mot-de-passe', element: lazyRoute(<SetPasswordPage />) },
     {
       path: '/bienvenue',
       element: <RequireRole roles={['admin']}>{lazyRoute(<OnboardingWizard />)}</RequireRole>,
@@ -116,6 +123,7 @@ export const router = createBrowserRouter(
       ),
       children: [
         { index: true, element: lazyRoute(<DashboardPage />) },
+        { path: 'mon-compte', element: lazyRoute(<MyAccountPage />) },
         { path: 'planning', element: lazyRoute(<PlanningPage />) },
         { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
         { path: 'alertes', element: lazyRoute(<AlertsPage />) },
@@ -169,6 +177,7 @@ export const router = createBrowserRouter(
       element: <RequireRole roles={['client']}>{lazyRoute(<PortalLayout />)}</RequireRole>,
       children: [
         { index: true, element: lazyRoute(<PortalCalendarPage />) },
+        { path: 'mon-compte', element: lazyRoute(<MyAccountPage />) },
         { path: 'a-valider', element: lazyRoute(<PortalReviewPage />) },
         { path: 'publies', element: lazyRoute(<PortalPublishedPage />) },
         { path: 'briefs', element: lazyRoute(<PortalBriefsPage />) },

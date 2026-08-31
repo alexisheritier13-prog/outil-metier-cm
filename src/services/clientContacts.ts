@@ -1,4 +1,5 @@
 import { getSupabase } from '@/lib/supabase';
+import { setPasswordRedirectUrl } from '@/lib/authRedirect';
 import { toClientContact, type ClientContact } from '@/shared/types';
 
 export async function listClientContacts(clientId: string): Promise<ClientContact[]> {
@@ -65,7 +66,13 @@ export async function inviteClientContact(
   email: string,
 ): Promise<InviteContactResult> {
   const { data, error } = await getSupabase().functions.invoke('admin-users', {
-    body: { action: 'invite_contact', clientId, fullName, email: email.trim().toLowerCase() },
+    body: {
+      action: 'invite_contact',
+      clientId,
+      fullName,
+      email: email.trim().toLowerCase(),
+      redirectTo: setPasswordRedirectUrl(),
+    },
   });
   if (error) {
     const body = (await readFnError(error)) as { error?: string } | null;

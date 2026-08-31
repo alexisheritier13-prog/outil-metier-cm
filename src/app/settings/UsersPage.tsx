@@ -7,6 +7,7 @@ import { ROLE_LABELS } from '@/shared/constants/roles';
 import type { Profile } from '@/shared/types';
 import { CreateUserDialog } from './CreateUserDialog';
 import { AssignClientsDialog } from './AssignClientsDialog';
+import { CredentialsSheet } from './CredentialsSheet';
 import { useInternalUsers, useSetActive, useUpdateRole } from './useUsersAdmin';
 import type { InternalRole } from '@/services/users';
 
@@ -16,6 +17,7 @@ export function UsersPage() {
   const updateRole = useUpdateRole();
   const setActive = useSetActive();
   const [assignFor, setAssignFor] = useState<Profile | null>(null);
+  const [credsFor, setCredsFor] = useState<Profile | null>(null);
 
   if (users.isLoading) return <FullPageSpinner />;
   if (users.isError) {
@@ -92,6 +94,9 @@ export function UsersPage() {
                       >
                         Assignations
                       </Button>
+                      <Button size="sm" variant="outline" onClick={() => setCredsFor(u)}>
+                        E-mail / mot de passe
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -110,6 +115,14 @@ export function UsersPage() {
       </div>
 
       <AssignClientsDialog user={assignFor} onClose={() => setAssignFor(null)} />
+      <CredentialsSheet
+        userId={credsFor?.id ?? null}
+        currentEmail={credsFor?.email ?? ''}
+        personLabel={credsFor?.fullName || credsFor?.email || ''}
+        invalidateKeys={[['admin', 'internal-users']]}
+        open={Boolean(credsFor)}
+        onOpenChange={(v) => !v && setCredsFor(null)}
+      />
     </Page>
   );
 }

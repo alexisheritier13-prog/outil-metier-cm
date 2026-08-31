@@ -1,9 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { createClient } from '@supabase/supabase-js';
 import {
   createTestUser,
   deleteTestUsers,
   hasDbTestEnv,
   tableExists,
+  TEST_ANON_KEY,
+  TEST_URL,
   type TestUser,
 } from './_helpers';
 
@@ -44,6 +47,44 @@ maybe('admin-users (Edge Function) + RLS gestion des comptes', () => {
   it('un CM ne peut pas appeler la fonction (403)', async () => {
     const { error } = await cm.client.functions.invoke('admin-users', {
       body: { action: 'create', email: 'x@example.test', fullName: 'X', role: 'cm', activate: true },
+    });
+    expect(error).not.toBeNull();
+  });
+
+  it("l'admin change l'email et le mot de passe d'un compte (update_user)", async () => {
+    const email = `test+creds-${crypto.randomUUID()}@example.test`;
+    const created = await admin.client.functions.invoke('admin-users', {
+      body: { action: 'create', email, fullName: 'Creds', role: 'cm', activate: true },
+    });
+    const id = (created.data as { profile: { id: string } }).profile.id;
+    createdIds.push(id);
+
+    const newEmail = `test+creds2-${crypto.randomUUID()}@example.test`;
+    const upd = await admin.client.functions.invoke('admin-users', {
+      body: { action: 'update_user', userId: id, email: newEmail, password: 'motdepasse-1' },
+    });
+    expect(upd.error).toBeNull();
+
+    // le profil reflète le nouvel email
+    const { data: prof } = await admin.client
+      .from('profiles')
+      .select('email')
+      .eq('id', id)
+      .single();
+    expect(prof?.email).toBe(newEmail);
+
+    // on peut se connecter avec le nouvel email + mot de passe
+    const fresh = createClient(TEST_URL, TEST_ANON_KEY, { auth: { persistSession: false } });
+    const signin = await fresh.auth.signInWithPassword({
+      email: newEmail,
+      password: 'motdepasse-1',
+    });
+    expect(signin.error).toBeNull();
+  });
+
+  it('un CM ne peut pas appeler update_user (403)', async () => {
+    const { error } = await cm.client.functions.invoke('admin-users', {
+      body: { action: 'update_user', userId: cm.id, password: 'peu-importe-8' },
     });
     expect(error).not.toBeNull();
   });

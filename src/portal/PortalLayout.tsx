@@ -125,9 +125,12 @@ export function PortalLayout() {
 
             <div className="flex shrink-0 items-center gap-2">
               {profile && (
-                <span className="text-muted-foreground hidden text-sm sm:inline">
+                <NavLink
+                  to="/portail/mon-compte"
+                  className="text-muted-foreground hover:text-foreground hidden text-sm sm:inline"
+                >
                   {profile.fullName || profile.email}
-                </span>
+                </NavLink>
               )}
               <button
                 type="button"
