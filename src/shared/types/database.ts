@@ -886,6 +886,53 @@ export type Database = {
           },
         ]
       }
+      client_activity: {
+        Row: {
+          action: string | null
+          actor_id: string | null
+          actor_name: string | null
+          client_id: string | null
+          created_at: string | null
+          field: string | null
+          history_id: number | null
+          network: Database["public"]["Enums"]["network_t"] | null
+          new_value: string | null
+          old_value: string | null
+          post_caption: string | null
+          post_id: string | null
+          scheduled_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_history_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_history_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_onboarding_progress: {
         Row: {
           client_id: string | null

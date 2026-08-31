@@ -21,6 +21,7 @@ import { SocialAccountsTab } from './tabs/SocialAccountsTab';
 import { ContactsTab } from './tabs/ContactsTab';
 import { GuidelinesTab } from './tabs/GuidelinesTab';
 import { OnboardingTab } from './tabs/OnboardingTab';
+import { ActivityTab } from './tabs/ActivityTab';
 import { onboardingKey } from './tabs/onboardingKeys';
 import { useQuery } from '@tanstack/react-query';
 import { listOnboardingItems } from '@/services/onboarding';
@@ -172,9 +173,7 @@ export function ClientDetailPage() {
         </TabsContent>
 
         <TabsContent value="activity">
-          <p className="text-muted-foreground text-sm">
-            Le journal d'activité du client arrive avec la Story 5.5.
-          </p>
+          <ActivityTab clientId={c.id} />
         </TabsContent>
       </Tabs>
 

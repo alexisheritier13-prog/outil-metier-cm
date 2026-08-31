@@ -290,6 +290,7 @@ export function toCampaignOverview(row: CampaignOverviewRow): Campaign {
 type PostHistoryRow = Database['public']['Tables']['post_history']['Row'];
 type PostCommentRow = Database['public']['Tables']['post_comments']['Row'];
 type NotificationRow = Database['public']['Tables']['notifications']['Row'];
+type ClientActivityRow = Database['public']['Views']['client_activity']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -362,5 +363,38 @@ export function toNotification(row: NotificationRow): AppNotification {
     body: row.body,
     readAt: row.read_at,
     createdAt: row.created_at,
+  };
+}
+
+export interface ClientActivityEntry {
+  historyId: number;
+  clientId: string;
+  postId: string;
+  postCaption: string;
+  network: Network;
+  scheduledAt: string;
+  action: string;
+  field: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  actorId: string | null;
+  actorName: string | null;
+  createdAt: string;
+}
+export function toClientActivityEntry(row: ClientActivityRow): ClientActivityEntry {
+  return {
+    historyId: row.history_id ?? 0,
+    clientId: row.client_id ?? '',
+    postId: row.post_id ?? '',
+    postCaption: row.post_caption ?? '',
+    network: row.network as Network,
+    scheduledAt: row.scheduled_at ?? '',
+    action: row.action ?? '',
+    field: row.field,
+    oldValue: row.old_value,
+    newValue: row.new_value,
+    actorId: row.actor_id,
+    actorName: row.actor_name,
+    createdAt: row.created_at ?? '',
   };
 }
