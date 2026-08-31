@@ -31,8 +31,8 @@ export function HelpPage() {
           <h2 className="text-section">En deux mots</h2>
           <p>
             Cadence planifie les publications réseaux sociaux de vos clients et fait circuler
-            chaque post dans un <strong>circuit de validation</strong> : le Community Manager
-            prépare, un Lead valide en interne, le client approuve, puis le post est planifié
+            chaque post dans un <strong>circuit de validation</strong> : le CM prépare, un
+            chef de projet valide en interne, le client approuve, puis le post est planifié
             et marqué publié. Chaque client ne voit que ses propres contenus.
           </p>
           <p className="text-muted-foreground">
@@ -49,8 +49,8 @@ export function HelpPage() {
               à la validation interne.
             </Step>
             <Step badge={<StatusBadge status="internal_review" />}>
-              Un <strong>Lead</strong> relit et valide en interne, ou renvoie au rédacteur
-              avec un commentaire. File dédiée :{' '}
+              Un <strong>chef de projet</strong> relit et valide en interne, ou renvoie au
+              rédacteur avec un commentaire. File dédiée :{' '}
               <NavRef to="/app/a-valider">À valider</NavRef>.
             </Step>
             <Step badge={<StatusBadge status="client_review" />}>
@@ -66,33 +66,34 @@ export function HelpPage() {
             </Step>
           </ol>
           <p className="text-muted-foreground">
-            Un retour en arrière est toujours possible pour un Lead ou un Admin (avec
-            commentaire quand c'est un renvoi). Tout changement est tracé dans l'onglet
+            Un retour en arrière est toujours possible pour un chef de projet ou un directeur
+            (avec commentaire quand c'est un renvoi). Tout changement est tracé dans l'onglet
             <strong className="text-foreground"> Historique</strong> du post.
           </p>
           <p className="text-muted-foreground">
-            Un Admin peut activer le mode <strong className="text-foreground">« CM seul »</strong>{' '}
+            Freelance ou studio solo ? Un directeur peut activer le mode{' '}
+            <strong className="text-foreground">« CM seul »</strong>{' '}
             (<NavRef to="/app/parametres/workflow">Paramètres → Circuit de validation</NavRef>) :
-            le CM envoie alors le brouillon directement au client, sans validation interne.
+            le brouillon part alors directement au client, sans validation interne.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-section">Qui fait quoi</h2>
           <dl className="divide-border/70 divide-y">
-            <Role name="Community Manager">
+            <Role name="CM">
               Crée et édite les posts de <em>ses</em> clients assignés, les soumet, répond aux
               retours, note la performance après publication.
             </Role>
-            <Role name="Lead CM">
+            <Role name="Chef de projet">
               Tout ce que fait un CM, sur <em>tous</em> les clients, plus : valider en interne,
               envoyer au client, réassigner, gérer la corbeille, déclencher la détection
               d'alertes.
             </Role>
-            <Role name="Admin agence">
+            <Role name="Directeur">
               Tout, plus la gestion des comptes (
-              <NavRef to="/app/parametres">Paramètres</NavRef>), les seuils d'alertes et le
-              journal des tâches planifiées.
+              <NavRef to="/app/parametres">Paramètres</NavRef>), les seuils d'alertes, le
+              circuit de validation et le journal des tâches planifiées.
             </Role>
             <Role name="Client">
               Accès à son espace uniquement : calendrier en lecture, posts à valider, archive
@@ -162,8 +163,8 @@ export function HelpPage() {
         <section className="space-y-2">
           <h2 className="text-section">Un souci ?</h2>
           <p>
-            Pour une question sur un client ou un post, adressez-vous à votre Lead. Pour un
-            problème de compte ou d'accès, contactez un Admin de l'agence.
+            Pour une question sur un client ou un post, adressez-vous à votre chef de projet.
+            Pour un problème de compte ou d'accès, contactez un directeur.
           </p>
         </section>
       </div>

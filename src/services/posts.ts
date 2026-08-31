@@ -205,7 +205,7 @@ export async function trashPost(id: string): Promise<void> {
   if (error) {
     if (/brouillons|autoris/i.test(error.message)) {
       throw new Error(
-        'Un CM ne peut mettre à la corbeille que ses propres brouillons. Demandez à un Lead.',
+        'Un CM ne met à la corbeille que ses propres brouillons. Demandez à un chef de projet.',
       );
     }
     throw error;

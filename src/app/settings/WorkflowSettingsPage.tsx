@@ -59,9 +59,10 @@ export function WorkflowSettingsPage() {
               Mode « CM seul » — sauter la validation interne
             </label>
             <p className="text-muted-foreground mt-1">
-              Un Community Manager peut envoyer un brouillon directement au client, sans qu'un
-              Lead ne valide d'abord en interne. L'étape « À valider en interne » reste
-              disponible pour ceux qui veulent une relecture.
+              Pensé pour un freelance ou un studio solo : le CM (souvent le directeur
+              lui-même) envoie un brouillon directement au client, sans qu'un chef de projet
+              ne valide d'abord en interne. L'étape « À valider en interne » reste disponible
+              pour qui veut une relecture.
             </p>
           </div>
         </div>

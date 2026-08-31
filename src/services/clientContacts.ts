@@ -94,7 +94,7 @@ async function readFnError(error: unknown): Promise<unknown> {
 function mapInviteError(code: string | undefined): string {
   switch (code) {
     case 'forbidden':
-      return 'Action réservée à un Lead ou un Admin.';
+      return 'Action réservée à un chef de projet ou un directeur.';
     case 'invalid_email':
       return 'Email invalide.';
     case 'client_not_found':
