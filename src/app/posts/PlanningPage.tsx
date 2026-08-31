@@ -16,6 +16,8 @@ import { isInternalRole } from '@/shared/constants/roles';
 import { listClients } from '@/services/clients';
 import { listInternalUsers } from '@/services/users';
 import { listPostTemplates } from '@/services/postTemplates';
+import { listKeyDates } from '@/services/keyDates';
+import { keyDateOccurrences } from './keyDateEvents';
 import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { PostsTable } from './PostsTable';
@@ -43,6 +45,7 @@ export function PlanningPage() {
   const [mode, setMode] = useState<ViewMode>('month');
   const [createOpen, setCreateOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
+  const [showKeyDates, setShowKeyDates] = useState(false);
 
   const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
     useFilters();
@@ -57,7 +60,18 @@ export function PlanningPage() {
     enabled: canReassign,
   });
   const templates = useQuery({ queryKey: ['post-templates'], queryFn: listPostTemplates });
+  const keyDates = useQuery({
+    queryKey: ['key-dates'],
+    queryFn: listKeyDates,
+    enabled: showKeyDates,
+  });
   const create = useCreatePost();
+
+  const keyDateMarkers = useMemo(() => {
+    if (!showKeyDates) return [];
+    const y = new Date().getFullYear();
+    return keyDateOccurrences(keyDates.data ?? [], [y, y + 1]);
+  }, [showKeyDates, keyDates.data]);
 
   const clientName = useMemo(() => {
     const map = new Map((clients.data ?? []).map((c) => [c.id, c.name]));
@@ -133,6 +147,17 @@ export function PlanningPage() {
         isEmpty={filtersEmpty}
       />
 
+      {(mode === 'month' || mode === 'week') && (
+        <label className="text-muted-foreground mb-2 flex items-center gap-1.5 text-sm">
+          <input
+            type="checkbox"
+            checked={showKeyDates}
+            onChange={(e) => setShowKeyDates(e.target.checked)}
+          />
+          Afficher les marronniers
+        </label>
+      )}
+
       {mode === 'list' && (
         <PostsTable
           posts={rows}
@@ -154,6 +179,7 @@ export function PlanningPage() {
             clientName={clientName}
             onOpen={setOpenPost}
             editable
+            keyDates={keyDateMarkers}
           />
         </Suspense>
       )}

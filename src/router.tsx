@@ -54,6 +54,9 @@ const IdeasPage = lazy(() =>
 const TemplatesPage = lazy(() =>
   import('@/app/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
 );
+const KeyDatesPage = lazy(() =>
+  import('@/app/keydates/KeyDatesPage').then((m) => ({ default: m.KeyDatesPage })),
+);
 
 function lazyRoute(node: React.ReactNode) {
   return <Suspense fallback={<FullPageSpinner />}>{node}</Suspense>;
@@ -74,6 +77,7 @@ export const router = createBrowserRouter(
         { path: 'demandes', element: lazyRoute(<RequestsPage />) },
         { path: 'idees', element: lazyRoute(<IdeasPage />) },
         { path: 'templates', element: lazyRoute(<TemplatesPage />) },
+        { path: 'marronniers', element: lazyRoute(<KeyDatesPage />) },
         { path: 'clients', element: lazyRoute(<ClientsPage />) },
         { path: 'clients/:clientId', element: lazyRoute(<ClientDetailPage />) },
         { path: 'campagnes', element: lazyRoute(<CampaignsPage />) },

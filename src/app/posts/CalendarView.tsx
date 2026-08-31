@@ -20,26 +20,44 @@ const NETWORK_ABBR: Record<string, string> = {
   threads: 'TH',
 };
 
+interface KeyDateMarker {
+  id: string;
+  date: string;
+  name: string;
+}
+
 interface Props {
   posts: Post[];
   view: 'dayGridMonth' | 'timeGridWeek';
   clientName: (id: string) => string;
   onOpen: (post: Post) => void;
   editable: boolean;
+  keyDates?: KeyDateMarker[];
 }
 
-export function CalendarView({ posts, view, clientName, onOpen, editable }: Props) {
+export function CalendarView({ posts, view, clientName, onOpen, editable, keyDates = [] }: Props) {
   const reschedule = useReschedulePost();
 
   const events = useMemo(
-    () =>
-      posts.map((p) => ({
+    () => [
+      ...posts.map((p) => ({
         id: p.id,
         title: p.caption || 'Sans légende',
         start: p.scheduledAt,
         extendedProps: { post: p },
       })),
-    [posts],
+      ...keyDates.map((k) => ({
+        id: `kd-${k.id}`,
+        title: k.name,
+        start: k.date,
+        allDay: true,
+        display: 'block' as const,
+        editable: false,
+        classNames: ['fc-keydate'],
+        extendedProps: { keyDate: k },
+      })),
+    ],
+    [posts, keyDates],
   );
 
   function handleDrop(arg: EventDropArg) {
@@ -52,8 +70,8 @@ export function CalendarView({ posts, view, clientName, onOpen, editable }: Prop
   }
 
   function handleClick(arg: EventClickArg) {
-    const post = arg.event.extendedProps.post as Post;
-    onOpen(post);
+    const post = arg.event.extendedProps.post as Post | undefined;
+    if (post) onOpen(post);
   }
 
   return (
@@ -77,6 +95,14 @@ export function CalendarView({ posts, view, clientName, onOpen, editable }: Prop
         eventClick={handleClick}
         buttonText={{ today: "Aujourd'hui" }}
         eventContent={(arg: EventContentArg) => {
+          const kd = arg.event.extendedProps.keyDate as KeyDateMarker | undefined;
+          if (kd) {
+            return (
+              <div className="truncate px-1 text-[10px] uppercase tracking-wide opacity-70">
+                ✦ {kd.name}
+              </div>
+            );
+          }
           const post = arg.event.extendedProps.post as Post;
           return (
             <div

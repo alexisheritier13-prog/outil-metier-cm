@@ -475,6 +475,70 @@ export type Database = {
         }
         Relationships: []
       }
+      key_dates: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          event_date: string
+          id: string
+          name: string
+          recurring_annually: boolean
+          scope: Database["public"]["Enums"]["key_date_scope_t"]
+          sector: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string
+          event_date: string
+          id?: string
+          name: string
+          recurring_annually?: boolean
+          scope: Database["public"]["Enums"]["key_date_scope_t"]
+          sector?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          event_date?: string
+          id?: string
+          name?: string
+          recurring_annually?: boolean
+          scope?: Database["public"]["Enums"]["key_date_scope_t"]
+          sector?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "key_dates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_dates_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "key_dates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       networks: {
         Row: {
           code: Database["public"]["Enums"]["network_t"]
@@ -1353,6 +1417,67 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      key_date_to_post: {
+        Args: {
+          p_client_id: string
+          p_key_date_id: string
+          p_network?: Database["public"]["Enums"]["network_t"]
+          p_year?: number
+        }
+        Returns: {
+          author_id: string
+          campaign_id: string | null
+          canva_fetched_at: string | null
+          canva_thumbnail_source: string | null
+          canva_thumbnail_url: string | null
+          canva_url: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          network: Database["public"]["Enums"]["network_t"]
+          origin_id: string | null
+          origin_type: string | null
+          performance_note: string | null
+          performance_visible_to_client: boolean
+          scheduled_at: string
+          search_tsv: unknown
+          status: Database["public"]["Enums"]["post_status_t"]
+          status_changed_at: string
+          status_changed_by: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "posts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      key_dates_for_client: {
+        Args: { p_client_id: string }
+        Returns: {
+          client_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          event_date: string
+          id: string
+          name: string
+          recurring_annually: boolean
+          scope: Database["public"]["Enums"]["key_date_scope_t"]
+          sector: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "key_dates"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       notify: {
         Args: {
           p_actor_id?: string
@@ -1577,6 +1702,7 @@ export type Database = {
     Enums: {
       client_request_status_t: "nouvelle" | "prise_en_compte" | "traitee"
       comment_visibility_t: "internal" | "client"
+      key_date_scope_t: "global" | "sector" | "client"
       network_t:
         | "instagram"
         | "linkedin"
@@ -1723,6 +1849,7 @@ export const Constants = {
     Enums: {
       client_request_status_t: ["nouvelle", "prise_en_compte", "traitee"],
       comment_visibility_t: ["internal", "client"],
+      key_date_scope_t: ["global", "sector", "client"],
       network_t: [
         "instagram",
         "linkedin",

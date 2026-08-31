@@ -295,6 +295,7 @@ type ClientRequestRow = Database['public']['Tables']['client_requests']['Row'];
 type ClientRequestCommentRow = Database['public']['Tables']['client_request_comments']['Row'];
 type IdeaRow = Database['public']['Tables']['ideas']['Row'];
 type PostTemplateRow = Database['public']['Tables']['post_templates']['Row'];
+type KeyDateRow = Database['public']['Tables']['key_dates']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -499,6 +500,37 @@ export function toPostTemplate(row: PostTemplateRow): PostTemplate {
     captionTemplate: row.caption_template,
     defaultTags: row.default_tags ?? [],
     clientId: row.client_id,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export type KeyDateScope = 'global' | 'sector' | 'client';
+
+export interface KeyDate {
+  id: string;
+  name: string;
+  eventDate: string;
+  recurringAnnually: boolean;
+  scope: KeyDateScope;
+  sector: string | null;
+  clientId: string | null;
+  description: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export function toKeyDate(row: KeyDateRow): KeyDate {
+  return {
+    id: row.id,
+    name: row.name,
+    eventDate: row.event_date,
+    recurringAnnually: row.recurring_annually,
+    scope: row.scope,
+    sector: row.sector,
+    clientId: row.client_id,
+    description: row.description,
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

@@ -47,6 +47,7 @@ export function AppLayout() {
           <NavItem to="/app/campagnes">Campagnes</NavItem>
           <NavItem to="/app/idees">Idées</NavItem>
           <NavItem to="/app/templates">Templates</NavItem>
+          <NavItem to="/app/marronniers">Marronniers</NavItem>
           {(profile?.role === 'lead' || profile?.role === 'admin') && (
             <NavItem to="/app/corbeille">Corbeille</NavItem>
           )}

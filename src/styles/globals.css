@@ -94,6 +94,15 @@
   cursor: pointer;
   box-shadow: none;
 }
+/* Marronniers : surimpression discrète, non cliquable */
+.fc-monochrome .fc-keydate {
+  background: transparent;
+  border: 0;
+  border-left: 2px solid var(--muted-foreground);
+  border-radius: 0;
+  cursor: default;
+  opacity: 0.75;
+}
 .fc-monochrome .fc-daygrid-day-number,
 .fc-monochrome .fc-col-header-cell-cushion {
   color: var(--muted-foreground);
