@@ -110,3 +110,37 @@ export async function assignUserToClient(profileId: string, clientId: string): P
     .insert({ profile_id: profileId, client_id: clientId });
   if (error) throw new Error(`assignUserToClient a échoué : ${error.message}`);
 }
+
+export interface TestContact {
+  authUserId: string;
+  email: string;
+  /** Client Supabase connecté en tant que ce contact (role 'client', RLS active). */
+  client: SupabaseClient;
+}
+
+/**
+ * Crée un contact client via l'Edge Function `invite_contact` (appelée par `inviter`,
+ * un lead/admin), lui fixe un mot de passe et renvoie un client Supabase connecté.
+ */
+export async function createTestContact(
+  inviter: TestUser,
+  clientId: string,
+  fullName = 'Contact',
+): Promise<TestContact> {
+  const email = `test+contact-${crypto.randomUUID()}@example.test`;
+  const inv = await inviter.client.functions.invoke('admin-users', {
+    body: { action: 'invite_contact', clientId, fullName, email },
+  });
+  const authUserId = (inv.data as { contact: { auth_user_id: string } } | null)?.contact
+    ?.auth_user_id;
+  if (!authUserId) throw new Error(`invite_contact a échoué : ${JSON.stringify(inv.error)}`);
+  await admin().auth.admin.updateUserById(authUserId, { password: PASSWORD });
+
+  const client = createClient(TEST_URL, TEST_ANON_KEY, {
+    auth: { persistSession: false, storageKey: `test-contact-${crypto.randomUUID()}` },
+  });
+  const signIn = await client.auth.signInWithPassword({ email, password: PASSWORD });
+  if (signIn.error) throw new Error(`signIn contact a échoué : ${signIn.error.message}`);
+
+  return { authUserId, email, client };
+}
