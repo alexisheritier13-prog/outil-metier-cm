@@ -121,6 +121,20 @@ export async function duplicatePost(id: string, shiftDays = 7): Promise<Post> {
   return toPost(data as never);
 }
 
+/**
+ * Réassigne un post à un autre CM interne (`author_id`). RLS : accès interne au
+ * client requis ; l'UI réserve l'action aux Lead/Admin. Ne touche à rien d'autre —
+ * le trigger `posts_log_field_changes` journalise le changement (Story 4.4).
+ */
+export async function reassignPost(id: string, authorId: string): Promise<void> {
+  const { error } = await getSupabase()
+    .from('posts')
+    .update({ author_id: authorId })
+    .eq('id', id)
+    .is('deleted_at', null);
+  if (error) throw error;
+}
+
 /** Re-planifie un post (drag & drop calendrier) — ne touche qu'à `scheduled_at`. */
 export async function reschedulePost(id: string, scheduledAt: string): Promise<void> {
   const { error } = await getSupabase()

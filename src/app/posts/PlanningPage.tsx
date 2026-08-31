@@ -24,6 +24,7 @@ import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { PostsTable } from './PostsTable';
 import { PostSheet } from './PostSheet';
+import { BulkActionBar } from './BulkActionBar';
 import { FiltersBar } from './FiltersBar';
 import { useFilters } from './useFilters';
 import { useCreatePost, usePosts } from './usePosts';
@@ -42,11 +43,13 @@ export function PlanningPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
   const [showKeyDates, setShowKeyDates] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
     useFilters();
   const posts = usePosts(toService);
+  const filterKey = JSON.stringify(toService);
   const clients = useQuery({
     queryKey: ['clients', { includeArchived: false }],
     queryFn: () => listClients(false),
@@ -88,6 +91,26 @@ export function PlanningPage() {
     const p = (posts.data ?? []).find((x) => x.id === deepLinkId);
     if (p) setOpenPost(p);
   }, [deepLinkId, posts.data, openPost?.id]);
+
+  // Une sélection ne survit pas à un changement de filtre (les ids affichés changent).
+  useEffect(() => setSelected(new Set()), [filterKey]);
+
+  const toggleSelect = (id: string) =>
+    setSelected((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const toggleAll = (ids: string[], select: boolean) =>
+    setSelected((s) => {
+      const next = new Set(s);
+      for (const id of ids) {
+        if (select) next.add(id);
+        else next.delete(id);
+      }
+      return next;
+    });
 
   function closeSheet() {
     setOpenPost(null);
@@ -176,11 +199,21 @@ export function PlanningPage() {
           clientName={clientName}
           onOpen={setOpenPost}
           hasClients={hasClients}
+          selectedIds={selected}
+          onToggleSelect={toggleSelect}
+          onToggleAll={toggleAll}
         />
       )}
       {mode === 'kanban' && (
         <Suspense fallback={<FullPageSpinner />}>
-          <KanbanView posts={rows} role={me.role} clientName={clientName} onOpen={setOpenPost} />
+          <KanbanView
+            posts={rows}
+            role={me.role}
+            clientName={clientName}
+            onOpen={setOpenPost}
+            selectedIds={selected}
+            onToggleSelect={toggleSelect}
+          />
         </Suspense>
       )}
       {(mode === 'month' || mode === 'week') && (
@@ -202,6 +235,19 @@ export function PlanningPage() {
         authors={authors.data ?? []}
         onClose={closeSheet}
       />
+
+      {(mode === 'list' || mode === 'kanban') && (
+        <BulkActionBar
+          selectedIds={[...selected]}
+          posts={rows}
+          clientName={clientName}
+          role={me.role}
+          canReassign={canReassign}
+          authors={authors.data ?? []}
+          onSelectAll={() => setSelected(new Set(rows.map((p) => p.id)))}
+          onClear={() => setSelected(new Set())}
+        />
+      )}
     </Page>
   );
 }

@@ -59,7 +59,9 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 8.3** faite : seuils configurables (`app_settings.alert_thresholds`, migr 0027), page `/app/parametres/alertes` (Admin, bornes de validation) ; index `/app/parametres`.
 - **Story 8.4** faite : `pg_cron` planifie `generate_alerts` (nuit + horaire) et `purge_trash` (nuit) (migr 0028), page `/app/parametres/jobs` (journal `job_runs`), notification d'échec aux Admins. **Epic 8 terminé.**
 - **Passe couleur sémantique** faite (`impeccable colorize`) : tokens `--success` / `--warning` / `--danger` / `--info` (OKLCH), statuts de post et sévérité d'alertes colorés, boutons `success` / `destructive`, badge « Alertes » rouge. Le reste reste noir & blanc. `PRODUCT.md` + `DESIGN.md` ajoutés.
-- Prochaine : Epic 9 (actions en masse, exports, finitions + polish UI).
+- **Refonte coquille « SaaS »** faite : barre latérale (`AppSidebar`, groupes repliables), dashboard d'accueil (`/app`), calendrier déplacé sur `/app/planning`, accent indigo, portail client réaligné, dates lisibles FR (`10 sept. 2026`).
+- **Story 9.1** faite : sélection multiple + actions en masse (Liste et Kanban) — barre flottante `BulkActionBar` (dupliquer / statut / réassigner / corbeille), exécution atomique par post avec récapitulatif des échecs (`useBulkActions`). Aucune migration (réutilise les RPC unitaires). 16 tests unitaires + 3 d'intégration.
+- Prochaine : Epic 9 — suite (exports `.ics` / PDF, champ performance, a11y AA + polish).
 
 ### Tests
 

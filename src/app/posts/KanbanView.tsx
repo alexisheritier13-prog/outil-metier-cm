@@ -13,9 +13,11 @@ interface Props {
   role: Role;
   clientName: (id: string) => string;
   onOpen: (post: Post) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
-export function KanbanView({ posts, role, clientName, onOpen }: Props) {
+export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onToggleSelect }: Props) {
   const change = useChangePostStatus();
   const [dragId, setDragId] = useState<string | null>(null);
   const [overCol, setOverCol] = useState<PostStatus | null>(null);
@@ -27,6 +29,7 @@ export function KanbanView({ posts, role, clientName, onOpen }: Props) {
   }, [posts]);
 
   const dragged = posts.find((p) => p.id === dragId) ?? null;
+  const selectable = Boolean(selectedIds && onToggleSelect);
 
   function drop(to: PostStatus) {
     setOverCol(null);
@@ -71,29 +74,50 @@ export function KanbanView({ posts, role, clientName, onOpen }: Props) {
               <span className="text-muted-foreground text-xs">{items.length}</span>
             </div>
             <div className="flex flex-col gap-2 p-2">
-              {items.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  draggable
-                  onDragStart={() => setDragId(p.id)}
-                  onDragEnd={() => {
-                    setDragId(null);
-                    setOverCol(null);
-                  }}
-                  onClick={() => onOpen(p)}
-                  className="bg-background hover:border-foreground/40 cursor-grab rounded border p-2 text-left text-xs active:cursor-grabbing"
-                >
-                  <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
-                    <NetworkIcon network={p.network} />
-                    <span>{parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}</span>
+              {items.map((p) => {
+                const checked = selectable && selectedIds!.has(p.id);
+                return (
+                  <div
+                    key={p.id}
+                    className={cn(
+                      'bg-background hover:border-foreground/40 relative rounded border text-xs',
+                      checked && 'border-primary ring-primary/30 ring-1',
+                    )}
+                  >
+                    {selectable && (
+                      <input
+                        type="checkbox"
+                        className="accent-primary absolute right-1.5 top-1.5 z-10 h-3.5 w-3.5"
+                        checked={checked}
+                        aria-label={`Sélectionner le post ${p.caption || 'sans légende'}`}
+                        onChange={() => onToggleSelect!(p.id)}
+                      />
+                    )}
+                    <button
+                      type="button"
+                      draggable
+                      onDragStart={() => setDragId(p.id)}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setOverCol(null);
+                      }}
+                      onClick={() => onOpen(p)}
+                      className="block w-full cursor-grab p-2 pr-6 text-left active:cursor-grabbing"
+                    >
+                      <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
+                        <NetworkIcon network={p.network} />
+                        <span>
+                          {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                        </span>
+                      </div>
+                      <div className="font-medium">{clientName(p.clientId)}</div>
+                      <div className="text-muted-foreground line-clamp-2">
+                        {p.caption || 'Sans légende'}
+                      </div>
+                    </button>
                   </div>
-                  <div className="font-medium">{clientName(p.clientId)}</div>
-                  <div className="text-muted-foreground line-clamp-2">
-                    {p.caption || 'Sans légende'}
-                  </div>
-                </button>
-              ))}
+                );
+              })}
               {items.length === 0 && (
                 <p className="text-muted-foreground px-1 py-2 text-xs">—</p>
               )}

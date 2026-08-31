@@ -13,16 +13,28 @@ import { useTrashPost } from './usePosts';
 
 type SortKey = 'date' | 'client' | 'status';
 const ROW_H = 48;
-const COLS = 'grid-cols-[10.5rem_minmax(8rem,1fr)_4rem_minmax(0,2fr)_10.5rem_2.75rem]';
+const COLS =
+  'grid-cols-[2.5rem_10.5rem_minmax(8rem,1fr)_4rem_minmax(0,2fr)_10.5rem_2.75rem]';
 
 interface Props {
   posts: Post[];
   clientName: (id: string) => string;
   onOpen: (post: Post) => void;
   hasClients: boolean;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  onToggleAll?: (ids: string[], select: boolean) => void;
 }
 
-export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
+export function PostsTable({
+  posts,
+  clientName,
+  onOpen,
+  hasClients,
+  selectedIds,
+  onToggleSelect,
+  onToggleAll,
+}: Props) {
   const trash = useTrashPost();
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({
     key: 'date',
@@ -71,11 +83,25 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
     setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }));
   }
 
+  const selectable = Boolean(selectedIds && onToggleSelect);
+  const allChecked = selectable && rows.length > 0 && rows.every((p) => selectedIds!.has(p.id));
+
   return (
     <div className="overflow-hidden rounded-md border">
       <div
         className={`bg-surface-2 text-muted-foreground sticky top-0 z-10 grid ${COLS} items-center border-b text-xs font-medium uppercase tracking-wide`}
       >
+        <span className="grid place-items-center">
+          {selectable && (
+            <input
+              type="checkbox"
+              className="accent-primary h-3.5 w-3.5"
+              checked={allChecked}
+              aria-label="Tout sélectionner"
+              onChange={(e) => onToggleAll?.(rows.map((p) => p.id), e.target.checked)}
+            />
+          )}
+        </span>
         <SortHead label="Date" k="date" sort={sort} onClick={toggle} />
         <SortHead label="Client" k="client" sort={sort} onClick={toggle} />
         <span className="px-3 py-2.5">Réseau</span>
@@ -92,13 +118,15 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
         >
           {visible.map((v) => {
             const p = rows[v.index]!;
+            const checked = selectable && selectedIds!.has(p.id);
             return (
               <div
                 key={p.id}
                 role="button"
                 tabIndex={0}
                 aria-label={`Ouvrir le post ${p.caption || 'sans légende'}`}
-                className={`hover:bg-surface-2/60 absolute inset-x-0 grid cursor-pointer ${COLS} items-center border-b text-sm last:border-b-0`}
+                data-selected={checked || undefined}
+                className={`hover:bg-surface-2/60 data-[selected]:bg-primary-surface/60 absolute inset-x-0 grid cursor-pointer ${COLS} items-center border-b text-sm last:border-b-0`}
                 style={{ height: ROW_H, top: 0, transform: `translateY(${v.start}px)` }}
                 onClick={() => onOpen(p)}
                 onKeyDown={(e) => {
@@ -108,6 +136,18 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                   }
                 }}
               >
+                <span className="grid place-items-center">
+                  {selectable && (
+                    <input
+                      type="checkbox"
+                      className="accent-primary h-3.5 w-3.5"
+                      checked={checked}
+                      aria-label={`Sélectionner le post ${p.caption || 'sans légende'}`}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => onToggleSelect!(p.id)}
+                    />
+                  )}
+                </span>
                 <span className="text-muted-foreground truncate px-3 text-[13px] tabular-nums">
                   {parisDateLabel(p.scheduledAt)}
                   <span className="text-muted-foreground/70"> · {parisTimeLabel(p.scheduledAt)}</span>
