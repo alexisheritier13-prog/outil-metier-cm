@@ -5,33 +5,39 @@
 @tailwind utilities;
 
 /*
- * Neutres monochromes (noir & blanc assumés, chroma 0). La couleur est STRICTEMENT
- * sémantique : succès (vert), attention (ambre), danger (rouge), info (bleu) — jamais
- * décorative, jamais seule (toujours doublée d'un texte + icône). Tokens en OKLCH.
- * Valeurs sémantiques calées sur les échelles WCAG de Tailwind (emerald/amber/red/blue).
- * Mode sombre : préparé dans docs/front-end-spec.md §6.2, non activé en v1.
+ * Neutres légèrement teintés vers l'indigo de la marque (chroma ~0.004) + un accent
+ * indigo unique (actions primaires, sélection, focus). La couleur d'état reste
+ * STRICTEMENT sémantique : succès (vert), attention (ambre), danger (rouge), info (bleu)
+ * — jamais décorative, jamais seule. Tokens OKLCH. Mode sombre préparé (spec §6.2), off.
  */
 @layer base {
   :root {
     --background: oklch(1 0 0);
-    --foreground: oklch(0.22 0 0); /* ~13:1 sur blanc */
+    --foreground: oklch(0.24 0.012 274); /* encre — ~12:1 sur blanc */
     --surface: oklch(1 0 0);
-    --surface-2: oklch(0.975 0 0); /* toolbars, en-têtes de tableau, panneaux */
-    --muted: oklch(0.965 0 0);
-    --muted-foreground: oklch(0.44 0 0); /* ~4.8:1 sur blanc — plancher AA */
+    --surface-2: oklch(0.976 0.003 274); /* sidebar, barres d'outils, en-têtes de tableau */
+    --surface-3: oklch(0.955 0.004 274); /* survol dans la sidebar, 3e couche */
+    --muted: oklch(0.968 0.003 274);
+    --muted-foreground: oklch(0.47 0.012 274); /* ~4.7:1 sur blanc — plancher AA */
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.22 0 0);
+    --popover-foreground: oklch(0.24 0.012 274);
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.22 0 0);
-    --border: oklch(0.9 0 0);
-    --input: oklch(0.86 0 0);
-    --ring: oklch(0.22 0 0);
-    --primary: oklch(0.22 0 0); /* accent monochrome — passe couleur ultérieure */
-    --primary-foreground: oklch(1 0 0);
-    --secondary: oklch(0.965 0 0);
-    --secondary-foreground: oklch(0.22 0 0);
-    --accent: oklch(0.95 0 0);
-    --accent-foreground: oklch(0.22 0 0);
+    --card-foreground: oklch(0.24 0.012 274);
+    --border: oklch(0.91 0.004 274);
+    --border-strong: oklch(0.85 0.006 274);
+    --input: oklch(0.87 0.006 274);
+
+    /* ── Accent : indigo de la marque (hue 274) ── */
+    --primary: oklch(0.52 0.19 274); /* aplat, texte blanc ~6:1 */
+    --primary-foreground: oklch(0.99 0 0);
+    --primary-surface: oklch(0.955 0.028 274); /* fond d'état actif (nav, sélection) */
+    --primary-strong: oklch(0.45 0.18 274); /* texte/icône sur --primary-surface ~7:1 */
+    --primary-border: oklch(0.86 0.06 274);
+    --ring: oklch(0.52 0.19 274);
+    --secondary: oklch(0.968 0.003 274);
+    --secondary-foreground: oklch(0.24 0.012 274);
+    --accent: oklch(0.955 0.004 274);
+    --accent-foreground: oklch(0.24 0.012 274);
 
     /* ── Sémantique : succès (vert · hue ~158) ── */
     --success: oklch(0.52 0.11 158); /* aplat, texte blanc ~5.3:1 */
@@ -65,7 +71,7 @@
     --destructive: var(--danger);
     --destructive-foreground: var(--danger-foreground);
 
-    --radius: 0.5rem;
+    --radius: 0.625rem; /* 10px — coins un peu plus doux (cartes, panneaux) */
   }
 
   * {
@@ -87,8 +93,10 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    font-feature-settings: 'cv05', 'cv08', 'ss01';
+    font-feature-settings: 'cv05', 'cv08', 'ss01', 'ss03';
+    font-variation-settings: 'opsz' 20;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1,

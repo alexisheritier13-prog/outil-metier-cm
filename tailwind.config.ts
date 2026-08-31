@@ -6,7 +6,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: 'var(--border)',
+        border: {
+          DEFAULT: 'var(--border)',
+          strong: 'var(--border-strong)',
+        },
         input: 'var(--input)',
         ring: 'var(--ring)',
         background: 'var(--background)',
@@ -14,10 +17,14 @@ export default {
         surface: {
           DEFAULT: 'var(--surface)',
           2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
         },
         primary: {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
+          surface: 'var(--primary-surface)',
+          strong: 'var(--primary-strong)',
+          border: 'var(--primary-border)',
         },
         secondary: {
           DEFAULT: 'var(--secondary)',
@@ -74,14 +81,19 @@ export default {
       },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 3px)',
+        sm: 'calc(var(--radius) - 5px)',
+      },
+      boxShadow: {
+        // Élévation unique et discrète pour panneaux / menus (pas de glassmorphism).
+        panel: '0 1px 2px oklch(0 0 0 / 0.04), 0 8px 24px oklch(0.3 0.03 274 / 0.10)',
+        card: '0 1px 2px oklch(0 0 0 / 0.05)',
       },
       fontSize: {
         // Échelle rem fixe (registre produit) — pas de clamp.
-        'title': ['1.25rem', { lineHeight: '1.3', fontWeight: '600' }],
-        'section': ['1rem', { lineHeight: '1.4', fontWeight: '600' }],
-        'dense': ['0.8125rem', { lineHeight: '1.45' }],
+        title: ['1.375rem', { lineHeight: '1.25', fontWeight: '600', letterSpacing: '-0.014em' }],
+        section: ['1rem', { lineHeight: '1.4', fontWeight: '600', letterSpacing: '-0.006em' }],
+        dense: ['0.8125rem', { lineHeight: '1.45' }],
       },
       zIndex: {
         dropdown: '1000',

@@ -22,3 +22,15 @@ export async function listClientActivity(
   if (error) throw error;
   return data.map(toClientActivityEntry);
 }
+
+/** Activité récente tous clients confondus (accueil). RLS = clients accessibles. */
+export async function listRecentActivity(limit = 8): Promise<ClientActivityEntry[]> {
+  const { data, error } = await getSupabase()
+    .from('client_activity')
+    .select('*')
+    .in('action', ['status_change', 'trash', 'restore'])
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data.map(toClientActivityEntry);
+}

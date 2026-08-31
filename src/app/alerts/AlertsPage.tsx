@@ -70,7 +70,7 @@ export function AlertsPage() {
   if (alerts.isLoading) return <FullPageSpinner />;
 
   function goTo(clientId: string | null, postId: string | null) {
-    if (postId) navigate(`/app?post=${postId}`);
+    if (postId) navigate(`/app/planning?post=${postId}`);
     else if (clientId) navigate(`/app/clients/${clientId}`);
   }
 

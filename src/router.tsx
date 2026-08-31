@@ -8,6 +8,9 @@ const LoginPage = lazy(() =>
   import('@/auth/LoginPage').then((m) => ({ default: m.LoginPage })),
 );
 const AppLayout = lazy(() => import('@/app/AppLayout').then((m) => ({ default: m.AppLayout })));
+const DashboardPage = lazy(() =>
+  import('@/app/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+);
 const PlanningPage = lazy(() =>
   import('@/app/posts/PlanningPage').then((m) => ({ default: m.PlanningPage })),
 );
@@ -84,7 +87,8 @@ export const router = createBrowserRouter(
         <RequireRole roles={INTERNAL_ROLES}>{lazyRoute(<AppLayout />)}</RequireRole>
       ),
       children: [
-        { index: true, element: lazyRoute(<PlanningPage />) },
+        { index: true, element: lazyRoute(<DashboardPage />) },
+        { path: 'planning', element: lazyRoute(<PlanningPage />) },
         { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
         { path: 'alertes', element: lazyRoute(<AlertsPage />) },
         { path: 'demandes', element: lazyRoute(<RequestsPage />) },
