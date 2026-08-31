@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          dedupe_key: string
+          id: string
+          message: string
+          post_id: string | null
+          severity: string
+          status: Database["public"]["Enums"]["alert_status_t"]
+          target_role: Database["public"]["Enums"]["role_t"] | null
+          target_user_id: string | null
+          type: Database["public"]["Enums"]["alert_type_t"]
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          message: string
+          post_id?: string | null
+          severity?: string
+          status?: Database["public"]["Enums"]["alert_status_t"]
+          target_role?: Database["public"]["Enums"]["role_t"] | null
+          target_user_id?: string | null
+          type: Database["public"]["Enums"]["alert_type_t"]
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          message?: string
+          post_id?: string | null
+          severity?: string
+          status?: Database["public"]["Enums"]["alert_status_t"]
+          target_role?: Database["public"]["Enums"]["role_t"] | null
+          target_user_id?: string | null
+          type?: Database["public"]["Enums"]["alert_type_t"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_meta: {
         Row: {
           key: string
@@ -1327,6 +1401,8 @@ export type Database = {
         }
       }
       _contact_display_name: { Args: { p_client_id: string }; Returns: string }
+      _thr: { Args: { p_default: number; p_key: string }; Returns: number }
+      alert_thresholds: { Args: never; Returns: Json }
       approve_post: {
         Args: { p_post_id: string }
         Returns: {
@@ -1377,6 +1453,24 @@ export type Database = {
       client_restore: { Args: { p_client_id: string }; Returns: undefined }
       client_trash: { Args: { p_client_id: string }; Returns: undefined }
       contact_client_ids: { Args: never; Returns: string[] }
+      generate_alerts: {
+        Args: never
+        Returns: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "job_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_client_access: { Args: { cid: string }; Returns: boolean }
       idea_to_post: {
         Args: {
@@ -1698,8 +1792,35 @@ export type Database = {
         Args: { p_entity: string; p_id: string }
         Returns: undefined
       }
+      trigger_generate_alerts: {
+        Args: never
+        Returns: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "job_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
+      alert_status_t: "new" | "seen" | "dismissed"
+      alert_type_t:
+        | "validation_overdue"
+        | "deadline_unvalidated"
+        | "calendar_gap"
+        | "missing_canva"
+        | "keydate_unplanned"
+        | "client_inactive"
+        | "publish_reminder"
       client_request_status_t: "nouvelle" | "prise_en_compte" | "traitee"
       comment_visibility_t: "internal" | "client"
       key_date_scope_t: "global" | "sector" | "client"
@@ -1847,6 +1968,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      alert_status_t: ["new", "seen", "dismissed"],
+      alert_type_t: [
+        "validation_overdue",
+        "deadline_unvalidated",
+        "calendar_gap",
+        "missing_canva",
+        "keydate_unplanned",
+        "client_inactive",
+        "publish_reminder",
+      ],
       client_request_status_t: ["nouvelle", "prise_en_compte", "traitee"],
       comment_visibility_t: ["internal", "client"],
       key_date_scope_t: ["global", "sector", "client"],

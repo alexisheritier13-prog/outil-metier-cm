@@ -244,6 +244,16 @@ async function main() {
     p_comment: 'On évite le mot « promo » et les codes chocs, pas raccord avec la marque.',
   });
 
+  // conditions déclenchant des alertes (Epic 8)
+  await admin
+    .from('posts')
+    .update({ status_changed_at: day(-6) })
+    .in('id', [P.ir1, P.cr2]); // en attente de validation depuis 6 j (règle a)
+  const pToday = new Date();
+  pToday.setHours(9, 30, 0, 0);
+  await mkPost({ network: 'instagram', at: pToday.toISOString(), caption: 'Post du jour — citation inspirante à publier ce matin.', status: 'scheduled', canva: 'ptoday' });
+  await mkPost({ network: 'linkedin', at: day(2), caption: 'Brouillon urgent : deadline dans 2 jours et pas encore de visuel.' }); // règles b + d
+
   console.log('→ commentaires');
   await cm.from('post_comments').insert([
     { post_id: P.cr1, author_id: cmId, body: 'Visuel validé en interne, on attend le retour de la cliente.', visibility: 'internal' },
@@ -388,12 +398,19 @@ async function main() {
     p_network: 'instagram',
   });
 
+  console.log('→ génération des alertes');
+  await admin.from('alerts').delete().eq('client_id', CLIENT_ID);
+  const alertsRun = await admin.rpc('generate_alerts');
+
   const counts = await admin.from('posts').select('status').eq('client_id', CLIENT_ID);
   const byStatus = {};
   for (const p of counts.data ?? []) byStatus[p.status] = (byStatus[p.status] ?? 0) + 1;
+  const al = await admin.from('alerts').select('type').eq('client_id', CLIENT_ID);
   console.log('\n✓ jeu de démo prêt.');
   console.log('  posts par statut :', byStatus);
+  console.log('  alertes :', (al.data ?? []).map((a) => a.type));
   console.log('  connexion : voir en-tête du script (mdp : ' + PW + ')');
+  void alertsRun;
 }
 
 main().catch((e) => {

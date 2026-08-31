@@ -1,4 +1,5 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,7 @@ export function PlanningPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
   const [showKeyDates, setShowKeyDates] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
     useFilters();
@@ -83,6 +85,22 @@ export function PlanningPage() {
     () => (openPost ? ((posts.data ?? []).find((p) => p.id === openPost.id) ?? openPost) : null),
     [openPost, posts.data],
   );
+
+  // Ouverture directe via ?post=<id> (depuis une alerte).
+  const deepLinkId = searchParams.get('post');
+  useEffect(() => {
+    if (!deepLinkId || openPost?.id === deepLinkId) return;
+    const p = (posts.data ?? []).find((x) => x.id === deepLinkId);
+    if (p) setOpenPost(p);
+  }, [deepLinkId, posts.data, openPost?.id]);
+
+  function closeSheet() {
+    setOpenPost(null);
+    if (searchParams.has('post')) {
+      searchParams.delete('post');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }
 
   if (!me || !isInternalRole(me.role)) return null;
   if (posts.isLoading || clients.isLoading) return <FullPageSpinner />;
@@ -188,7 +206,7 @@ export function PlanningPage() {
         post={currentOpen}
         clients={clients.data ?? []}
         authors={authors.data ?? []}
-        onClose={() => setOpenPost(null)}
+        onClose={closeSheet}
       />
     </section>
   );

@@ -302,6 +302,7 @@ type ClientRequestCommentRow = Database['public']['Tables']['client_request_comm
 type IdeaRow = Database['public']['Tables']['ideas']['Row'];
 type PostTemplateRow = Database['public']['Tables']['post_templates']['Row'];
 type KeyDateRow = Database['public']['Tables']['key_dates']['Row'];
+type AlertRow = Database['public']['Tables']['alerts']['Row'];
 
 export interface PostHistoryEntry {
   id: number;
@@ -540,5 +541,53 @@ export function toKeyDate(row: KeyDateRow): KeyDate {
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export type AlertType =
+  | 'validation_overdue'
+  | 'deadline_unvalidated'
+  | 'calendar_gap'
+  | 'missing_canva'
+  | 'keydate_unplanned'
+  | 'client_inactive'
+  | 'publish_reminder';
+export type AlertSeverity = 'info' | 'warning' | 'critical';
+export type AlertStatus = 'new' | 'seen' | 'dismissed';
+
+export const ALERT_TYPE_LABELS: Record<AlertType, string> = {
+  validation_overdue: 'Validation en retard',
+  deadline_unvalidated: 'Deadline / non validé',
+  calendar_gap: 'Trou de calendrier',
+  missing_canva: 'Visuel manquant',
+  keydate_unplanned: 'Marronnier non planifié',
+  client_inactive: 'Client inactif',
+  publish_reminder: 'À publier aujourd’hui',
+};
+
+export interface Alert {
+  id: string;
+  type: AlertType;
+  severity: AlertSeverity;
+  clientId: string | null;
+  postId: string | null;
+  targetRole: Role | null;
+  targetUserId: string | null;
+  message: string;
+  status: AlertStatus;
+  createdAt: string;
+}
+export function toAlert(row: AlertRow): Alert {
+  return {
+    id: row.id,
+    type: row.type,
+    severity: row.severity as AlertSeverity,
+    clientId: row.client_id,
+    postId: row.post_id,
+    targetRole: row.target_role,
+    targetUserId: row.target_user_id,
+    message: row.message,
+    status: row.status,
+    createdAt: row.created_at,
   };
 }
