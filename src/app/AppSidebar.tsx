@@ -46,15 +46,15 @@ export function AppSidebar() {
   const requestCount = useOpenRequestCount(Boolean(profile));
 
   return (
-    <div className="bg-surface-2 flex h-full w-60 shrink-0 flex-col border-r">
-      <div className="flex items-center gap-2.5 px-4 py-3.5">
-        <span className="bg-primary text-primary-foreground grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
+    <div className="bg-background flex h-full w-[248px] shrink-0 flex-col">
+      <div className="flex items-center gap-2.5 px-5 pb-2 pt-5">
+        <span className="bg-primary text-primary-foreground shadow-card grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
           C
         </span>
         <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5 pb-4">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
         <Item to="/app" end icon={LayoutGrid}>
           Accueil
         </Item>
@@ -99,7 +99,7 @@ export function AppSidebar() {
         </Item>
       </nav>
 
-      <div className="space-y-0.5 border-t px-2.5 py-3">
+      <div className="border-border/70 space-y-0.5 border-t px-3 py-3">
         {isManager && (
           <Item to="/app/corbeille" icon={Trash2}>
             Corbeille
@@ -115,12 +115,14 @@ export function AppSidebar() {
         </Item>
       </div>
 
-      <div className="flex items-center gap-2.5 border-t px-3 py-3">
+      <div className="border-border/70 m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
         <span className="bg-primary-surface text-primary-strong grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold">
           {(profile?.fullName || profile?.email || '?').slice(0, 2).toUpperCase()}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{profile?.fullName || profile?.email}</p>
+          <p className="truncate text-sm font-medium leading-tight">
+            {profile?.fullName || profile?.email}
+          </p>
           <p className="text-muted-foreground truncate text-xs">
             {profile && ROLE_LABELS[profile.role]}
           </p>
@@ -129,7 +131,7 @@ export function AppSidebar() {
           type="button"
           onClick={() => signOut.mutate()}
           aria-label="Se déconnecter"
-          className="text-muted-foreground hover:bg-surface-3 hover:text-foreground rounded-md p-1.5"
+          className="text-muted-foreground hover:bg-surface-2 hover:text-foreground rounded-md p-1.5 transition-colors"
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -142,10 +144,10 @@ type IconType = typeof Bell;
 
 function itemClass(active: boolean) {
   return cn(
-    'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-[background-color,color,box-shadow] duration-150',
+    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-150',
     active
-      ? 'bg-background text-foreground shadow-card font-medium'
-      : 'text-muted-foreground hover:bg-surface-3 hover:text-foreground',
+      ? 'bg-primary-surface text-primary-strong font-medium'
+      : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
   );
 }
 
@@ -201,10 +203,10 @@ function Group({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors',
+          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
           containsActive && !open
             ? 'text-foreground font-medium'
-            : 'text-muted-foreground hover:bg-surface-3 hover:text-foreground',
+            : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )}
         aria-expanded={open}
       >
@@ -215,7 +217,7 @@ function Group({
           aria-hidden="true"
         />
       </button>
-      {open && <div className="mt-0.5 space-y-0.5 pl-3.5">{children}</div>}
+      {open && <div className="mt-0.5 space-y-0.5 pl-3">{children}</div>}
     </div>
   );
 }
@@ -236,10 +238,10 @@ function SubItem({
       to={to}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-2.5 rounded-md py-1.5 pl-2.5 pr-2 text-sm transition-colors',
+          'flex items-center gap-3 rounded-lg py-2 pl-3 pr-2 text-sm transition-colors',
           isActive
-            ? 'bg-background text-foreground shadow-card font-medium'
-            : 'text-muted-foreground hover:bg-surface-3 hover:text-foreground',
+            ? 'bg-primary-surface text-primary-strong font-medium'
+            : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )
       }
     >

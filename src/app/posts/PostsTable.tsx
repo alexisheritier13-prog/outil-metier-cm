@@ -87,9 +87,9 @@ export function PostsTable({
   const allChecked = selectable && rows.length > 0 && rows.every((p) => selectedIds!.has(p.id));
 
   return (
-    <div>
+    <div className="surface-card overflow-hidden">
       <div
-        className={`bg-background text-muted-foreground border-border-strong sticky top-0 z-10 grid ${COLS} items-center border-b text-[11px] font-medium uppercase tracking-wide`}
+        className={`bg-surface text-muted-foreground border-border sticky top-0 z-10 grid ${COLS} items-center border-b text-[10.5px] font-medium uppercase tracking-wider`}
       >
         <span className="grid place-items-center">
           {selectable && (

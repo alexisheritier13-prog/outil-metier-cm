@@ -15,7 +15,7 @@ export function Page({
   return (
     <section
       className={cn(
-        'animate-in fade-in slide-in-from-bottom-1 p-6 duration-300 ease-out',
+        'animate-in fade-in slide-in-from-bottom-1 px-5 py-6 duration-300 ease-out sm:px-8 sm:py-8',
         size === 'form' && 'max-w-2xl',
         className,
       )}
@@ -42,7 +42,7 @@ export function PageHeader({
   return (
     <header className="mb-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <h1 className="text-title tracking-tight">{title}</h1>
           {description && (
             <p className="text-muted-foreground max-w-[68ch] text-sm text-pretty">{description}</p>

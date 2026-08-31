@@ -122,9 +122,9 @@ export function ClientsPage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-border-strong border-b-2 text-left">
+            <thead className="border-border border-b text-left">
               <tr>
                 <Th label="Client" active={sort.key === 'name'} dir={sort.dir} onClick={() => toggleSort('name')} />
                 <th className="p-3 font-medium">Secteur</th>
@@ -147,7 +147,7 @@ export function ClientsPage() {
             </thead>
             <tbody>
               {rows.map((c) => (
-                <tr key={c.id} className="hover:bg-surface-2/60 border-border/70 border-b">
+                <tr key={c.id} className="hover:bg-surface-2/60 border-border/60 border-b last:border-0">
                   <td className="p-3">
                     <Link
                       to={`/app/clients/${c.id}`}

@@ -14,23 +14,32 @@
   :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.24 0.012 274); /* encre — ~12:1 sur blanc */
-    --surface: oklch(1 0 0);
-    --surface-2: oklch(0.976 0.003 274); /* sidebar, barres d'outils, en-têtes de tableau */
-    --surface-3: oklch(0.955 0.004 274); /* survol dans la sidebar, 3e couche */
+    --surface: oklch(1 0 0); /* cartes / contenu */
+    --surface-2: oklch(0.957 0.005 274); /* sol de l'app : les cartes blanches flottent dessus */
+    --surface-3: oklch(0.94 0.006 274); /* survol, 3e couche */
     --muted: oklch(0.968 0.003 274);
     --muted-foreground: oklch(0.446 0.014 274); /* ~5.4:1 sur blanc — tient l'AA aussi sur surface-2/3 */
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.24 0.012 274);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.24 0.012 274);
-    --border: oklch(0.91 0.004 274);
-    --border-strong: oklch(0.85 0.006 274);
-    --input: oklch(0.87 0.006 274);
+    --border: oklch(0.922 0.004 274); /* filet fin, discret */
+    --border-strong: oklch(0.86 0.006 274);
+    --input: oklch(0.88 0.006 274);
+
+    /* Ombre douce et diffuse, légèrement froide — pour cartes / panneaux flottants. */
+    --shadow-xs: 0 1px 2px 0 oklch(0.42 0.04 264 / 0.06);
+    --shadow-sm:
+      0 1px 2px 0 oklch(0.42 0.04 264 / 0.06), 0 3px 8px -2px oklch(0.42 0.04 264 / 0.07);
+    --shadow-md:
+      0 2px 4px -1px oklch(0.42 0.04 264 / 0.07), 0 12px 28px -8px oklch(0.42 0.04 264 / 0.12);
+    --shadow-panel:
+      0 1px 2px oklch(0 0 0 / 0.04), 0 16px 44px -12px oklch(0.38 0.04 264 / 0.2);
 
     /* ── Accent : indigo de la marque (hue 274) ── */
     --primary: oklch(0.52 0.19 274); /* aplat, texte blanc ~6:1 */
     --primary-foreground: oklch(0.99 0 0);
-    --primary-surface: oklch(0.955 0.028 274); /* fond d'état actif (nav, sélection) */
+    --primary-surface: oklch(0.947 0.035 274); /* fond d'état actif (nav, sélection) */
     --primary-strong: oklch(0.45 0.18 274); /* texte/icône sur --primary-surface ~7:1 */
     --primary-border: oklch(0.86 0.06 274);
     --ring: oklch(0.52 0.19 274);
@@ -71,7 +80,7 @@
     --destructive: var(--danger);
     --destructive-foreground: var(--danger-foreground);
 
-    --radius: 0.625rem; /* 10px — coins un peu plus doux (cartes, panneaux) */
+    --radius: 0.75rem; /* 12px — coins doux façon SaaS (Linear / Notion / Attio) */
   }
 
   * {
@@ -129,15 +138,19 @@
 @layer components {
   /* Contrôle de formulaire natif (select, input date) — hauteur et style homogènes. */
   .field {
-    @apply border-input bg-background h-9 rounded-md border px-2.5 text-sm transition-colors;
+    @apply border-input bg-surface h-9 rounded-lg border px-2.5 text-sm transition-colors;
+    box-shadow: var(--shadow-xs);
   }
   .field:focus-visible {
     @apply border-primary outline-none;
     box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 25%, transparent);
   }
-  /* Bloc de contenu encadré (cartes tableau, panneaux d'accueil). */
+  /* Carte de contenu : blanche, coins doux, filet fin + ombre discrète.
+     Flotte sur le sol `surface-2`. Base de la plupart des blocs (tableaux,
+     panneaux d'accueil, filtres). */
   .surface-card {
-    @apply bg-surface rounded-lg border;
+    @apply bg-surface rounded-xl border;
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -219,8 +232,12 @@
   background: var(--success-surface);
   border-color: var(--success-border);
 }
+/* « publié » = terminé : fond gris neutre, texte gris lisible (pas d'opacité qui
+   ferait chuter le contraste sous AA). */
 .fc-monochrome .fc-status-published {
-  opacity: 0.62;
+  background: var(--surface-3);
+  border-color: var(--border);
+  color: var(--muted-foreground);
 }
 /* Marronniers : surimpression discrète (filet pointillé en tête), non cliquable */
 .fc-monochrome .fc-keydate {

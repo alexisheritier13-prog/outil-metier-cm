@@ -10,9 +10,9 @@ export function AppLayout() {
   useEffect(() => setDrawer(false), [pathname]);
 
   return (
-    <div className="bg-background flex min-h-dvh">
+    <div className="bg-surface-2 flex min-h-dvh">
       {/* Sidebar fixe (desktop) */}
-      <aside className="sticky top-0 hidden h-dvh lg:block">
+      <aside className="border-border sticky top-0 hidden h-dvh border-r lg:block">
         <AppSidebar />
       </aside>
 
@@ -32,12 +32,12 @@ export function AppLayout() {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-surface-2 flex items-center gap-3 border-b px-4 py-2.5 lg:hidden">
+        <header className="bg-background flex items-center gap-3 border-b px-4 py-2.5 lg:hidden">
           <button
             type="button"
             aria-label={drawer ? 'Fermer le menu' : 'Ouvrir le menu'}
             onClick={() => setDrawer((v) => !v)}
-            className="hover:bg-surface-3 rounded-md p-1.5"
+            className="hover:bg-surface-2 rounded-md p-1.5"
           >
             {drawer ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

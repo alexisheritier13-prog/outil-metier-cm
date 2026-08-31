@@ -122,9 +122,9 @@ export function ReviewQueuePage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-muted-foreground border-border-strong border-b-2">
+            <thead className="text-muted-foreground border-border border-b">
               <tr>
                 <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Client</th>
                 <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide">Réseau</th>
@@ -137,7 +137,7 @@ export function ReviewQueuePage() {
             </thead>
             <tbody>
               {rows.map((p) => (
-                <tr key={p.id} className="border-border/70 border-b">
+                <tr key={p.id} className="border-border/60 border-b last:border-0">
                   <td className="p-3">{clientName(p.clientId)}</td>
                   <td className="p-3">
                     <NetworkIcon network={p.network} />

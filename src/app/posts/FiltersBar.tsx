@@ -18,7 +18,7 @@ interface Props {
 
 export function FiltersBar({ clients, filters, onChange, onReset, isEmpty }: Props) {
   return (
-    <div className="bg-background sticky top-0 z-sticky mb-4 flex flex-wrap items-center gap-2 border-b pb-3 pt-1">
+    <div className="surface-card mb-4 flex flex-wrap items-center gap-2 px-3 py-2.5">
       <MultiSelect
         label="Client"
         options={clients.map((c) => ({ value: c.id, label: c.name }))}

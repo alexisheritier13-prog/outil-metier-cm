@@ -80,14 +80,16 @@ export default {
         },
       },
       borderRadius: {
+        xl: 'calc(var(--radius) + 4px)',
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 3px)',
-        sm: 'calc(var(--radius) - 5px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 6px)',
       },
       boxShadow: {
-        // Élévation unique et discrète pour panneaux / menus (pas de glassmorphism).
-        panel: '0 1px 2px oklch(0 0 0 / 0.04), 0 8px 24px oklch(0.3 0.03 274 / 0.10)',
-        card: '0 1px 2px oklch(0 0 0 / 0.05)',
+        xs: 'var(--shadow-xs)',
+        card: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
+        panel: 'var(--shadow-panel)',
       },
       fontSize: {
         // Échelle rem fixe (registre produit) — pas de clamp.

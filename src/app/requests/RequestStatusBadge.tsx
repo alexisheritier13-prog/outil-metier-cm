@@ -15,11 +15,11 @@ export function RequestStatusBadge({ status }: { status: ClientRequestStatus }) 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
         toneClasses(tone),
       )}
     >
-      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      <Icon className="h-3 w-3" aria-hidden="true" />
       {CLIENT_REQUEST_STATUS_LABELS[status]}
     </span>
   );

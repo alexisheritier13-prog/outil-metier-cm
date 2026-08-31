@@ -108,7 +108,7 @@ export function DashboardPage() {
       <PageHeader title={`Bonjour ${firstName}`} description={today} />
 
       {/* À traiter */}
-      <div className="mb-8 grid gap-3 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-8 grid gap-4 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           to="/app/a-valider"
           icon={Inbox}
@@ -144,7 +144,7 @@ export function DashboardPage() {
         {/* Cette semaine */}
         <section className="lg:col-span-2">
           <SectionTitle to="/app/planning" label="Cette semaine" />
-          <div className="rounded-lg border">
+          <div className="surface-card">
             {weekQ.isLoading ? (
               <div className="space-y-2 p-4">
                 <Skeleton className="h-5 w-24" />
@@ -157,7 +157,7 @@ export function DashboardPage() {
                 description="Aucun post planifié sur les 7 prochains jours. Ouvrez le planning pour en créer."
               />
             ) : (
-              <ul className="divide-y">
+              <ul className="divide-border/60 divide-y">
                 {byDay.map(([day, posts]) => (
                   <li key={day} className="p-3">
                     <p className="text-muted-foreground mb-1.5 px-1 text-xs font-medium uppercase tracking-wide">
@@ -177,7 +177,7 @@ export function DashboardPage() {
                             <span className="min-w-0 flex-1 truncate">
                               <span className="font-medium">{clientName(p.clientId)}</span>
                               <span className="text-muted-foreground">
-                                {' — '}
+                                {' · '}
                                 {p.caption || 'Sans légende'}
                               </span>
                             </span>
@@ -197,7 +197,7 @@ export function DashboardPage() {
         <div className="space-y-6">
           <section>
             <SectionTitle label="Clients à surveiller" />
-            <div className="rounded-lg border">
+            <div className="surface-card">
               {alertsQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-10 w-full" />
@@ -208,7 +208,7 @@ export function DashboardPage() {
                   Aucun signal — tous les clients sont à jour.
                 </p>
               ) : (
-                <ul className="divide-y">
+                <ul className="divide-border/60 divide-y">
                   {watchlist.map(([clientId, issues]) => (
                     <li key={clientId}>
                       <Link
@@ -233,7 +233,7 @@ export function DashboardPage() {
 
           <section>
             <SectionTitle label="Activité récente" />
-            <div className="rounded-lg border">
+            <div className="surface-card">
               {activityQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-8 w-full" />
@@ -243,7 +243,7 @@ export function DashboardPage() {
               ) : (activityQ.data ?? []).length === 0 ? (
                 <p className="text-muted-foreground p-4 text-sm">Rien à afficher.</p>
               ) : (
-                <ul className="divide-y">
+                <ul className="divide-border/60 divide-y">
                   {(activityQ.data ?? []).map((e) => (
                     <li key={e.historyId} className="flex items-start gap-3 p-3 text-sm">
                       <NetworkIcon network={e.network} />
@@ -287,14 +287,14 @@ function StatTile({
     <Link
       to={to}
       className={cn(
-        'group hover:border-border-strong hover:shadow-card flex flex-col gap-2 rounded-lg border p-4 transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5',
-        tone === 'danger' && 'border-danger-border bg-danger-surface',
-        tone === 'warning' && 'border-warning-border bg-warning-surface',
+        'surface-card group hover:shadow-md flex flex-col gap-3 p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5',
+        tone === 'danger' && 'ring-danger-border bg-danger-surface ring-1',
+        tone === 'warning' && 'ring-warning-border bg-warning-surface ring-1',
       )}
     >
       <span
         className={cn(
-          'text-muted-foreground flex items-center gap-1.5 text-xs font-medium',
+          'text-muted-foreground flex items-center gap-2 text-xs font-medium',
           tone === 'danger' && 'text-danger-strong',
           tone === 'warning' && 'text-warning-strong',
         )}
@@ -302,13 +302,15 @@ function StatTile({
         <Icon className="h-3.5 w-3.5" aria-hidden="true" />
         {label}
       </span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-baseline gap-1.5">
         {loading ? (
           <Skeleton className="h-7 w-10" />
         ) : (
-          <span className="text-2xl font-semibold tabular-nums tracking-tight">{value ?? 0}</span>
+          <span className="text-[1.75rem] font-semibold tabular-nums leading-none tracking-tight">
+            {value ?? 0}
+          </span>
         )}
-        <ArrowRight className="text-muted-foreground h-4 w-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+        <ArrowRight className="text-muted-foreground h-4 w-4 -translate-x-1 self-center opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
       </span>
     </Link>
   );
@@ -316,7 +318,7 @@ function StatTile({
 
 function SectionTitle({ label, to }: { label: string; to?: string }) {
   return (
-    <div className="mb-2 flex items-center justify-between">
+    <div className="mb-3 flex items-center justify-between">
       <h2 className="text-section">{label}</h2>
       {to && (
         <Link
