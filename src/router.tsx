@@ -36,6 +36,11 @@ const ClientsPage = lazy(() =>
 const ClientDetailPage = lazy(() =>
   import('@/app/clients/ClientDetailPage').then((m) => ({ default: m.ClientDetailPage })),
 );
+const ClientCalendarExportPage = lazy(() =>
+  import('@/app/clients/ClientCalendarExportPage').then((m) => ({
+    default: m.ClientCalendarExportPage,
+  })),
+);
 const CampaignsPage = lazy(() =>
   import('@/app/campaigns/CampaignsPage').then((m) => ({ default: m.CampaignsPage })),
 );
@@ -81,6 +86,15 @@ export const router = createBrowserRouter(
   [
     { path: '/', element: <Navigate to="/app" replace /> },
     { path: '/login', element: lazyRoute(<LoginPage />) },
+    {
+      // Vue imprimable autonome (hors coquille) — Story 9.3.
+      path: '/app/clients/:clientId/export',
+      element: (
+        <RequireRole roles={INTERNAL_ROLES}>
+          {lazyRoute(<ClientCalendarExportPage />)}
+        </RequireRole>
+      ),
+    },
     {
       path: '/app',
       element: (

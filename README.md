@@ -62,7 +62,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Refonte coquille « SaaS »** faite : barre latérale (`AppSidebar`, groupes repliables), dashboard d'accueil (`/app`), calendrier déplacé sur `/app/planning`, accent indigo, portail client réaligné, dates lisibles FR (`10 sept. 2026`).
 - **Story 9.1** faite : sélection multiple + actions en masse (Liste et Kanban) — barre flottante `BulkActionBar` (dupliquer / statut / réassigner / corbeille), exécution atomique par post avec récapitulatif des échecs (`useBulkActions`). Aucune migration (réutilise les RPC unitaires). 16 tests unitaires + 3 d'intégration.
 - **Story 9.2** faite : export `.ics` du calendrier filtré (bouton dans `/app/planning`) — générateur pur `postsToIcs` conforme RFC 5545 (VTIMEZONE Europe/Paris, échappement, pliage), `downloadTextFile`. 10 tests unitaires, zéro dépendance ajoutée.
-- Prochaine : Epic 9 — suite (export PDF client, champ performance, a11y AA + polish).
+- **Story 9.3** faite : export PDF du calendrier client — route imprimable autonome `/app/clients/:id/export` (période dans l'URL) + « Enregistrer en PDF » du navigateur, bouton sur la fiche client. Décision (ni Edge Function ni `react-pdf`) documentée dans `docs/architecture.md`. 2 tests composant.
+- Prochaine : Epic 9 — suite (champ performance, a11y AA + polish).
 
 ### Tests
 

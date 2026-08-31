@@ -137,7 +137,7 @@ graph TD
 | Auth | Supabase Auth (GoTrue) | plateforme | Email/mot de passe, sessions JWT | Intégré, hash géré |
 | Serverless Functions | Supabase Edge Functions (Deno) | Deno 1.4x runtime | canva-preview, export-pdf, orchestration jobs | Pas de serveur, proche DB |
 | Scheduler | pg_cron + pg_net | extensions PG | Déclenchement quotidien/horaire des jobs | Natif Postgres, pas de service externe |
-| PDF | Edge Function HTML→PDF (`@react-pdf/renderer` en Deno) ou `react-pdf` côté client | 3.x | Export PDF calendrier client | Décision : rendu côté Edge pour fidélité et cohérence serveur |
+| PDF | impression navigateur (`window.print()`) sur vue dédiée `ClientCalendarExportPage` | — | Export PDF calendrier client (Story 9.3) | Décision revue : ni Edge Function (pas de moteur HTML→PDF sur Deno Deploy, Docker absent) ni `@react-pdf/renderer` (lourd) ; une route imprimable autonome + « Enregistrer en PDF » du navigateur suffit, pagination gérée par le moteur d'impression, zéro dépendance. |
 | ICS | générateur maison `src/shared/utils/ics.ts` (pur, zéro dépendance) | — | Export .ics (Story 9.2) | RFC 5545 : `VTIMEZONE` Europe/Paris statique + `DTSTART;TZID`, échappement et pliage de lignes testés. Un paquet npm n'apportait rien de plus. |
 | Frontend Testing | Vitest + React Testing Library | vitest 2.x / RTL 16.x | Tests unitaires composants + logique | Intégré Vite |
 | RLS / DB Testing | pgTAP + scripts SQL via Supabase CLI | pgTAP 1.3.x | Tests des policies d'isolation | Vérifie la sécurité au bon niveau |
@@ -550,14 +550,15 @@ redirection par rôle, refus des comptes désactivés.
 **Dependencies:** Deno `fetch`, un parseur HTML léger (`deno-dom` ou regex ciblées sur les
 `<meta>`)
 
-### export-pdf (Edge Function)
+### export-pdf (Edge Function) — ABANDONNÉE (Story 9.3)
 
-**Responsibility:** Rendu d'un récapitulatif calendrier client → PDF ; lit les posts via le
-client service-role borné à `client_id` passé + vérification que l'appelant y a accès.
-
-**Key Interfaces:** `POST { clientId, from, to } -> application/pdf`
-
-**Dependencies:** `@react-pdf/renderer` (Deno) ou moteur HTML→PDF
+Décision revue : pas d'Edge Function. L'export PDF est une **route imprimable
+autonome** côté client (`/app/clients/:id/export`, composant
+`ClientCalendarExportPage`) que l'utilisateur enregistre en PDF via la boîte
+d'impression du navigateur. Motifs : pas de moteur HTML→PDF disponible sur Deno
+Deploy, Docker absent, `@react-pdf/renderer` trop lourd pour le gain. Les posts
+sont lus via la RLS habituelle (l'utilisateur interne est déjà authentifié), la
+pagination est gérée par le moteur d'impression, zéro dépendance ajoutée.
 
 ### Job Orchestrator (`generate_alerts`, `purge_trash`)
 

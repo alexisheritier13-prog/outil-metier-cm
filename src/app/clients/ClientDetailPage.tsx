@@ -106,8 +106,12 @@ export function ClientDetailPage() {
           </div>
         </div>
 
-        {canWrite && (
-          <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to={`/app/clients/${clientId}/export`}>Exporter PDF</Link>
+          </Button>
+          {canWrite && (
+            <>
             <Button variant="outline" onClick={() => setEditOpen(true)}>
               Modifier
             </Button>
@@ -132,8 +136,9 @@ export function ClientDetailPage() {
             >
               Corbeille
             </Button>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </header>
 
       <Tabs defaultValue="overview">
