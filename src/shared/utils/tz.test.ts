@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   parisDateKey,
+  parisDateLabel,
   parisOffsetMinutes,
   parisTimeLabel,
   parisWallTimeToUtc,
@@ -51,5 +52,17 @@ describe('parisDateKey / parisTimeLabel', () => {
     // 23:30 UTC en été = 01:30 le lendemain à Paris
     expect(parisDateKey('2026-07-01T23:30:00Z')).toBe('2026-07-02');
     expect(parisTimeLabel('2026-07-01T23:30:00Z')).toBe('01:30');
+  });
+});
+
+describe('parisDateLabel', () => {
+  it('formate en français, en Europe/Paris', () => {
+    expect(parisDateLabel('2026-09-10T08:00:00Z')).toBe('10 sept. 2026');
+    // 23:30 UTC en été = le lendemain à Paris
+    expect(parisDateLabel('2026-07-01T23:30:00Z')).toBe('2 juil. 2026');
+  });
+
+  it('omet l’année sur demande', () => {
+    expect(parisDateLabel('2026-09-10T08:00:00Z', { year: false })).toBe('10 sept.');
   });
 });

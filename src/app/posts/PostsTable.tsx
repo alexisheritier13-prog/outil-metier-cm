@@ -7,7 +7,7 @@ import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
 import { cn } from '@/lib/utils';
 import { POST_STATUS_ORDER } from '@/shared/constants/postStatus';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { useTrashPost } from './usePosts';
 
@@ -109,7 +109,7 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                 }}
               >
                 <span className="text-muted-foreground truncate px-3 text-[13px] tabular-nums">
-                  {parisDateKey(p.scheduledAt)}
+                  {parisDateLabel(p.scheduledAt)}
                   <span className="text-muted-foreground/70"> · {parisTimeLabel(p.scheduledAt)}</span>
                 </span>
                 <span className="truncate px-3 font-medium">{clientName(p.clientId)}</span>

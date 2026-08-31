@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import { getPostTagIds, listTags } from '@/services/tags';
 import { listCampaignsForClient } from '@/services/campaigns';
 import { ORIGIN_TYPE_LABELS, describeOrigin } from '@/services/postOrigin';
@@ -109,7 +109,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
           <dl className="grid grid-cols-[7rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">Date</dt>
             <dd>
-              {parisDateKey(post.scheduledAt)} à {parisTimeLabel(post.scheduledAt)} (Paris)
+              {parisDateLabel(post.scheduledAt)} à {parisTimeLabel(post.scheduledAt)} (Paris)
             </dd>
             <dt className="text-muted-foreground">Réseau</dt>
             <dd>{NETWORK_LABELS[post.network]}</dd>

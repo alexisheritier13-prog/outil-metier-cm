@@ -11,7 +11,7 @@ import { isInternalRole } from '@/shared/constants/roles';
 import { listClients } from '@/services/clients';
 import { listInternalUsers } from '@/services/users';
 import { listReviewQueue, remindClientReview } from '@/services/posts';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { PostSheet } from '@/app/posts/PostSheet';
 import { useChangePostStatus } from '@/app/posts/usePosts';
@@ -138,7 +138,7 @@ export function ReviewQueuePage() {
                     <NetworkIcon network={p.network} />
                   </td>
                   <td className="text-muted-foreground whitespace-nowrap p-3">
-                    {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                    {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
                   </td>
                   <td className="text-muted-foreground max-w-xs truncate p-3">
                     {p.caption || 'Sans légende'}

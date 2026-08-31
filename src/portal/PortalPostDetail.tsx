@@ -5,7 +5,7 @@ import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/she
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { useAddPortalComment, useApprovePost, usePortalComments, useRejectPost } from './usePortal';
 
@@ -58,7 +58,7 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
           <dl className="grid grid-cols-[6rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">Date</dt>
             <dd>
-              {parisDateKey(post.scheduledAt)} à {parisTimeLabel(post.scheduledAt)}
+              {parisDateLabel(post.scheduledAt)} à {parisTimeLabel(post.scheduledAt)}
             </dd>
             <dt className="text-muted-foreground">Réseau</dt>
             <dd>{NETWORK_LABELS[post.network]}</dd>

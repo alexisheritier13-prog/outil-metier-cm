@@ -9,7 +9,7 @@ import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
 import { listPosts } from '@/services/posts';
 import { getClient } from '@/services/clients';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import { useCampaign } from './useCampaigns';
 
 export function CampaignDetailPage() {
@@ -73,7 +73,7 @@ export function CampaignDetailPage() {
               {(posts.data ?? []).map((p) => (
                 <tr key={p.id} className="border-t first:border-t-0">
                   <td className="p-3 whitespace-nowrap">
-                    {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                    {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
                   </td>
                   <td className="p-3">
                     <NetworkIcon network={p.network} />

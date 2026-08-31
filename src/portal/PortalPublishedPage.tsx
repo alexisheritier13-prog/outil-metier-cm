@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
-import { parisDateKey } from '@/shared/utils/tz';
+import { parisDateLabel } from '@/shared/utils/tz';
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue';
 import { usePortalClient } from './PortalClientContext';
 import { usePortalPosts } from './usePortal';
@@ -114,7 +114,7 @@ export function PortalPublishedPage() {
                 )}
                 <div className="min-w-0 text-sm">
                   <p className="text-muted-foreground text-xs">
-                    {parisDateKey(p.scheduledAt)} · {NETWORK_LABELS[p.network]}
+                    {parisDateLabel(p.scheduledAt)} · {NETWORK_LABELS[p.network]}
                   </p>
                   <p className="line-clamp-2">{p.caption || 'Sans légende'}</p>
                   {p.performanceVisibleToClient && p.performanceNote && (

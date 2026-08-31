@@ -6,7 +6,7 @@ import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Segmented } from '@/components/Segmented';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
 import { listPortalPosts } from '@/services/portal';
 import { usePortalClient } from './PortalClientContext';
@@ -72,7 +72,7 @@ export function PortalCalendarPage() {
                 className="hover:bg-surface-2 flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3.5 text-left text-sm transition-colors"
               >
                 <span className="text-muted-foreground whitespace-nowrap tabular-nums">
-                  {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                  {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
                 </span>
                 <NetworkIcon network={p.network} />
                 <span className="min-w-0 flex-1 truncate">

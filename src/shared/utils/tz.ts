@@ -83,6 +83,34 @@ export function parisTimeLabel(instant: Date | string): string {
   return `${pad(p.hour)}:${pad(p.minute)}`;
 }
 
+const MONTHS_SHORT = [
+  'janv.',
+  'févr.',
+  'mars',
+  'avr.',
+  'mai',
+  'juin',
+  'juil.',
+  'août',
+  'sept.',
+  'oct.',
+  'nov.',
+  'déc.',
+];
+
+/**
+ * Date lisible en français, en Europe/Paris — ex. `10 sept. 2026`. Pour l'affichage
+ * (jamais pour une clé de regroupement : utiliser `parisDateKey`).
+ */
+export function parisDateLabel(
+  instant: Date | string,
+  opts: { year?: boolean } = { year: true },
+): string {
+  const p = toParisParts(instant);
+  const base = `${p.day} ${MONTHS_SHORT[p.month - 1]}`;
+  return opts.year === false ? base : `${base} ${p.year}`;
+}
+
 function pad(n: number): string {
   return n.toString().padStart(2, '0');
 }

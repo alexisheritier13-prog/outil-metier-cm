@@ -13,12 +13,12 @@ import {
 } from '@/services/clients';
 import { listClients } from '@/services/clients';
 import { listTrashedPosts, purgePostNow, restorePost } from '@/services/posts';
-import { parisDateKey } from '@/shared/utils/tz';
+import { parisDateLabel } from '@/shared/utils/tz';
 
 function purgeDate(deletedAt: string): string {
   const d = new Date(deletedAt);
   d.setDate(d.getDate() + 60);
-  return d.toLocaleDateString('fr-FR');
+  return parisDateLabel(d);
 }
 
 export function TrashPage() {
@@ -74,7 +74,8 @@ export function TrashPage() {
                       <tr key={c.id} className="border-t first:border-t-0">
                         <td className="p-3 font-medium">{c.name}</td>
                         <td className="text-muted-foreground p-3">
-                          supprimé le {parisDateKey(c.deletedAt!)} · purge le {purgeDate(c.deletedAt!)}
+                          supprimé le {parisDateLabel(c.deletedAt!)} · purge le{' '}
+                          {purgeDate(c.deletedAt!)}
                         </td>
                         <td className="p-3 text-right">
                           <Button size="sm" variant="outline" onClick={() => restoreClientM.mutate(c.id)}>

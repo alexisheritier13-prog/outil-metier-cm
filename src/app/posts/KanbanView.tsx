@@ -3,7 +3,7 @@ import { POST_STATUSES, POST_STATUS_LABELS, type PostStatus } from '@/shared/con
 import type { Role } from '@/shared/constants/roles';
 import { canTransition, transitionNeedsComment } from '@/shared/utils/transitions';
 import { NetworkIcon } from '@/components/NetworkIcon';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/shared/types';
 import { useChangePostStatus } from './usePosts';
@@ -86,7 +86,7 @@ export function KanbanView({ posts, role, clientName, onOpen }: Props) {
                 >
                   <div className="text-muted-foreground mb-1 flex items-center gap-1.5">
                     <NetworkIcon network={p.network} />
-                    <span>{parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}</span>
+                    <span>{parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}</span>
                   </div>
                   <div className="font-medium">{clientName(p.clientId)}</div>
                   <div className="text-muted-foreground line-clamp-2">

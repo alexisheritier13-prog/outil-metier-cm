@@ -3,7 +3,7 @@ import { CheckCheck } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { NetworkIcon } from '@/components/NetworkIcon';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import { usePortalClient } from './PortalClientContext';
 import { usePortalPosts } from './usePortal';
 import { PortalPostDetail } from './PortalPostDetail';
@@ -44,7 +44,7 @@ export function PortalReviewPage() {
                 className="hover:bg-surface-2 group flex w-full flex-wrap items-center gap-x-3 gap-y-1 p-3.5 text-left text-sm transition-colors"
               >
                 <span className="text-muted-foreground whitespace-nowrap tabular-nums">
-                  {parisDateKey(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
+                  {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
                 </span>
                 <NetworkIcon network={p.network} />
                 <span className="min-w-0 flex-1 truncate">
