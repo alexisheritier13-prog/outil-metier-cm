@@ -40,7 +40,9 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Stories 4.1 + 4.2** faites : Edge Function `canva-preview` (récupère l'og:image d'un lien Canva public) + `CanvaField` (auto + miniature manuelle + aperçu iframe). 137 tests.
 - **Stories 4.3 à 4.5** faites : rappel des specs réseau, historique du post (triggers), fil de commentaires (interne / visible client). **Epic 4 terminé** — 141 tests.
 - **Story 5.1** faite : validation interne (Lead) — actions nommées dans le panneau (`StatusActions` : « Soumettre à la validation interne », « Valider en interne », « Renvoyer au rédacteur » avec commentaire obligatoire), table `notifications` + émission aux étapes du workflow (`notify()`, RPC `post_change_status`). 146 tests.
-- Prochaine : Epic 5 (5.2 → 5.5 : envoi client, approbation/refus client, file « À valider », historique par client).
+- **Story 5.2** faite : envoi au client — rappel de visibilité dans le fil de commentaires ; RLS client + transitions de retour déjà en place (consolidation).
+- **Story 5.3** faite : approbation / refus client — RPC `approve_post` / `reject_post` (contact du client, statut « à valider client » uniquement), commentaire système + notification au rédacteur. 151 tests. UI portail = Epic 6.
+- Prochaine : Epic 5 (5.4 file « À valider », 5.5 historique par client).
 
 ### Tests
 

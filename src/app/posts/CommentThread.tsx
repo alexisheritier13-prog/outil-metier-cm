@@ -139,6 +139,11 @@ export function CommentThread({ postId }: { postId: string }) {
             Commenter
           </Button>
         </div>
+        {visibility === 'client' && (
+          <p className="text-muted-foreground text-xs">
+            Le client verra ce commentaire dans son espace de validation.
+          </p>
+        )}
       </form>
     </div>
   );
