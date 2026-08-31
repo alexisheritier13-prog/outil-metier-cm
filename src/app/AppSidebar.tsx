@@ -110,13 +110,9 @@ export function AppSidebar() {
             Paramètres
           </Item>
         )}
-        <a
-          href="mailto:support@example.test"
-          className="text-muted-foreground hover:bg-surface-3 hover:text-foreground flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm"
-        >
-          <LifeBuoy className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <Item to="/app/aide" icon={LifeBuoy}>
           Aide
-        </a>
+        </Item>
       </div>
 
       <div className="flex items-center gap-2.5 border-t px-3 py-3">
