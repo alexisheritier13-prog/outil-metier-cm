@@ -30,8 +30,14 @@ const CampaignsPage = lazy(() =>
 const CampaignDetailPage = lazy(() =>
   import('@/app/campaigns/CampaignDetailPage').then((m) => ({ default: m.CampaignDetailPage })),
 );
-const PortalHome = lazy(() =>
-  import('@/portal/PortalHome').then((m) => ({ default: m.PortalHome })),
+const PortalLayout = lazy(() =>
+  import('@/portal/PortalLayout').then((m) => ({ default: m.PortalLayout })),
+);
+const PortalCalendarPage = lazy(() =>
+  import('@/portal/PortalCalendarPage').then((m) => ({ default: m.PortalCalendarPage })),
+);
+const PortalSoonPage = lazy(() =>
+  import('@/portal/PortalSoonPage').then((m) => ({ default: m.PortalSoonPage })),
 );
 
 function lazyRoute(node: React.ReactNode) {
@@ -67,8 +73,38 @@ export const router = createBrowserRouter(
       ],
     },
     {
-      path: '/portail/*',
-      element: <RequireRole roles={['client']}>{lazyRoute(<PortalHome />)}</RequireRole>,
+      path: '/portail',
+      element: <RequireRole roles={['client']}>{lazyRoute(<PortalLayout />)}</RequireRole>,
+      children: [
+        { index: true, element: lazyRoute(<PortalCalendarPage />) },
+        {
+          path: 'a-valider',
+          element: lazyRoute(
+            <PortalSoonPage
+              title="À valider"
+              note="La file des posts en attente de votre réponse arrive très bientôt."
+            />,
+          ),
+        },
+        {
+          path: 'publies',
+          element: lazyRoute(
+            <PortalSoonPage
+              title="Publiés"
+              note="L'historique de vos posts publiés arrive très bientôt."
+            />,
+          ),
+        },
+        {
+          path: 'briefs',
+          element: lazyRoute(
+            <PortalSoonPage
+              title="Briefs"
+              note="Le dépôt de demandes de contenu arrive très bientôt."
+            />,
+          ),
+        },
+      ],
     },
     { path: '*', element: <Navigate to="/app" replace /> },
   ],
