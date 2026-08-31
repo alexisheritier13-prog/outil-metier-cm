@@ -150,7 +150,7 @@
      Flotte sur le sol `surface-2`. Base de la plupart des blocs (tableaux,
      panneaux d'accueil, filtres). */
   .surface-card {
-    @apply bg-surface rounded-xl border;
+    @apply bg-surface relative rounded-xl border;
     box-shadow: var(--shadow-sm);
   }
 }

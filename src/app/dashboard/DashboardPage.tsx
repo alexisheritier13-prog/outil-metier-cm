@@ -12,7 +12,6 @@ import {
   TriangleAlert,
   Users,
 } from 'lucide-react';
-import { Page } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { UserAvatar } from '@/components/UserAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -145,17 +144,17 @@ export function DashboardPage() {
   const firstName = (me.fullName || me.email).split(' ')[0];
 
   return (
-    <Page>
-      <header className="mb-6 flex items-center gap-3">
+    <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
+      <header className="flex shrink-0 items-center gap-3">
         <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
-        <div className="space-y-1">
+        <div>
           <h1 className="text-title tracking-tight">Bonjour {firstName}</h1>
           <p className="text-muted-foreground text-sm capitalize">{today}</p>
         </div>
       </header>
 
       {/* À traiter */}
-      <div className="mb-6 grid gap-4 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid shrink-0 gap-3 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           to="/app/a-valider"
           icon={Inbox}
@@ -190,19 +189,11 @@ export function DashboardPage() {
         />
       </div>
 
-      <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards mb-6 duration-300 [animation-delay:220ms]">
-        <ProductionPanel
-          counts={pipelineCounts}
-          total={pipelineTotal}
-          loading={pipelineQ.isLoading}
-        />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="flex flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* Cette semaine */}
-        <section className="lg:col-span-2">
+        <section className="flex min-w-0 flex-col lg:min-h-0 lg:flex-1">
           <SectionTitle to="/app/planning" icon={CalendarRange} label="Cette semaine" />
-          <div className="surface-card">
+          <div className="surface-card overflow-y-auto lg:min-h-0 lg:flex-1">
             {weekQ.isLoading ? (
               <div className="space-y-2 p-4">
                 <Skeleton className="h-5 w-24" />
@@ -252,10 +243,18 @@ export function DashboardPage() {
         </section>
 
         {/* Colonne droite */}
-        <div className="space-y-6">
-          <section>
+        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:w-[360px] lg:shrink-0">
+          <div className="shrink-0">
+            <ProductionPanel
+              counts={pipelineCounts}
+              total={pipelineTotal}
+              loading={pipelineQ.isLoading}
+            />
+          </div>
+
+          <section className="flex shrink-0 flex-col">
             <SectionTitle icon={Users} label="Clients à surveiller" />
-            <div className="surface-card">
+            <div className="surface-card max-h-[38vh] overflow-y-auto">
               {alertsQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-10 w-full" />
@@ -289,9 +288,10 @@ export function DashboardPage() {
             </div>
           </section>
 
-          <section>
+          <section className="flex flex-col lg:min-h-0 lg:flex-1">
             <SectionTitle icon={Activity} label="Activité récente" />
-            <div className="surface-card">
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone défilable sans enfant focusable, rendue accessible au clavier (axe) */}
+            <div tabIndex={0} role="region" aria-label="Activité récente" className="surface-card overflow-y-auto lg:min-h-0 lg:flex-1">
               {activityQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-8 w-full" />
@@ -322,7 +322,7 @@ export function DashboardPage() {
           </section>
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
 
@@ -347,14 +347,14 @@ function StatTile({
     <Link
       to={to}
       className={cn(
-        'surface-card group flex items-center gap-3.5 p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
+        'surface-card group flex items-center gap-3 p-3 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
         tone === 'danger' && 'ring-danger-border bg-danger-surface ring-1',
         tone === 'warning' && 'ring-warning-border bg-warning-surface ring-1',
       )}
     >
       <span
         className={cn(
-          'grid h-10 w-10 shrink-0 place-items-center rounded-xl',
+          'grid h-9 w-9 shrink-0 place-items-center rounded-lg',
           tone === 'danger'
             ? 'bg-danger text-danger-foreground'
             : tone === 'warning'
@@ -368,13 +368,13 @@ function StatTile({
         {loading ? (
           <Skeleton className="h-7 w-10" />
         ) : (
-          <span className="block text-[1.65rem] font-semibold tabular-nums leading-none tracking-tight">
+          <span className="block text-[1.4rem] font-semibold tabular-nums leading-none tracking-tight">
             {value ?? 0}
           </span>
         )}
         <span
           className={cn(
-            'mt-1 block truncate text-xs font-medium',
+            'mt-0.5 block truncate text-xs font-medium',
             tone === 'danger'
               ? 'text-danger-strong'
               : tone === 'warning'
@@ -403,36 +403,36 @@ function ProductionPanel({
   loading?: boolean;
 }) {
   return (
-    <section className="surface-card p-4 sm:p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <section className="surface-card p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="bg-primary text-primary-foreground grid h-8 w-8 shrink-0 place-items-center rounded-lg">
-            <GaugeCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+          <span className="bg-primary text-primary-foreground grid h-7 w-7 shrink-0 place-items-center rounded-lg">
+            <GaugeCircle className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
             <h2 className="text-section leading-tight">Production en cours</h2>
-            <p className="text-muted-foreground text-xs">Posts en préparation, hors publiés</p>
+            <p className="text-muted-foreground text-xs">Hors publiés</p>
           </div>
         </div>
         {loading ? (
-          <Skeleton className="h-7 w-10" />
+          <Skeleton className="h-6 w-9" />
         ) : (
-          <span className="text-2xl font-semibold tabular-nums leading-none tracking-tight">
+          <span className="text-xl font-semibold tabular-nums leading-none tracking-tight">
             {total}
           </span>
         )}
       </div>
 
       {loading ? (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {PIPELINE_STATUSES.map((s) => (
-            <Skeleton key={s} className="h-6 w-full" />
+            <Skeleton key={s} className="h-5 w-full" />
           ))}
         </div>
       ) : total === 0 ? (
         <p className="text-muted-foreground text-sm">Aucun post en préparation pour le moment.</p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-1.5">
           {PIPELINE_STATUSES.map((s) => {
             const n = counts[s];
             const max = Math.max(...PIPELINE_STATUSES.map((k) => counts[k]), 1);
@@ -446,7 +446,7 @@ function ProductionPanel({
                   />
                   <span className="truncate">{POST_STATUS_LABELS[s]}</span>
                 </span>
-                <span className="bg-surface-2 relative h-6 flex-1 overflow-hidden rounded-md">
+                <span className="bg-surface-2 relative h-5 flex-1 overflow-hidden rounded-md">
                   <span
                     className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-500 ease-out"
                     style={{

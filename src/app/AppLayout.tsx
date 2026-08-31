@@ -19,7 +19,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="bg-background min-h-dvh lg:p-4">
+    <div className="bg-background min-h-dvh lg:h-dvh lg:overflow-hidden lg:p-4">
       {/* Conteneur flottant unique : coins arrondis + ombre douce (desktop). */}
       <div className="bg-surface lg:shadow-panel lg:h-[calc(100dvh-2rem)] mx-auto flex min-h-dvh w-full overflow-hidden lg:min-h-0 lg:rounded-3xl lg:border">
         {/* Sidebar (desktop) */}
