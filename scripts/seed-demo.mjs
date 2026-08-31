@@ -193,7 +193,45 @@ async function main() {
       '« Le lin, on l’aime encore un peu froissé — c’est sa signature. »\n« Cousu à Roubaix, pensé pour durer. »',
     visual_guidelines:
       'Lumière naturelle, tons sable / écru / terracotta. Gros plans matière. Pas de filtre saturé.',
+    brand_colors: [
+      { hex: '#C56B4A', label: 'Terracotta' },
+      { hex: '#E9E1D4', label: 'Écru' },
+      { hex: '#2E2A26', label: 'Encre' },
+    ],
+    typography: 'Titres : Fraunces (serif)\nCorps : Inter Regular\nÉviter les tout-capitales.',
   });
+
+  console.log('→ contrat + accès');
+  await admin.from('client_contracts').upsert({
+    client_id: CLIENT_ID,
+    scope:
+      '12 posts / mois (feed + carrousels), 3 stories / semaine, 1 reel / mois. Community management 5j/7. Reporting mensuel.',
+    cadence: 'Publication mar. et jeu. 10h. Réponse aux commentaires sous 24h ouvrées.',
+    channels: 'Instagram, LinkedIn, TikTok',
+    start_date: '2026-03-01',
+    notes: 'Engagement 6 mois, reconduction tacite. Shooting produit non inclus (refacturé).',
+  });
+  await admin.from('client_credentials').delete().eq('client_id', CLIENT_ID);
+  await admin.from('client_credentials').insert([
+    {
+      client_id: CLIENT_ID,
+      label: 'Instagram',
+      login: 'studiolumen.paris',
+      secret: 'demo-not-a-real-password',
+      url: 'https://instagram.com',
+      notes: '2FA sur le téléphone de Chris',
+      sort_order: 0,
+    },
+    {
+      client_id: CLIENT_ID,
+      label: 'Site (WordPress)',
+      login: 'agence@studiolumen.test',
+      secret: 'demo-not-a-real-password',
+      url: 'https://studiolumen.test/wp-admin',
+      notes: 'Compte partagé équipe',
+      sort_order: 1,
+    },
+  ]);
 
   console.log('→ onboarding (partiel)');
   const ob = await admin

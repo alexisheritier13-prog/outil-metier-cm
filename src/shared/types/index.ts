@@ -127,6 +127,11 @@ export function toClientContact(row: ClientContactRow): ClientContact {
   };
 }
 
+export interface BrandColor {
+  hex: string;
+  label: string;
+}
+
 export interface EditorialGuideline {
   clientId: string;
   tone: string;
@@ -134,7 +139,19 @@ export interface EditorialGuideline {
   wordsToPrefer: string;
   goodExamples: string;
   visualGuidelines: string;
+  brandColors: BrandColor[];
+  typography: string;
   updatedAt: string;
+}
+
+function toBrandColors(value: unknown): BrandColor[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((c): c is Record<string, unknown> => Boolean(c) && typeof c === 'object')
+    .map((c) => ({
+      hex: typeof c.hex === 'string' ? c.hex : '',
+      label: typeof c.label === 'string' ? c.label : '',
+    }));
 }
 
 export function toEditorialGuideline(row: EditorialGuidelineRow): EditorialGuideline {
@@ -145,6 +162,8 @@ export function toEditorialGuideline(row: EditorialGuidelineRow): EditorialGuide
     wordsToPrefer: row.words_to_prefer,
     goodExamples: row.good_examples,
     visualGuidelines: row.visual_guidelines,
+    brandColors: toBrandColors(row.brand_colors),
+    typography: row.typography,
     updatedAt: row.updated_at,
   };
 }
@@ -156,8 +175,71 @@ export const EMPTY_GUIDELINE = (clientId: string): EditorialGuideline => ({
   wordsToPrefer: '',
   goodExamples: '',
   visualGuidelines: '',
+  brandColors: [],
+  typography: '',
   updatedAt: '',
 });
+
+type ClientContractRow = Database['public']['Tables']['client_contracts']['Row'];
+type ClientCredentialRow = Database['public']['Tables']['client_credentials']['Row'];
+
+export interface ClientContract {
+  clientId: string;
+  scope: string;
+  cadence: string;
+  channels: string;
+  startDate: string | null;
+  notes: string;
+  updatedAt: string;
+}
+
+export function toClientContract(row: ClientContractRow): ClientContract {
+  return {
+    clientId: row.client_id,
+    scope: row.scope,
+    cadence: row.cadence,
+    channels: row.channels,
+    startDate: row.start_date,
+    notes: row.notes,
+    updatedAt: row.updated_at,
+  };
+}
+
+export const EMPTY_CONTRACT = (clientId: string): ClientContract => ({
+  clientId,
+  scope: '',
+  cadence: '',
+  channels: '',
+  startDate: null,
+  notes: '',
+  updatedAt: '',
+});
+
+export interface ClientCredential {
+  id: string;
+  clientId: string;
+  label: string;
+  login: string;
+  secret: string;
+  url: string;
+  notes: string;
+  sortOrder: number;
+  updatedAt: string;
+}
+
+export function toClientCredential(row: ClientCredentialRow): ClientCredential {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    label: row.label,
+    login: row.login,
+    secret: row.secret,
+    url: row.url,
+    notes: row.notes,
+    sortOrder: row.sort_order,
+    updatedAt: row.updated_at,
+  };
+}
 
 export interface OnboardingItem {
   id: string;

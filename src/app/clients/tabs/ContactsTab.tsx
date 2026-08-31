@@ -50,7 +50,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
   const busy = add.isPending || invite.isPending;
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       {contacts.isLoading ? (
         <p className="text-muted-foreground text-sm">Chargement…</p>
       ) : rows.length === 0 && !adding ? (
@@ -66,8 +66,8 @@ export function ContactsTab({ clientId }: { clientId: string }) {
           }
         />
       ) : (
-        <div className="space-y-2">
-          <table className="w-full text-sm">
+        <div className="space-y-2 overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm [&_td:last-child]:pr-0 [&_td]:whitespace-nowrap [&_td]:pr-5 [&_th:last-child]:pr-0 [&_th]:pr-5">
             <thead className="text-muted-foreground text-left">
               <tr>
                 <th className="pb-2 font-medium">Nom</th>

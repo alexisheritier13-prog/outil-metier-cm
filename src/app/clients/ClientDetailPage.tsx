@@ -15,13 +15,15 @@ import { useClient, useSetClientArchived, useUpdateClient } from './useClients';
 import { ClientForm } from './ClientForm';
 import { SocialAccountsTab } from './tabs/SocialAccountsTab';
 import { ContactsTab } from './tabs/ContactsTab';
+import { OverviewTab } from './tabs/OverviewTab';
 import { GuidelinesTab } from './tabs/GuidelinesTab';
+import { ContractTab } from './tabs/ContractTab';
+import { CredentialsTab } from './tabs/CredentialsTab';
 import { OnboardingTab } from './tabs/OnboardingTab';
 import { ActivityTab } from './tabs/ActivityTab';
 import { onboardingKey } from './tabs/onboardingKeys';
 import { useQuery } from '@tanstack/react-query';
 import { listOnboardingItems } from '@/services/onboarding';
-import { parisDateLabel } from '@/shared/utils/tz';
 
 export function ClientDetailPage() {
   const { clientId = '' } = useParams();
@@ -45,6 +47,7 @@ export function ClientDetailPage() {
     enabled: Boolean(clientId),
   });
   const [editOpen, setEditOpen] = useState(false);
+  const [tab, setTab] = useState('overview');
 
   if (client.isLoading) return <FullPageSpinner />;
   if (!client.data) {
@@ -137,35 +140,24 @@ export function ClientDetailPage() {
         </div>
       </header>
 
-      <Tabs defaultValue="overview">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="contract">Contrat</TabsTrigger>
           <TabsTrigger value="social">Comptes sociaux</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
+          <TabsTrigger value="credentials">Accès</TabsTrigger>
           <TabsTrigger value="guidelines">Charte</TabsTrigger>
           <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
           <TabsTrigger value="activity">Activité</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="surface-card mt-4 p-5">
-          <dl className="grid max-w-md grid-cols-[10rem_1fr] gap-y-3 text-sm">
-            <dt className="text-muted-foreground">Nom</dt>
-            <dd>{c.name}</dd>
-            <dt className="text-muted-foreground">Secteur</dt>
-            <dd>{c.sector || '—'}</dd>
-            <dt className="text-muted-foreground">Logo</dt>
-            <dd className="truncate">
-              {c.logoUrl ? (
-                <a href={c.logoUrl} target="_blank" rel="noreferrer" className="hover:underline">
-                  {c.logoUrl}
-                </a>
-              ) : (
-                '—'
-              )}
-            </dd>
-            <dt className="text-muted-foreground">Créé le</dt>
-            <dd>{parisDateLabel(c.createdAt)}</dd>
-          </dl>
+        <TabsContent value="overview" className="mt-4">
+          <OverviewTab client={c} onNavigate={setTab} />
+        </TabsContent>
+
+        <TabsContent value="contract" className="surface-card mt-4 p-5">
+          <ContractTab clientId={c.id} />
         </TabsContent>
 
         <TabsContent value="social" className="surface-card mt-4 p-5">
@@ -174,6 +166,10 @@ export function ClientDetailPage() {
 
         <TabsContent value="contacts" className="surface-card mt-4 p-5">
           <ContactsTab clientId={c.id} />
+        </TabsContent>
+
+        <TabsContent value="credentials" className="surface-card mt-4 p-5">
+          <CredentialsTab clientId={c.id} />
         </TabsContent>
 
         <TabsContent value="guidelines" className="surface-card mt-4 p-5">

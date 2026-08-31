@@ -1,4 +1,5 @@
 import { getSupabase } from '@/lib/supabase';
+import type { Json } from '@/shared/types/database';
 import {
   EMPTY_GUIDELINE,
   toEditorialGuideline,
@@ -18,7 +19,13 @@ export async function getEditorialGuideline(clientId: string): Promise<Editorial
 
 export type EditorialGuidelineInput = Pick<
   EditorialGuideline,
-  'tone' | 'wordsToAvoid' | 'wordsToPrefer' | 'goodExamples' | 'visualGuidelines'
+  | 'tone'
+  | 'wordsToAvoid'
+  | 'wordsToPrefer'
+  | 'goodExamples'
+  | 'visualGuidelines'
+  | 'brandColors'
+  | 'typography'
 >;
 
 export async function saveEditorialGuideline(
@@ -36,6 +43,10 @@ export async function saveEditorialGuideline(
         words_to_prefer: input.wordsToPrefer,
         good_examples: input.goodExamples,
         visual_guidelines: input.visualGuidelines,
+        brand_colors: input.brandColors
+          .filter((c) => c.hex.trim() || c.label.trim())
+          .map((c) => ({ hex: c.hex, label: c.label })) as Json,
+        typography: input.typography,
         updated_by: userRes.user?.id ?? null,
       },
       { onConflict: 'client_id' },

@@ -225,6 +225,125 @@ export type Database = {
           },
         ]
       }
+      client_contracts: {
+        Row: {
+          cadence: string
+          channels: string
+          client_id: string
+          notes: string
+          scope: string
+          start_date: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cadence?: string
+          channels?: string
+          client_id: string
+          notes?: string
+          scope?: string
+          start_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cadence?: string
+          channels?: string
+          client_id?: string
+          notes?: string
+          scope?: string
+          start_date?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_contracts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contracts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contracts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_credentials: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          label: string
+          login: string
+          notes: string
+          secret: string
+          sort_order: number
+          updated_at: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          label?: string
+          login?: string
+          notes?: string
+          secret?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          login?: string
+          notes?: string
+          secret?: string
+          sort_order?: number
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_credentials_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_credentials_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_credentials_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_request_comments: {
         Row: {
           author_id: string
@@ -377,9 +496,11 @@ export type Database = {
       }
       editorial_guidelines: {
         Row: {
+          brand_colors: Json
           client_id: string
           good_examples: string
           tone: string
+          typography: string
           updated_at: string
           updated_by: string | null
           visual_guidelines: string
@@ -387,9 +508,11 @@ export type Database = {
           words_to_prefer: string
         }
         Insert: {
+          brand_colors?: Json
           client_id: string
           good_examples?: string
           tone?: string
+          typography?: string
           updated_at?: string
           updated_by?: string | null
           visual_guidelines?: string
@@ -397,9 +520,11 @@ export type Database = {
           words_to_prefer?: string
         }
         Update: {
+          brand_colors?: Json
           client_id?: string
           good_examples?: string
           tone?: string
+          typography?: string
           updated_at?: string
           updated_by?: string | null
           visual_guidelines?: string
