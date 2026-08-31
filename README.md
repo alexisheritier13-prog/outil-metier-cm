@@ -53,7 +53,9 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 7.3** faite : marronniers (`/app/marronniers`) — `key_dates` (migr 0025, portée global/secteur/client), résolution `key_dates_for_client`, surimpression discrète sur le calendrier (case à cocher), « Planifier » (RPC `key_date_to_post`).
 - **Story 7.4** faite : traçabilité origine ↔ post — `posts.origin_type`/`origin_id` exposés, ligne « Origine » dans le détail post + « Posts générés » côté idée/demande ; origine supprimée → « origine supprimée ». **Epic 7 terminé.**
 - **Stories 8.1 + 8.2** faites : alertes in-app — table `alerts` + page `/app/alertes` + badge nav (migr 0026), moteur `generate_alerts()` (FR36 a–g, idempotent via `dedupe_key`, fermeture auto des alertes caduques, trace `job_runs`), bouton « Lancer la détection » (Lead/Admin).
-- Prochaine : Epic 8 (8.3 réglage des seuils, 8.4 pg_cron + journal des jobs).
+- **Story 8.3** faite : seuils configurables (`app_settings.alert_thresholds`, migr 0027), page `/app/parametres/alertes` (Admin, bornes de validation) ; index `/app/parametres`.
+- **Story 8.4** faite : `pg_cron` planifie `generate_alerts` (nuit + horaire) et `purge_trash` (nuit) (migr 0028), page `/app/parametres/jobs` (journal `job_runs`), notification d'échec aux Admins. **Epic 8 terminé.**
+- Prochaine : Epic 9 (actions en masse, exports, finitions).
 
 ### Tests
 

@@ -14,6 +14,15 @@ const PlanningPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('@/app/settings/UsersPage').then((m) => ({ default: m.UsersPage })),
 );
+const AlertSettingsPage = lazy(() =>
+  import('@/app/settings/AlertSettingsPage').then((m) => ({ default: m.AlertSettingsPage })),
+);
+const SettingsHome = lazy(() =>
+  import('@/app/settings/SettingsHome').then((m) => ({ default: m.SettingsHome })),
+);
+const JobsPage = lazy(() =>
+  import('@/app/settings/JobsPage').then((m) => ({ default: m.JobsPage })),
+);
 const TrashPage = lazy(() => import('@/app/trash/TrashPage').then((m) => ({ default: m.TrashPage })));
 const ReviewQueuePage = lazy(() =>
   import('@/app/review/ReviewQueuePage').then((m) => ({ default: m.ReviewQueuePage })),
@@ -93,8 +102,20 @@ export const router = createBrowserRouter(
           ),
         },
         {
+          path: 'parametres',
+          element: <RequireRole roles={['admin']}>{lazyRoute(<SettingsHome />)}</RequireRole>,
+        },
+        {
           path: 'parametres/utilisateurs',
           element: <RequireRole roles={['admin']}>{lazyRoute(<UsersPage />)}</RequireRole>,
+        },
+        {
+          path: 'parametres/alertes',
+          element: <RequireRole roles={['admin']}>{lazyRoute(<AlertSettingsPage />)}</RequireRole>,
+        },
+        {
+          path: 'parametres/jobs',
+          element: <RequireRole roles={['admin']}>{lazyRoute(<JobsPage />)}</RequireRole>,
         },
       ],
     },

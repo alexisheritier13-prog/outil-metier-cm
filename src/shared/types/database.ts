@@ -1810,6 +1810,24 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      trigger_purge_trash: {
+        Args: never
+        Returns: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "job_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       alert_status_t: "new" | "seen" | "dismissed"

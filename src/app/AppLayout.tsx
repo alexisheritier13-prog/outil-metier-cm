@@ -65,9 +65,7 @@ export function AppLayout() {
           {(profile?.role === 'lead' || profile?.role === 'admin') && (
             <NavItem to="/app/corbeille">Corbeille</NavItem>
           )}
-          {profile?.role === 'admin' && (
-            <NavItem to="/app/parametres/utilisateurs">Utilisateurs</NavItem>
-          )}
+          {profile?.role === 'admin' && <NavItem to="/app/parametres">Paramètres</NavItem>}
         </nav>
         <div className="flex items-center gap-3">
           {profile && (
