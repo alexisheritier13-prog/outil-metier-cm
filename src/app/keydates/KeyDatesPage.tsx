@@ -100,7 +100,8 @@ export function KeyDatesPage() {
                 <ul className="divide-y rounded-md border">
                   {byMonth[m]
                     .slice()
-                    .sort((a, b) => a.eventDate.localeCompare(b.eventDate))
+                    // tri par mois-jour (l'année stockée est arbitraire pour un marronnier annuel)
+                    .sort((a, b) => a.eventDate.slice(5).localeCompare(b.eventDate.slice(5)))
                     .map((k) => (
                       <li key={k.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 p-3 text-sm">
                         <span className="text-muted-foreground w-10 tabular-nums">

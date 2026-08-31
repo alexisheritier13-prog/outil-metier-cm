@@ -524,7 +524,8 @@ export interface KeyDate {
   sector: string | null;
   clientId: string | null;
   description: string;
-  createdBy: string;
+  /** `null` = marronnier fourni par le système (seed). */
+  createdBy: string | null;
   createdAt: string;
   updatedAt: string;
 }
