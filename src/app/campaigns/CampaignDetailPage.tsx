@@ -67,7 +67,7 @@ export function CampaignDetailPage() {
       {(posts.data ?? []).length === 0 ? (
         <p className="text-muted-foreground text-sm">Aucun post rattaché à cette campagne.</p>
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
             <tbody>
               {(posts.data ?? []).map((p) => (

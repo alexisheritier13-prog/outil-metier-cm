@@ -146,7 +146,7 @@ function itemClass(active: boolean) {
   return cn(
     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-150',
     active
-      ? 'bg-primary-surface text-primary-strong font-medium'
+      ? 'bg-primary text-primary-foreground shadow-card font-medium'
       : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
   );
 }
@@ -171,11 +171,12 @@ function Item({
       {({ isActive }) => (
         <>
           <Icon
-            className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')}
+            className={cn('h-[18px] w-[18px] shrink-0', !isActive && 'text-muted-foreground')}
             aria-hidden="true"
+            strokeWidth={2}
           />
           <span className="flex-1 truncate">{children}</span>
-          <CountBadge value={badge} tone={badgeTone} />
+          <CountBadge value={badge} tone={badgeTone} onDark={isActive} />
         </>
       )}
     </NavLink>
@@ -210,7 +211,7 @@ function Group({
         )}
         aria-expanded={open}
       >
-        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <Icon className="text-muted-foreground h-[18px] w-[18px] shrink-0" aria-hidden="true" strokeWidth={2} />
         <span className="flex-1 text-left">{label}</span>
         <ChevronRight
           className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-90')}
@@ -247,7 +248,10 @@ function SubItem({
     >
       {({ isActive }) => (
         <>
-          <Icon className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')} aria-hidden="true" />
+          <Icon
+            className={cn('h-4 w-4 shrink-0', isActive ? 'text-primary-strong' : 'text-muted-foreground')}
+            aria-hidden="true"
+          />
           <span className="flex-1 truncate">{children}</span>
           <CountBadge value={badge} />
         </>
@@ -256,13 +260,25 @@ function SubItem({
   );
 }
 
-function CountBadge({ value, tone }: { value?: number; tone?: 'danger' }) {
+function CountBadge({
+  value,
+  tone,
+  onDark,
+}: {
+  value?: number;
+  tone?: 'danger';
+  onDark?: boolean;
+}) {
   if (!value || value <= 0) return null;
   return (
     <span
       className={cn(
-        'rounded-full px-1.5 text-[11px] font-medium tabular-nums leading-5',
-        tone === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-surface-3 text-muted-foreground',
+        'min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-semibold tabular-nums leading-5',
+        tone === 'danger'
+          ? 'bg-danger text-danger-foreground'
+          : onDark
+            ? 'bg-primary-foreground/20 text-primary-foreground'
+            : 'bg-primary-surface text-primary-strong',
       )}
     >
       {value}

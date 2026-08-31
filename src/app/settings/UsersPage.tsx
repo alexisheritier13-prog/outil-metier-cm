@@ -30,7 +30,7 @@ export function UsersPage() {
         actions={<CreateUserDialog />}
       />
 
-      <div className="overflow-x-auto rounded-md border">
+      <div className="surface-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-surface-2 text-muted-foreground text-left">
             <tr>

@@ -67,7 +67,7 @@ export function TrashPage() {
           {trashedClients.length > 0 && (
             <div>
               <h2 className="text-section mb-2">Clients ({trashedClients.length})</h2>
-              <div className="overflow-x-auto rounded-md border">
+              <div className="surface-card overflow-x-auto">
                 <table className="w-full text-sm">
                   <tbody>
                     {trashedClients.map((c) => (
@@ -105,7 +105,7 @@ export function TrashPage() {
           {trashedPosts.length > 0 && (
             <div>
               <h2 className="text-section mb-2">Posts ({trashedPosts.length})</h2>
-              <div className="overflow-x-auto rounded-md border">
+              <div className="surface-card overflow-x-auto">
                 <table className="w-full text-sm">
                   <tbody>
                     {trashedPosts.map((p) => (

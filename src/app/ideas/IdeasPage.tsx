@@ -121,7 +121,7 @@ export function IdeasPage() {
               <button
                 type="button"
                 onClick={() => setOpenId(i.id)}
-                className="hover:bg-surface-2/60 flex h-full w-full flex-col gap-1 rounded-md border p-3 text-left"
+                className="hover:bg-surface-2/60 flex h-full w-full flex-col gap-1 rounded-xl border p-3 text-left shadow-xs"
               >
                 <span className="font-medium">{i.title}</span>
                 <span className="text-muted-foreground line-clamp-2 text-sm">
@@ -192,7 +192,7 @@ function IdeaForm({
   }
 
   return (
-    <form onSubmit={submit} className="mb-6 space-y-3 rounded-md border p-4">
+    <form onSubmit={submit} className="surface-card mb-6 space-y-3 p-4">
       <input
         className="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
         placeholder="Titre de l'idée"

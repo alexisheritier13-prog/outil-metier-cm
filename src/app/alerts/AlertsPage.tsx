@@ -156,7 +156,7 @@ export function AlertsPage() {
             <li
               key={a.id}
               className={cn(
-                'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border p-3 text-sm',
+                'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border p-3 text-sm',
                 SEVERITY[a.severity].card,
                 a.status === 'dismissed' && 'opacity-50',
               )}

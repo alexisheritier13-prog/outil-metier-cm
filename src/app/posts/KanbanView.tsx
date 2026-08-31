@@ -59,7 +59,7 @@ export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onTog
           <div
             key={status}
             className={cn(
-              'bg-surface-2 flex w-72 shrink-0 flex-col rounded-md border',
+              'bg-surface-2 flex w-72 shrink-0 flex-col rounded-xl border',
               overCol === status && droppable && 'ring-foreground ring-2',
             )}
             onDragOver={(e) => {

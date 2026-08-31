@@ -1,7 +1,17 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Inbox, MessageSquareText, Send, TriangleAlert } from 'lucide-react';
+import {
+  Activity,
+  ArrowRight,
+  CalendarRange,
+  GaugeCircle,
+  Inbox,
+  MessageSquareText,
+  Send,
+  TriangleAlert,
+  Users,
+} from 'lucide-react';
 import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +20,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
+import { POST_STATUSES, POST_STATUS_LABELS, type PostStatus } from '@/shared/constants/postStatus';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import { listPosts, listReviewQueue } from '@/services/posts';
 import type { Post } from '@/shared/types';
@@ -19,6 +30,24 @@ import { listClients } from '@/services/clients';
 import { listRecentActivity } from '@/services/clientActivity';
 import { ALERT_TYPE_LABELS } from '@/shared/types';
 import { activityLabel } from '@/app/clients/tabs/activity';
+
+type IconType = typeof Inbox;
+
+const PIPELINE_STATUSES = POST_STATUSES.filter((s) => s !== 'published');
+const STATUS_BAR_COLOR: Record<PostStatus, string> = {
+  draft: 'var(--border-strong)',
+  internal_review: 'var(--info)',
+  client_review: 'var(--warning)',
+  approved: 'var(--success)',
+  scheduled: 'var(--primary)',
+  published: 'var(--muted-foreground)',
+};
+
+const TILE_ACCENT = {
+  primary: 'bg-primary text-primary-foreground',
+  info: 'bg-info text-info-foreground',
+  success: 'bg-success text-success-foreground',
+} as const;
 
 const DAY_MS = 86_400_000;
 
@@ -60,6 +89,17 @@ export function DashboardPage() {
       }),
   });
   const activityQ = useQuery({ queryKey: ['dashboard', 'activity'], queryFn: () => listRecentActivity(8) });
+  const pipelineQ = useQuery({
+    queryKey: ['dashboard', 'pipeline'],
+    queryFn: () => listPosts({ statuses: PIPELINE_STATUSES }),
+  });
+
+  const pipelineCounts = useMemo(() => {
+    const c = Object.fromEntries(PIPELINE_STATUSES.map((s) => [s, 0])) as Record<PostStatus, number>;
+    for (const p of pipelineQ.data ?? []) c[p.status] = (c[p.status] ?? 0) + 1;
+    return c;
+  }, [pipelineQ.data]);
+  const pipelineTotal = (pipelineQ.data ?? []).length;
 
   const clientName = useMemo(() => {
     const m = new Map((clientsQ.data ?? []).map((c) => [c.id, c.name]));
@@ -108,10 +148,11 @@ export function DashboardPage() {
       <PageHeader title={`Bonjour ${firstName}`} description={today} />
 
       {/* À traiter */}
-      <div className="mb-8 grid gap-4 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid gap-4 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           to="/app/a-valider"
           icon={Inbox}
+          accent="primary"
           label="À valider en interne"
           value={internalQ.data?.length}
           loading={internalQ.isLoading}
@@ -119,6 +160,7 @@ export function DashboardPage() {
         <StatTile
           to="/app/a-valider"
           icon={Send}
+          accent="info"
           label="En attente du client"
           value={clientQ.data?.length}
           loading={clientQ.isLoading}
@@ -126,7 +168,8 @@ export function DashboardPage() {
         <StatTile
           to="/app/demandes"
           icon={MessageSquareText}
-          label="Demandes clients ouvertes"
+          accent="success"
+          label="Demandes ouvertes"
           value={openRequests.length}
           loading={requestsQ.isLoading}
         />
@@ -140,10 +183,18 @@ export function DashboardPage() {
         />
       </div>
 
+      <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards mb-6 duration-300 [animation-delay:220ms]">
+        <ProductionPanel
+          counts={pipelineCounts}
+          total={pipelineTotal}
+          loading={pipelineQ.isLoading}
+        />
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Cette semaine */}
         <section className="lg:col-span-2">
-          <SectionTitle to="/app/planning" label="Cette semaine" />
+          <SectionTitle to="/app/planning" icon={CalendarRange} label="Cette semaine" />
           <div className="surface-card">
             {weekQ.isLoading ? (
               <div className="space-y-2 p-4">
@@ -196,7 +247,7 @@ export function DashboardPage() {
         {/* Colonne droite */}
         <div className="space-y-6">
           <section>
-            <SectionTitle label="Clients à surveiller" />
+            <SectionTitle icon={Users} label="Clients à surveiller" />
             <div className="surface-card">
               {alertsQ.isLoading ? (
                 <div className="space-y-2 p-4">
@@ -232,7 +283,7 @@ export function DashboardPage() {
           </section>
 
           <section>
-            <SectionTitle label="Activité récente" />
+            <SectionTitle icon={Activity} label="Activité récente" />
             <div className="surface-card">
               {activityQ.isLoading ? (
                 <div className="space-y-2 p-4">
@@ -274,52 +325,150 @@ function StatTile({
   label,
   value,
   loading,
+  accent = 'primary',
   tone,
 }: {
   to: string;
-  icon: typeof Inbox;
+  icon: IconType;
   label: string;
   value?: number;
   loading?: boolean;
+  accent?: keyof typeof TILE_ACCENT;
   tone?: 'danger' | 'warning';
 }) {
   return (
     <Link
       to={to}
       className={cn(
-        'surface-card group hover:shadow-md flex flex-col gap-3 p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5',
+        'surface-card group flex items-center gap-3.5 p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
         tone === 'danger' && 'ring-danger-border bg-danger-surface ring-1',
         tone === 'warning' && 'ring-warning-border bg-warning-surface ring-1',
       )}
     >
       <span
         className={cn(
-          'text-muted-foreground flex items-center gap-2 text-xs font-medium',
-          tone === 'danger' && 'text-danger-strong',
-          tone === 'warning' && 'text-warning-strong',
+          'grid h-10 w-10 shrink-0 place-items-center rounded-xl',
+          tone === 'danger'
+            ? 'bg-danger text-danger-foreground'
+            : tone === 'warning'
+              ? 'bg-warning text-warning-foreground'
+              : TILE_ACCENT[accent],
         )}
       >
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-        {label}
+        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
       </span>
-      <span className="flex items-baseline gap-1.5">
+      <span className="min-w-0 flex-1">
         {loading ? (
           <Skeleton className="h-7 w-10" />
         ) : (
-          <span className="text-[1.75rem] font-semibold tabular-nums leading-none tracking-tight">
+          <span className="block text-[1.65rem] font-semibold tabular-nums leading-none tracking-tight">
             {value ?? 0}
           </span>
         )}
-        <ArrowRight className="text-muted-foreground h-4 w-4 -translate-x-1 self-center opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+        <span
+          className={cn(
+            'mt-1 block truncate text-xs font-medium',
+            tone === 'danger'
+              ? 'text-danger-strong'
+              : tone === 'warning'
+                ? 'text-warning-strong'
+                : 'text-muted-foreground',
+          )}
+        >
+          {label}
+        </span>
       </span>
+      <ArrowRight
+        className="text-muted-foreground h-4 w-4 shrink-0 -translate-x-1 self-center opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+        aria-hidden="true"
+      />
     </Link>
   );
 }
 
-function SectionTitle({ label, to }: { label: string; to?: string }) {
+function ProductionPanel({
+  counts,
+  total,
+  loading,
+}: {
+  counts: Record<PostStatus, number>;
+  total: number;
+  loading?: boolean;
+}) {
+  return (
+    <section className="surface-card p-4 sm:p-5">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="bg-primary text-primary-foreground grid h-8 w-8 shrink-0 place-items-center rounded-lg">
+            <GaugeCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+          </span>
+          <div>
+            <h2 className="text-section leading-tight">Production en cours</h2>
+            <p className="text-muted-foreground text-xs">Posts en préparation, hors publiés</p>
+          </div>
+        </div>
+        {loading ? (
+          <Skeleton className="h-7 w-10" />
+        ) : (
+          <span className="text-2xl font-semibold tabular-nums leading-none tracking-tight">
+            {total}
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <Skeleton className="h-2.5 w-full rounded-full" />
+      ) : total === 0 ? (
+        <p className="text-muted-foreground text-sm">Aucun post en préparation pour le moment.</p>
+      ) : (
+        <>
+          <div className="bg-surface-2 flex h-2.5 overflow-hidden rounded-full">
+            {PIPELINE_STATUSES.map((s) =>
+              counts[s] > 0 ? (
+                <span
+                  key={s}
+                  className="h-full"
+                  style={{
+                    width: `${(counts[s] / total) * 100}%`,
+                    backgroundColor: STATUS_BAR_COLOR[s],
+                  }}
+                  title={`${POST_STATUS_LABELS[s]} : ${counts[s]}`}
+                />
+              ) : null,
+            )}
+          </div>
+          <ul className="mt-4 grid gap-x-5 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-3">
+            {PIPELINE_STATUSES.map((s) => (
+              <li key={s} className="flex items-center gap-2 text-sm">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: STATUS_BAR_COLOR[s] }}
+                  aria-hidden="true"
+                />
+                <span className="text-muted-foreground min-w-0 flex-1 truncate">
+                  {POST_STATUS_LABELS[s]}
+                </span>
+                <span className="font-medium tabular-nums">{counts[s]}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
+function SectionTitle({ label, to, icon: Icon }: { label: string; to?: string; icon?: IconType }) {
   return (
     <div className="mb-3 flex items-center justify-between">
-      <h2 className="text-section">{label}</h2>
+      <h2 className="text-section flex items-center gap-2">
+        {Icon && (
+          <span className="bg-primary text-primary-foreground grid h-6 w-6 shrink-0 place-items-center rounded-md">
+            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
+        )}
+        {label}
+      </h2>
       {to && (
         <Link
           to={to}

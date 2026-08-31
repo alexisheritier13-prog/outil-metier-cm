@@ -73,7 +73,7 @@ export function CampaignsPage() {
           description="Créez une campagne pour regrouper les posts d'un temps fort."
         />
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-surface-2 text-left">
               <tr>

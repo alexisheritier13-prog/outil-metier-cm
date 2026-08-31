@@ -93,7 +93,7 @@ export function SocialAccountsTab({ clientId }: { clientId: string }) {
       )}
 
       {adding && (
-        <form onSubmit={submit} className="bg-surface-2 space-y-3 rounded-md border p-4">
+        <form onSubmit={submit} className="surface-card space-y-3 p-4">
           <div className="flex flex-wrap gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="sa-network">Réseau</Label>

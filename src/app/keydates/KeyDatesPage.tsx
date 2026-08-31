@@ -97,7 +97,7 @@ export function KeyDatesPage() {
             byMonth[m]?.length ? (
               <div key={m}>
                 <h2 className="text-section mb-2 capitalize">{label}</h2>
-                <ul className="divide-y rounded-md border">
+                <ul className="surface-card divide-y overflow-hidden">
                   {byMonth[m]
                     .slice()
                     // tri par mois-jour (l'année stockée est arbitraire pour un marronnier annuel)
@@ -250,7 +250,7 @@ function KeyDateForm({
 
   return (
     <form
-      className="mb-6 space-y-3 rounded-md border p-4"
+      className="surface-card mb-6 space-y-3 p-4"
       onSubmit={(e) => {
         e.preventDefault();
         if (!valid) return;

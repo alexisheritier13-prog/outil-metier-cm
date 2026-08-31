@@ -71,7 +71,7 @@ export function PortalBriefsPage() {
       </header>
 
       {creating && (
-        <form onSubmit={submitNew} className="mb-6 space-y-3 rounded-md border p-4">
+        <form onSubmit={submitNew} className="surface-card mb-6 space-y-3 p-4">
           <input
             className="border-input bg-background focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
             placeholder="Titre de la demande"

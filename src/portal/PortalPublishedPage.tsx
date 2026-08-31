@@ -100,7 +100,7 @@ export function PortalPublishedPage() {
               <button
                 type="button"
                 onClick={() => setOpenId(p.id)}
-                className="hover:bg-surface-2/60 flex w-full gap-3 rounded-md border p-3 text-left"
+                className="hover:bg-surface-2/60 flex w-full gap-3 rounded-xl border p-3 text-left shadow-xs"
               >
                 {(mediaByPost.data?.get(p.id) ?? []).length > 0 ? (
                   <FirstMediaThumb

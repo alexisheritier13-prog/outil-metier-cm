@@ -56,7 +56,7 @@ export function OnboardingTab({ clientId }: { clientId: string }) {
         Avancement : <span className="text-foreground font-medium">{done}/{rows.length}</span>
       </p>
 
-      <ul className="divide-y rounded-md border">
+      <ul className="surface-card divide-y overflow-hidden">
         {rows.map((item, i) => (
           <li key={item.id} className="flex items-center gap-3 p-2">
             <input

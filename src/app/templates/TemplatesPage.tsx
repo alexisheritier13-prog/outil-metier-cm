@@ -72,7 +72,7 @@ export function TemplatesPage() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {(templates.data ?? []).map((t) => (
-            <li key={t.id} className="rounded-md border p-3">
+            <li key={t.id} className="rounded-xl border bg-surface p-3 shadow-xs">
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-medium">{t.name}</p>
@@ -147,7 +147,7 @@ function TemplateForm({
 
   return (
     <form
-      className="mb-6 space-y-3 rounded-md border p-4"
+      className="surface-card mb-6 space-y-3 p-4"
       onSubmit={(e) => {
         e.preventDefault();
         if (!name.trim()) return;

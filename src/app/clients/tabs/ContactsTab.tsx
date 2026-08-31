@@ -102,7 +102,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
       )}
 
       {lastLink && (
-        <div className="bg-surface-2 space-y-2 rounded-md border p-4 text-sm">
+        <div className="surface-card space-y-2 p-4 text-sm">
           <p className="font-medium">Lien de définition du mot de passe</p>
           <p className="text-muted-foreground">
             Aucun email n'est envoyé : transmettez ce lien au contact.
@@ -117,7 +117,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
       )}
 
       {adding && (
-        <form onSubmit={submit} className="bg-surface-2 space-y-3 rounded-md border p-4">
+        <form onSubmit={submit} className="surface-card space-y-3 p-4">
           <div className="flex flex-wrap gap-3">
             <div className="flex-1 space-y-1.5">
               <Label htmlFor="cc-name">Nom</Label>

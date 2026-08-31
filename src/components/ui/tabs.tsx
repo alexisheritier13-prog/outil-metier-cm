@@ -27,7 +27,7 @@ export const TabsTrigger = forwardRef<
       className={cn(
         'text-muted-foreground -mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium transition-colors',
         'hover:text-foreground focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2',
-        'data-[state=active]:border-foreground data-[state=active]:text-foreground',
+        'data-[state=active]:border-primary data-[state=active]:text-foreground',
         className,
       )}
       {...props}
@@ -42,7 +42,7 @@ export const TabsContent = forwardRef<
   return (
     <TabsPrimitive.Content
       ref={ref}
-      className={cn('focus-visible:ring-ring pt-6 focus-visible:outline-none focus-visible:ring-2', className)}
+      className={cn('focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2', className)}
       {...props}
     />
   );

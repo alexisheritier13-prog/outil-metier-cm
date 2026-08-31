@@ -33,7 +33,7 @@ export function SettingsHome() {
   return (
     <Page size="form">
       <PageHeader title="Paramètres" />
-      <ul className="divide-y rounded-md border">
+      <ul className="surface-card divide-y overflow-hidden">
         {LINKS.map((l) => (
           <li key={l.to}>
             <NavLink

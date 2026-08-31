@@ -152,7 +152,7 @@ export function ClientDetailPage() {
           <TabsTrigger value="activity">Activité</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview">
+        <TabsContent value="overview" className="surface-card mt-4 p-5">
           <dl className="grid max-w-md grid-cols-[10rem_1fr] gap-y-3 text-sm">
             <dt className="text-muted-foreground">Nom</dt>
             <dd>{c.name}</dd>
@@ -173,23 +173,23 @@ export function ClientDetailPage() {
           </dl>
         </TabsContent>
 
-        <TabsContent value="social">
+        <TabsContent value="social" className="surface-card mt-4 p-5">
           <SocialAccountsTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="contacts">
+        <TabsContent value="contacts" className="surface-card mt-4 p-5">
           <ContactsTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="guidelines">
+        <TabsContent value="guidelines" className="surface-card mt-4 p-5">
           <GuidelinesTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="onboarding">
+        <TabsContent value="onboarding" className="surface-card mt-4 p-5">
           <OnboardingTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="activity">
+        <TabsContent value="activity" className="surface-card mt-4 p-5">
           <ActivityTab clientId={c.id} />
         </TabsContent>
       </Tabs>

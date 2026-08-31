@@ -95,7 +95,7 @@ export function RequestsPage() {
       {rows.length === 0 ? (
         <EmptyState icon={Inbox} title="Aucune demande" description="Rien à traiter pour l'instant." />
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-surface-2 text-muted-foreground">
               <tr>

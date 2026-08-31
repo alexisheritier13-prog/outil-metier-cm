@@ -64,7 +64,7 @@ export function JobsPage() {
       {runs.data && runs.data.length === 0 ? (
         <EmptyState title="Aucune exécution" description="Les jobs n'ont pas encore tourné." />
       ) : (
-        <div className="overflow-x-auto rounded-md border">
+        <div className="surface-card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-surface-2 text-muted-foreground">
               <tr>
