@@ -39,6 +39,9 @@ const PortalCalendarPage = lazy(() =>
 const PortalReviewPage = lazy(() =>
   import('@/portal/PortalReviewPage').then((m) => ({ default: m.PortalReviewPage })),
 );
+const PortalPublishedPage = lazy(() =>
+  import('@/portal/PortalPublishedPage').then((m) => ({ default: m.PortalPublishedPage })),
+);
 const PortalSoonPage = lazy(() =>
   import('@/portal/PortalSoonPage').then((m) => ({ default: m.PortalSoonPage })),
 );
@@ -81,15 +84,7 @@ export const router = createBrowserRouter(
       children: [
         { index: true, element: lazyRoute(<PortalCalendarPage />) },
         { path: 'a-valider', element: lazyRoute(<PortalReviewPage />) },
-        {
-          path: 'publies',
-          element: lazyRoute(
-            <PortalSoonPage
-              title="Publiés"
-              note="L'historique de vos posts publiés arrive très bientôt."
-            />,
-          ),
-        },
+        { path: 'publies', element: lazyRoute(<PortalPublishedPage />) },
         {
           path: 'briefs',
           element: lazyRoute(

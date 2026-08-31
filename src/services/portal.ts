@@ -8,6 +8,7 @@ import {
   type PostComment,
 } from '@/shared/types';
 import { CLIENT_VISIBLE_STATUSES, type PostStatus } from '@/shared/constants/postStatus';
+import type { Network } from '@/shared/constants/networks';
 
 /**
  * Espace client (`/portail`). Toutes ces requêtes sont contraintes par la RLS au(x)
@@ -24,6 +25,7 @@ export async function listMyClients(): Promise<Client[]> {
 
 export interface PortalPostFilters {
   statuses?: PostStatus[];
+  networks?: Network[];
   from?: string | null;
   to?: string | null;
   q?: string;
@@ -43,6 +45,7 @@ export async function listPortalPosts(
     .is('deleted_at', null)
     .eq('client_id', clientId)
     .in('status', statuses);
+  if (filters.networks?.length) q = q.in('network', filters.networks);
   if (filters.from) q = q.gte('scheduled_at', filters.from);
   if (filters.to) q = q.lte('scheduled_at', filters.to);
   if (filters.q?.trim()) {
@@ -50,7 +53,15 @@ export async function listPortalPosts(
   }
   const { data, error } = await q.order('scheduled_at');
   if (error) throw error;
-  return data.map(toPost);
+  return data.map((row) => redactClientPost(toPost(row)));
+}
+
+/**
+ * La note de performance n'est exposée au client que si elle est explicitement marquée
+ * visible — la RLS renvoie la colonne, on la masque ici (garde applicative).
+ */
+export function redactClientPost(post: Post): Post {
+  return post.performanceVisibleToClient ? post : { ...post, performanceNote: null };
 }
 
 /** Nombre de posts en attente de la réponse du contact (statut `client_review`). */
@@ -73,7 +84,7 @@ export async function getPortalPost(id: string): Promise<Post | null> {
     .is('deleted_at', null)
     .maybeSingle();
   if (error) throw error;
-  return data ? toPost(data) : null;
+  return data ? redactClientPost(toPost(data)) : null;
 }
 
 /** Commentaires visibles par le client (la RLS ne renvoie que `visibility = 'client'`). */
