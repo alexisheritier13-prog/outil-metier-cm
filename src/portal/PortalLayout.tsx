@@ -9,6 +9,7 @@ import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { listMyClients } from '@/services/portal';
 import { PortalClientContext } from './PortalClientContext';
+import { usePortalPendingCount } from './usePortal';
 
 const STORE_KEY = 'portal.clientId';
 
@@ -29,6 +30,7 @@ export function PortalLayout() {
 
   const list = clients.data ?? [];
   const active = list.find((c) => c.id === clientId) ?? list[0] ?? null;
+  const pending = usePortalPendingCount(active?.id ?? null);
 
   useEffect(() => {
     if (active && active.id !== clientId) setClientId(active.id);
@@ -101,7 +103,14 @@ export function PortalLayout() {
             <PortalNav to="/portail" end>
               Calendrier
             </PortalNav>
-            <PortalNav to="/portail/a-valider">À valider</PortalNav>
+            <PortalNav to="/portail/a-valider">
+              À valider
+              {(pending.data ?? 0) > 0 && (
+                <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
+                  {pending.data}
+                </span>
+              )}
+            </PortalNav>
             <PortalNav to="/portail/publies">Publiés</PortalNav>
             <PortalNav to="/portail/briefs">Briefs</PortalNav>
           </nav>

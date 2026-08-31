@@ -45,7 +45,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Story 5.4** faite : file « À valider » (`/app/a-valider`) — onglets interne / client, tri par ancienneté, actions rapides (ouvrir, valider en interne, relancer le client via `remind_client_review`), pastille de compteur dans la navigation. 157 tests.
 - **Story 5.5** faite : journal d'activité par client — vue `client_activity`, onglet « Activité » de la fiche client (filtres type + période) ; `client_overview` recâblée sur les vrais compteurs `pending_*` / `last_activity_at`. **Epic 5 terminé** — 163 tests.
 - **Stories 6.1 + 6.2** faites : espace client `/portail` — layout isolé (RLS `clients_select_contact`, migr 0021), sélecteur multi-clients, calendrier mois/liste (lecture), détail post client (`PortalPostDetail`, échanges `client` uniquement). Test d'isolation A≠B central. 171 tests.
-- Prochaine : Epic 6 (6.3 approbation/refus client, 6.4 publiés, 6.5 briefs).
+- **Story 6.3** faite : approbation / refus + commentaires côté client — boutons Approuver / Demander une modification (RPC 5.3), fil de commentaires client, file `/portail/a-valider` + compteur nav. 175 tests. (E2E Playwright → Epic 9.)
+- Prochaine : Epic 6 (6.4 publiés, 6.5 briefs).
 
 ### Tests
 

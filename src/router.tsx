@@ -36,6 +36,9 @@ const PortalLayout = lazy(() =>
 const PortalCalendarPage = lazy(() =>
   import('@/portal/PortalCalendarPage').then((m) => ({ default: m.PortalCalendarPage })),
 );
+const PortalReviewPage = lazy(() =>
+  import('@/portal/PortalReviewPage').then((m) => ({ default: m.PortalReviewPage })),
+);
 const PortalSoonPage = lazy(() =>
   import('@/portal/PortalSoonPage').then((m) => ({ default: m.PortalSoonPage })),
 );
@@ -77,15 +80,7 @@ export const router = createBrowserRouter(
       element: <RequireRole roles={['client']}>{lazyRoute(<PortalLayout />)}</RequireRole>,
       children: [
         { index: true, element: lazyRoute(<PortalCalendarPage />) },
-        {
-          path: 'a-valider',
-          element: lazyRoute(
-            <PortalSoonPage
-              title="À valider"
-              note="La file des posts en attente de votre réponse arrive très bientôt."
-            />,
-          ),
-        },
+        { path: 'a-valider', element: lazyRoute(<PortalReviewPage />) },
         {
           path: 'publies',
           element: lazyRoute(

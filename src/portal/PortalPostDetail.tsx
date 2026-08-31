@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -7,29 +7,26 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
-import { listPortalComments } from '@/services/portal';
+import { useAddPortalComment, useApprovePost, usePortalComments, useRejectPost } from './usePortal';
 
 /**
- * Détail d'un post côté client (Story 6.2). Lecture seule : réseau, date, légende,
- * aperçu Canva, statut, commentaires `client`. Jamais d'historique, de rédacteur, de
- * commentaire interne ni d'autre client. Les actions (approuver / commenter) = Story 6.3.
+ * Détail d'un post côté client (Stories 6.2 + 6.3). Lecture des méta + échanges `client`,
+ * ajout de commentaires, et — si le post est « à valider client » — approbation ou demande
+ * de modification (RPC de la Story 5.3).
  */
-export function PortalPostDetail({
-  post,
-  onClose,
-  footer,
-}: {
-  post: Post | null;
-  onClose: () => void;
-  footer?: React.ReactNode;
-}) {
-  const comments = useQuery({
-    queryKey: ['portal', 'comments', post?.id],
-    queryFn: () => listPortalComments(post!.id),
-    enabled: Boolean(post),
-  });
+export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose: () => void }) {
+  const comments = usePortalComments(post?.id ?? null);
+  const addComment = useAddPortalComment(post?.id ?? '');
+  const approve = useApprovePost();
+  const reject = useRejectPost();
+
+  const [body, setBody] = useState('');
+  const [rejectMode, setRejectMode] = useState(false);
+  const [rejectComment, setRejectComment] = useState('');
 
   if (!post) return null;
+  const pending = post.status === 'client_review';
+  const busy = approve.isPending || reject.isPending;
 
   return (
     <Sheet open onOpenChange={(v) => !v && onClose()}>
@@ -69,12 +66,7 @@ export function PortalPostDetail({
               <>
                 <dt className="text-muted-foreground">Visuel</dt>
                 <dd className="truncate">
-                  <a
-                    href={post.canvaUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:underline"
-                  >
+                  <a href={post.canvaUrl} target="_blank" rel="noreferrer" className="hover:underline">
                     Ouvrir dans Canva
                   </a>
                 </dd>
@@ -107,10 +99,80 @@ export function PortalPostDetail({
                 ))}
               </ul>
             )}
+
+            <form
+              className="mt-3 space-y-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!body.trim()) return;
+                addComment.mutate(body, { onSuccess: () => setBody('') });
+              }}
+            >
+              <textarea
+                className="border-input bg-background focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+                rows={2}
+                placeholder="Ajouter un commentaire…"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                aria-label="Nouveau commentaire"
+              />
+              <Button size="sm" type="submit" disabled={addComment.isPending || !body.trim()}>
+                Commenter
+              </Button>
+            </form>
           </div>
         </div>
 
-        {footer && <footer className="border-t p-4">{footer}</footer>}
+        {pending && (
+          <footer className="space-y-2 border-t p-4">
+            {reject.isError && (
+              <p className="text-destructive text-xs">{(reject.error as Error).message}</p>
+            )}
+            {approve.isError && (
+              <p className="text-destructive text-xs">{(approve.error as Error).message}</p>
+            )}
+
+            {rejectMode ? (
+              <div className="space-y-2">
+                <label className="text-sm font-medium" htmlFor="reject-comment">
+                  Que faut-il modifier ?
+                </label>
+                <textarea
+                  id="reject-comment"
+                  className="border-input bg-background focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+                  rows={3}
+                  value={rejectComment}
+                  onChange={(e) => setRejectComment(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    disabled={!rejectComment.trim() || busy}
+                    onClick={() =>
+                      reject.mutate(
+                        { postId: post.id, comment: rejectComment.trim() },
+                        { onSuccess: () => setRejectMode(false) },
+                      )
+                    }
+                  >
+                    Envoyer la demande
+                  </Button>
+                  <Button variant="ghost" onClick={() => setRejectMode(false)}>
+                    Annuler
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button disabled={busy} onClick={() => approve.mutate(post.id)}>
+                  Approuver
+                </Button>
+                <Button variant="outline" disabled={busy} onClick={() => setRejectMode(true)}>
+                  Demander une modification
+                </Button>
+              </div>
+            )}
+          </footer>
+        )}
       </SheetContent>
     </Sheet>
   );

@@ -53,6 +53,18 @@ export async function listPortalPosts(
   return data.map(toPost);
 }
 
+/** Nombre de posts en attente de la réponse du contact (statut `client_review`). */
+export async function countPortalPending(clientId: string): Promise<number> {
+  const { count, error } = await getSupabase()
+    .from('posts')
+    .select('id', { count: 'exact', head: true })
+    .is('deleted_at', null)
+    .eq('client_id', clientId)
+    .eq('status', 'client_review');
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function getPortalPost(id: string): Promise<Post | null> {
   const { data, error } = await getSupabase()
     .from('posts')
