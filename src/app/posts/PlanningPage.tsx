@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { CalendarArrowDown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,6 +20,9 @@ import { listInternalUsers } from '@/services/users';
 import { listPostTemplates } from '@/services/postTemplates';
 import { listKeyDates } from '@/services/keyDates';
 import { keyDateOccurrences } from './keyDateEvents';
+import { postsToIcs } from '@/shared/utils/ics';
+import { parisDateKey } from '@/shared/utils/tz';
+import { downloadTextFile } from '@/lib/download';
 import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
 import { PostsTable } from './PostsTable';
@@ -112,6 +115,13 @@ export function PlanningPage() {
       return next;
     });
 
+  function exportIcs() {
+    const rows = posts.data ?? [];
+    if (rows.length === 0) return;
+    const ics = postsToIcs(rows, { clientName });
+    downloadTextFile(`calendrier-${parisDateKey(new Date().toISOString())}.ics`, 'text/calendar', ics);
+  }
+
   function closeSheet() {
     setOpenPost(null);
     if (searchParams.has('post')) {
@@ -144,6 +154,15 @@ export function PlanningPage() {
           />
         }
         actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={exportIcs}
+              disabled={rows.length === 0}
+              title="Exporter le résultat filtré au format iCalendar"
+            >
+              <CalendarArrowDown className="h-4 w-4" /> Exporter .ics
+            </Button>
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
             <DialogTrigger asChild>
               <Button disabled={!hasClients}>
@@ -170,6 +189,7 @@ export function PlanningPage() {
               />
             </DialogContent>
           </Dialog>
+          </div>
         }
       />
 

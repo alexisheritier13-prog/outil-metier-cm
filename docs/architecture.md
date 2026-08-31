@@ -138,7 +138,7 @@ graph TD
 | Serverless Functions | Supabase Edge Functions (Deno) | Deno 1.4x runtime | canva-preview, export-pdf, orchestration jobs | Pas de serveur, proche DB |
 | Scheduler | pg_cron + pg_net | extensions PG | Déclenchement quotidien/horaire des jobs | Natif Postgres, pas de service externe |
 | PDF | Edge Function HTML→PDF (`@react-pdf/renderer` en Deno) ou `react-pdf` côté client | 3.x | Export PDF calendrier client | Décision : rendu côté Edge pour fidélité et cohérence serveur |
-| ICS | `ics` (npm) côté client | 3.x | Export .ics | Génération locale simple |
+| ICS | générateur maison `src/shared/utils/ics.ts` (pur, zéro dépendance) | — | Export .ics (Story 9.2) | RFC 5545 : `VTIMEZONE` Europe/Paris statique + `DTSTART;TZID`, échappement et pliage de lignes testés. Un paquet npm n'apportait rien de plus. |
 | Frontend Testing | Vitest + React Testing Library | vitest 2.x / RTL 16.x | Tests unitaires composants + logique | Intégré Vite |
 | RLS / DB Testing | pgTAP + scripts SQL via Supabase CLI | pgTAP 1.3.x | Tests des policies d'isolation | Vérifie la sécurité au bon niveau |
 | E2E Testing | Playwright | 1.47.x | 3 parcours critiques | Fiable, multi-navigateur |

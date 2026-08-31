@@ -61,7 +61,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Passe couleur sémantique** faite (`impeccable colorize`) : tokens `--success` / `--warning` / `--danger` / `--info` (OKLCH), statuts de post et sévérité d'alertes colorés, boutons `success` / `destructive`, badge « Alertes » rouge. Le reste reste noir & blanc. `PRODUCT.md` + `DESIGN.md` ajoutés.
 - **Refonte coquille « SaaS »** faite : barre latérale (`AppSidebar`, groupes repliables), dashboard d'accueil (`/app`), calendrier déplacé sur `/app/planning`, accent indigo, portail client réaligné, dates lisibles FR (`10 sept. 2026`).
 - **Story 9.1** faite : sélection multiple + actions en masse (Liste et Kanban) — barre flottante `BulkActionBar` (dupliquer / statut / réassigner / corbeille), exécution atomique par post avec récapitulatif des échecs (`useBulkActions`). Aucune migration (réutilise les RPC unitaires). 16 tests unitaires + 3 d'intégration.
-- Prochaine : Epic 9 — suite (exports `.ics` / PDF, champ performance, a11y AA + polish).
+- **Story 9.2** faite : export `.ics` du calendrier filtré (bouton dans `/app/planning`) — générateur pur `postsToIcs` conforme RFC 5545 (VTIMEZONE Europe/Paris, échappement, pliage), `downloadTextFile`. 10 tests unitaires, zéro dépendance ajoutée.
+- Prochaine : Epic 9 — suite (export PDF client, champ performance, a11y AA + polish).
 
 ### Tests
 
