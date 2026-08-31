@@ -84,7 +84,7 @@ export function TrashPage() {
                           {isAdmin && (
                             <Button
                               size="sm"
-                              variant="ghost"
+                              variant="ghost" className="text-danger-strong hover:bg-danger-surface hover:text-danger-strong"
                               onClick={() => {
                                 if (confirm(`Supprimer définitivement « ${c.name} » ?`))
                                   purgeClientM.mutate(c.id);
@@ -127,7 +127,7 @@ export function TrashPage() {
                           {isAdmin && (
                             <Button
                               size="sm"
-                              variant="ghost"
+                              variant="ghost" className="text-danger-strong hover:bg-danger-surface hover:text-danger-strong"
                               onClick={() => {
                                 if (confirm('Supprimer définitivement ce post ?'))
                                   purgePostM.mutate(p.id);

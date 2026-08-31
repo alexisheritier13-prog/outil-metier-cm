@@ -33,6 +33,6 @@ describe('GuidelinesTab', () => {
       'c1',
       expect.objectContaining({ tone: 'Direct. et chaleureux.' }),
     );
-    expect(await screen.findByText(/enregistré\./i)).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent(/enregistré/i);
   });
 });

@@ -163,7 +163,7 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button disabled={busy} onClick={() => approve.mutate(post.id)}>
+                <Button variant="success" disabled={busy} onClick={() => approve.mutate(post.id)}>
                   Approuver
                 </Button>
                 <Button variant="outline" disabled={busy} onClick={() => setRejectMode(true)}>

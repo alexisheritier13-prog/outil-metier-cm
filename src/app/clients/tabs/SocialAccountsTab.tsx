@@ -68,6 +68,7 @@ export function SocialAccountsTab({ clientId }: { clientId: string }) {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
                       aria-label={`Supprimer ${a.handle}`}
                       disabled={remove.isPending}
                       onClick={() => {

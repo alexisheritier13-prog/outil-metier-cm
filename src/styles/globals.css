@@ -5,9 +5,11 @@
 @tailwind utilities;
 
 /*
- * Palette monochrome (noir & blanc) — la couleur sémantique (success/warning/danger,
- * accent) sera ajoutée dans une passe ultérieure. Tokens en OKLCH, chroma 0.
- * Le mode sombre est préparé mais pas activé en v1.
+ * Neutres monochromes (noir & blanc assumés, chroma 0). La couleur est STRICTEMENT
+ * sémantique : succès (vert), attention (ambre), danger (rouge), info (bleu) — jamais
+ * décorative, jamais seule (toujours doublée d'un texte + icône). Tokens en OKLCH.
+ * Valeurs sémantiques calées sur les échelles WCAG de Tailwind (emerald/amber/red/blue).
+ * Mode sombre : préparé dans docs/front-end-spec.md §6.2, non activé en v1.
  */
 @layer base {
   :root {
@@ -24,14 +26,45 @@
     --border: oklch(0.9 0 0);
     --input: oklch(0.86 0 0);
     --ring: oklch(0.22 0 0);
-    --primary: oklch(0.22 0 0);
+    --primary: oklch(0.22 0 0); /* accent monochrome — passe couleur ultérieure */
     --primary-foreground: oklch(1 0 0);
     --secondary: oklch(0.965 0 0);
     --secondary-foreground: oklch(0.22 0 0);
     --accent: oklch(0.95 0 0);
     --accent-foreground: oklch(0.22 0 0);
-    --destructive: oklch(0.3 0 0); /* neutre pour l'instant ; deviendra rouge à la passe couleur */
-    --destructive-foreground: oklch(1 0 0);
+
+    /* ── Sémantique : succès (vert · hue ~158) ── */
+    --success: oklch(0.52 0.11 158); /* aplat, texte blanc ~5.3:1 */
+    --success-foreground: oklch(0.99 0 0);
+    --success-surface: oklch(0.97 0.022 155); /* fond teinté très léger */
+    --success-strong: oklch(0.44 0.09 158); /* texte sur --success-surface ~7:1 */
+    --success-border: oklch(0.88 0.09 158);
+
+    /* ── Sémantique : attention (ambre · hue ~65) ── */
+    --warning: oklch(0.55 0.13 62); /* ambre brûlé, texte blanc ~4.8:1 */
+    --warning-foreground: oklch(0.99 0 0);
+    --warning-surface: oklch(0.975 0.03 88);
+    --warning-strong: oklch(0.44 0.11 55); /* texte sur --warning-surface ~8:1 */
+    --warning-border: oklch(0.9 0.1 88);
+
+    /* ── Sémantique : danger (rouge · hue ~27) ── */
+    --danger: oklch(0.51 0.19 27); /* rouge-700, texte blanc ~6:1 */
+    --danger-foreground: oklch(0.99 0 0);
+    --danger-surface: oklch(0.968 0.015 20);
+    --danger-strong: oklch(0.51 0.19 27); /* texte sur --danger-surface ~6:1 */
+    --danger-border: oklch(0.89 0.055 22);
+
+    /* ── Sémantique : info (bleu · hue ~262) ── */
+    --info: oklch(0.48 0.17 264); /* bleu-700, texte blanc ~7:1 */
+    --info-foreground: oklch(0.99 0 0);
+    --info-surface: oklch(0.968 0.017 255);
+    --info-strong: oklch(0.42 0.16 264); /* texte sur --info-surface ~9:1 */
+    --info-border: oklch(0.87 0.05 252);
+
+    /* `--destructive` = alias danger (boutons/erreurs shadcn) */
+    --destructive: var(--danger);
+    --destructive-foreground: var(--danger-foreground);
+
     --radius: 0.5rem;
   }
 
@@ -62,6 +95,17 @@
   h2,
   h3 {
     text-wrap: balance;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -94,14 +138,31 @@
   cursor: pointer;
   box-shadow: none;
 }
-/* Marronniers : surimpression discrète, non cliquable */
+/* Teinte de statut sur l'événement (fond léger + contour plein, jamais une bande) */
+.fc-monochrome .fc-status-internal_review {
+  background: var(--info-surface);
+  border-color: var(--info-border);
+}
+.fc-monochrome .fc-status-client_review {
+  background: var(--warning-surface);
+  border-color: var(--warning-border);
+}
+.fc-monochrome .fc-status-approved,
+.fc-monochrome .fc-status-scheduled {
+  background: var(--success-surface);
+  border-color: var(--success-border);
+}
+.fc-monochrome .fc-status-published {
+  opacity: 0.62;
+}
+/* Marronniers : surimpression discrète (filet pointillé en tête), non cliquable */
 .fc-monochrome .fc-keydate {
   background: transparent;
   border: 0;
-  border-left: 2px solid var(--muted-foreground);
+  border-top: 1px dashed var(--muted-foreground);
   border-radius: 0;
   cursor: default;
-  opacity: 0.75;
+  opacity: 0.7;
 }
 .fc-monochrome .fc-daygrid-day-number,
 .fc-monochrome .fc-col-header-cell-cushion {

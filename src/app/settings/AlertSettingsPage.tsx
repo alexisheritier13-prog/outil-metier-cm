@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -82,7 +83,10 @@ export function AlertSettingsPage() {
             Enregistrer
           </Button>
           {save.isSuccess && !save.isPending && (
-            <span className="text-muted-foreground text-sm">Enregistré.</span>
+            <span className="text-success-strong inline-flex items-center gap-1 text-sm" role="status">
+              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              Enregistré
+            </span>
           )}
         </div>
       </form>

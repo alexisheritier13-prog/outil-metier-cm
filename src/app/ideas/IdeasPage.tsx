@@ -364,6 +364,7 @@ function IdeaSheet({
         <footer className="border-t p-4">
           <Button
             variant="ghost"
+            className="text-danger-strong hover:bg-danger-surface hover:text-danger-strong"
             onClick={() => {
               if (confirm('Supprimer définitivement cette idée ?')) {
                 del.mutate(idea.id, { onSuccess: onClose });

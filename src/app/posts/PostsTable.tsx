@@ -121,6 +121,7 @@ export function PostsTable({ posts, clientName, onOpen, hasClients }: Props) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
                     aria-label="Mettre à la corbeille"
                     onClick={(e) => {
                       e.stopPropagation();

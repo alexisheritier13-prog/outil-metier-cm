@@ -212,7 +212,13 @@ function ContactRow({
             <Button variant="ghost" size="sm" onClick={onToggleActive}>
               {c.isActive ? 'Désactiver' : 'Activer'}
             </Button>
-            <Button variant="ghost" size="icon" aria-label={`Supprimer ${c.email}`} onClick={onRemove}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
+              aria-label={`Supprimer ${c.email}`}
+              onClick={onRemove}
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

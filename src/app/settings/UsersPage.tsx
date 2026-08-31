@@ -71,10 +71,17 @@ export function UsersPage() {
                     <span
                       className={
                         u.isActive
-                          ? 'inline-flex items-center gap-1 text-green-700'
+                          ? 'text-success-strong inline-flex items-center gap-1'
                           : 'text-muted-foreground inline-flex items-center gap-1'
                       }
                     >
+                      <span
+                        aria-hidden="true"
+                        className={
+                          'h-1.5 w-1.5 rounded-full ' +
+                          (u.isActive ? 'bg-success' : 'bg-muted-foreground')
+                        }
+                      />
                       {u.isActive ? 'Actif' : 'Désactivé'}
                     </span>
                   </td>

@@ -90,12 +90,12 @@ export function JobsPage() {
                         <Loader className="h-3.5 w-3.5 animate-spin" /> en cours
                       </span>
                     ) : r.ok ? (
-                      <span className="inline-flex items-center gap-1">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> OK
+                      <span className="text-success-strong inline-flex items-center gap-1">
+                        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> OK
                       </span>
                     ) : (
-                      <span className="text-destructive inline-flex items-center gap-1">
-                        <XCircle className="h-3.5 w-3.5" /> échec
+                      <span className="text-danger-strong inline-flex items-center gap-1">
+                        <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> échec
                       </span>
                     )}
                   </td>

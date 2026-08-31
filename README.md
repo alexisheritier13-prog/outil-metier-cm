@@ -17,9 +17,12 @@ validation interne puis client, organisation du contenu. Application web héberg
   déconnexion, persistance de session.
 - **Story 1.5** faite : Edge Function `admin-users`, écran `/app/parametres/utilisateurs`.
   **Epic 1 terminé.**
-- **Spec UX** : `docs/front-end-spec.md` (IA, parcours, design system).
-- **Design system** : palette monochrome (noir & blanc), Inter self-host, `StatusBadge` /
-  `EmptyState` / `ClientAvatar` / `Tabs`.
+- **Spec UX** : `docs/front-end-spec.md` (IA, parcours). `PRODUCT.md` / `DESIGN.md`
+  (racine) : contexte produit + système visuel pour l'agent design (`impeccable`).
+- **Design system** : neutres monochromes (noir & blanc) + **couleur strictement
+  sémantique** (vert succès · ambre attention · rouge danger · bleu info — tokens OKLCH
+  dans `globals.css`, jamais la couleur seule). Inter self-host. `StatusBadge` (ton par
+  statut), `EmptyState`, `Tabs`.
 - **Story 2.1** faite : référentiel clients — liste, fiche à onglets, création/édition,
   archivage.
 - **Story 2.2** faite : comptes sociaux du client (table `networks` + onglet).
@@ -55,7 +58,8 @@ validation interne puis client, organisation du contenu. Application web héberg
 - **Stories 8.1 + 8.2** faites : alertes in-app — table `alerts` + page `/app/alertes` + badge nav (migr 0026), moteur `generate_alerts()` (FR36 a–g, idempotent via `dedupe_key`, fermeture auto des alertes caduques, trace `job_runs`), bouton « Lancer la détection » (Lead/Admin).
 - **Story 8.3** faite : seuils configurables (`app_settings.alert_thresholds`, migr 0027), page `/app/parametres/alertes` (Admin, bornes de validation) ; index `/app/parametres`.
 - **Story 8.4** faite : `pg_cron` planifie `generate_alerts` (nuit + horaire) et `purge_trash` (nuit) (migr 0028), page `/app/parametres/jobs` (journal `job_runs`), notification d'échec aux Admins. **Epic 8 terminé.**
-- Prochaine : Epic 9 (actions en masse, exports, finitions).
+- **Passe couleur sémantique** faite (`impeccable colorize`) : tokens `--success` / `--warning` / `--danger` / `--info` (OKLCH), statuts de post et sévérité d'alertes colorés, boutons `success` / `destructive`, badge « Alertes » rouge. Le reste reste noir & blanc. `PRODUCT.md` + `DESIGN.md` ajoutés.
+- Prochaine : Epic 9 (actions en masse, exports, finitions + polish UI).
 
 ### Tests
 

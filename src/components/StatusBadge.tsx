@@ -7,7 +7,8 @@ import {
   CheckCheck,
   type LucideIcon,
 } from 'lucide-react';
-import { POST_STATUS_LABELS, type PostStatus } from '@/shared/constants/postStatus';
+import { POST_STATUS_LABELS, POST_STATUS_TONE, type PostStatus } from '@/shared/constants/postStatus';
+import { toneClasses } from '@/components/statusTone';
 import { cn } from '@/lib/utils';
 
 const ICONS: Record<PostStatus, LucideIcon> = {
@@ -20,22 +21,17 @@ const ICONS: Record<PostStatus, LucideIcon> = {
 };
 
 /**
- * Statut d'un post : toujours icône + libellé (jamais la couleur seule).
- * Palette monochrome pour l'instant — la différenciation passe par le remplissage
- * (plein = terminé/validé, contour = en cours) et l'icône.
+ * Statut d'un post : toujours icône + libellé + couleur du statut (jamais la couleur
+ * seule). Fond teinté doux ou aplat plein selon l'avancement dans le pipeline.
  */
 export function StatusBadge({ status, className }: { status: PostStatus; className?: string }) {
   const Icon = ICONS[status];
-  const filled = status === 'approved' || status === 'scheduled' || status === 'published';
-
   return (
     <span
       className={cn(
         'inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-xs font-medium',
-        filled
-          ? 'bg-foreground text-background border-transparent'
-          : 'bg-surface-2 text-foreground',
-        status === 'published' && 'opacity-70',
+        toneClasses(POST_STATUS_TONE[status]),
+        status === 'published' && 'opacity-80',
         className,
       )}
     >

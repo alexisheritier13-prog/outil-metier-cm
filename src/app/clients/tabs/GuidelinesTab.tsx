@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -87,8 +88,9 @@ export function GuidelinesTab({ clientId }: { clientId: string }) {
           {save.isPending ? 'Enregistrement…' : 'Enregistrer la charte'}
         </Button>
         {justSaved && !save.isPending && (
-          <span className="text-muted-foreground text-sm" role="status">
-            Enregistré.
+          <span className="text-success-strong inline-flex items-center gap-1 text-sm" role="status">
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            Enregistré
           </span>
         )}
       </div>

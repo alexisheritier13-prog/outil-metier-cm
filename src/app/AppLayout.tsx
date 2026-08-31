@@ -35,27 +35,15 @@ export function AppLayout() {
           </NavItem>
           <NavItem to="/app/a-valider">
             À valider
-            {(reviewCount.data ?? 0) > 0 && (
-              <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
-                {reviewCount.data}
-              </span>
-            )}
+            <NavBadge count={reviewCount.data} />
           </NavItem>
           <NavItem to="/app/alertes">
             Alertes
-            {(alertCount.data ?? 0) > 0 && (
-              <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
-                {alertCount.data}
-              </span>
-            )}
+            <NavBadge count={alertCount.data} tone="danger" />
           </NavItem>
           <NavItem to="/app/demandes">
             Demandes
-            {(requestCount.data ?? 0) > 0 && (
-              <span className="bg-foreground text-background ml-1.5 rounded-full px-1.5 py-0.5 text-xs">
-                {requestCount.data}
-              </span>
-            )}
+            <NavBadge count={requestCount.data} />
           </NavItem>
           <NavItem to="/app/clients">Clients</NavItem>
           <NavItem to="/app/campagnes">Campagnes</NavItem>
@@ -80,6 +68,22 @@ export function AppLayout() {
       </header>
       <Outlet />
     </div>
+  );
+}
+
+function NavBadge({ count, tone }: { count?: number; tone?: 'danger' }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span
+      className={cn(
+        'ml-1.5 rounded-full px-1.5 py-0.5 text-xs tabular-nums',
+        tone === 'danger'
+          ? 'bg-danger text-danger-foreground'
+          : 'bg-foreground text-background',
+      )}
+    >
+      {count}
+    </span>
   );
 }
 

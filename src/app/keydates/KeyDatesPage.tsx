@@ -124,6 +124,7 @@ export function KeyDatesPage() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
                             aria-label="Supprimer"
                             onClick={() => {
                               if (confirm(`Supprimer « ${k.name} » ?`)) del.mutate(k.id);

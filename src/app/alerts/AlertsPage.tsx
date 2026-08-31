@@ -12,10 +12,14 @@ import { ALERT_TYPE_LABELS, type AlertSeverity, type AlertType } from '@/shared/
 import { listClients } from '@/services/clients';
 import { listAlerts, runGenerateAlerts, setAlertStatus } from '@/services/alerts';
 
-const SEVERITY_STYLE: Record<AlertSeverity, string> = {
-  info: 'border-l-muted-foreground',
-  warning: 'border-l-foreground',
-  critical: 'border-l-foreground bg-surface-2',
+const SEVERITY: Record<AlertSeverity, { card: string; dot: string; label: string }> = {
+  info: { card: 'border-info-border bg-info-surface', dot: 'bg-info', label: 'Info' },
+  warning: {
+    card: 'border-warning-border bg-warning-surface',
+    dot: 'bg-warning',
+    label: 'Important',
+  },
+  critical: { card: 'border-danger-border bg-danger-surface', dot: 'bg-danger', label: 'Critique' },
 };
 
 export function AlertsPage() {
@@ -153,17 +157,26 @@ export function AlertsPage() {
             <li
               key={a.id}
               className={cn(
-                'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-l-4 p-3 text-sm',
-                SEVERITY_STYLE[a.severity],
+                'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border p-3 text-sm',
+                SEVERITY[a.severity].card,
                 a.status === 'dismissed' && 'opacity-50',
               )}
             >
-              <span className="text-muted-foreground rounded border px-1 text-xs">
+              <span
+                className={cn('h-2 w-2 shrink-0 rounded-full', SEVERITY[a.severity].dot)}
+                aria-hidden="true"
+              />
+              <span className="bg-background/70 rounded border px-1 text-xs">
                 {ALERT_TYPE_LABELS[a.type]}
               </span>
+              <span className="sr-only">Sévérité : {SEVERITY[a.severity].label}.</span>
               {a.clientId && <span className="font-medium">{clientName(a.clientId)}</span>}
               <span className="min-w-0 flex-1">{a.message}</span>
-              {a.status === 'new' && <span className="bg-foreground h-2 w-2 rounded-full" aria-label="nouvelle" />}
+              {a.status === 'new' && (
+                <span className="bg-foreground rounded-full px-1.5 text-[10px] text-background">
+                  nouvelle
+                </span>
+              )}
               <div className="flex gap-1">
                 {(a.clientId || a.postId) && (
                   <Button size="sm" variant="ghost" onClick={() => goTo(a.clientId, a.postId)}>

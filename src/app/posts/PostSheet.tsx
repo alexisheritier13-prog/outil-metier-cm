@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Copy, X } from 'lucide-react';
+import { Copy, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -186,6 +186,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
           </Button>
           <Button
             variant="ghost"
+            className="text-danger-strong hover:bg-danger-surface hover:text-danger-strong"
             onClick={() => {
               if (confirm('Mettre ce post à la corbeille ?')) {
                 trash.mutate(post.id);
@@ -193,7 +194,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               }
             }}
           >
-            Corbeille
+            <Trash2 className="h-4 w-4" /> Corbeille
           </Button>
         </footer>
 

@@ -44,6 +44,7 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
         id: p.id,
         title: p.caption || 'Sans légende',
         start: p.scheduledAt,
+        classNames: [`fc-status-${p.status}`],
         extendedProps: { post: p },
       })),
       ...keyDates.map((k) => ({
@@ -123,16 +124,21 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
   );
 }
 
-/** Pictogramme de statut monochrome (rempli = validé/planifié/publié). */
+/** Pastille de statut colorée (info/attention/succès) — doublée du libellé dans le title. */
+const DOT_COLOR: Record<Post['status'], string> = {
+  draft: 'border-muted-foreground',
+  internal_review: 'border-info bg-info',
+  client_review: 'border-warning bg-warning',
+  approved: 'border-success bg-success',
+  scheduled: 'border-success bg-success',
+  published: 'border-muted-foreground bg-muted-foreground',
+};
+
 function StatusDot({ status }: { status: Post['status'] }) {
-  const filled = status === 'approved' || status === 'scheduled' || status === 'published';
   return (
     <span
       aria-hidden="true"
-      className={
-        'ml-auto inline-block h-2 w-2 shrink-0 rounded-full border border-current ' +
-        (filled ? 'bg-current' : '')
-      }
+      className={`ml-auto inline-block h-2 w-2 shrink-0 rounded-full border ${DOT_COLOR[status]}`}
     />
   );
 }

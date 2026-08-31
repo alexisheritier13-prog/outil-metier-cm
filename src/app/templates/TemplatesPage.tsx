@@ -89,6 +89,7 @@ export function TemplatesPage() {
                   <Button
                     size="sm"
                     variant="ghost"
+                    className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
                     aria-label="Supprimer"
                     onClick={() => {
                       if (confirm(`Supprimer le template « ${t.name} » ?`)) del.mutate(t.id);

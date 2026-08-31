@@ -90,6 +90,7 @@ export function OnboardingTab({ clientId }: { clientId: string }) {
               <Button
                 variant="ghost"
                 size="icon"
+                className="text-muted-foreground hover:bg-danger-surface hover:text-danger-strong"
                 aria-label={`Supprimer « ${item.label} »`}
                 onClick={() => remove.mutate(item.id)}
               >
