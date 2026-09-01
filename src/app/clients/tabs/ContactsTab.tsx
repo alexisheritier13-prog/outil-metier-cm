@@ -31,6 +31,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
   const [email, setEmail] = useState('');
   const [inviteOnAdd, setInviteOnAdd] = useState(true);
   const [lastLink, setLastLink] = useState<string | null>(null);
+  const [lastEmailed, setLastEmailed] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +39,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
     if (inviteOnAdd) {
       const res = await invite.mutateAsync({ fullName: name, email });
       setLastLink(res.actionLink);
+      setLastEmailed(Boolean(res.emailed));
     } else {
       await add.mutateAsync({ fullName: name, email });
     }
@@ -89,6 +91,7 @@ export function ContactsTab({ clientId }: { clientId: string }) {
                   onInvite={async () => {
                     const res = await invite.mutateAsync({ fullName: c.fullName, email: c.email });
                     setLastLink(res.actionLink);
+                    setLastEmailed(Boolean(res.emailed));
                   }}
                   onRemove={() => {
                     if (confirm(`Supprimer le contact ${c.email} ?`)) remove.mutate(c.id);
@@ -119,7 +122,9 @@ export function ContactsTab({ clientId }: { clientId: string }) {
         <div className="surface-card space-y-2 p-4 text-sm">
           <p className="font-medium">Lien de définition du mot de passe</p>
           <p className="text-muted-foreground">
-            Aucun email n'est envoyé : transmettez ce lien au contact.
+            {lastEmailed
+              ? 'Un e-mail a été envoyé au contact. Ce lien reste disponible en secours.'
+              : "Aucun e-mail n'est envoyé : transmettez ce lien au contact."}
           </p>
           <code className="bg-surface block overflow-x-auto rounded p-2 text-xs">
             {lastLink}

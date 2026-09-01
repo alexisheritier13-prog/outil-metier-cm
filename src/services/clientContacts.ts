@@ -57,6 +57,7 @@ export interface InviteContactResult {
   contact: ClientContact;
   isNewAccount: boolean;
   actionLink: string | null;
+  emailed?: boolean;
 }
 
 /** Crée (ou lie) un compte de connexion pour un contact, via l'Edge Function. */
@@ -78,11 +79,17 @@ export async function inviteClientContact(
     const body = (await readFnError(error)) as { error?: string } | null;
     throw new Error(mapInviteError(body?.error));
   }
-  const res = data as { contact: unknown; isNewAccount: boolean; actionLink: string | null };
+  const res = data as {
+    contact: unknown;
+    isNewAccount: boolean;
+    actionLink: string | null;
+    emailed?: boolean;
+  };
   return {
     contact: toClientContact(res.contact as never),
     isNewAccount: res.isNewAccount,
     actionLink: res.actionLink,
+    emailed: res.emailed,
   };
 }
 

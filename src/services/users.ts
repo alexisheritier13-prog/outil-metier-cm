@@ -46,8 +46,10 @@ export interface CreateUserInput {
 
 export interface CreateUserResult {
   profile: Profile;
-  /** Lien à transmettre à l'utilisateur pour définir son mot de passe (pas d'email en v1). */
+  /** Lien à transmettre pour définir le mot de passe (fallback si pas d'e-mail). */
   actionLink: string | null;
+  /** L'e-mail d'invitation a été envoyé (Resend configuré). */
+  emailed?: boolean;
 }
 
 /** Crée un compte interne via l'Edge Function `admin-users` (service_role côté serveur). */
@@ -60,8 +62,12 @@ export async function createInternalUser(input: CreateUserInput): Promise<Create
     const body = (await tryReadError(error)) as { error?: string } | null;
     throw new Error(mapCreateError(body?.error));
   }
-  const res = data as { profile: unknown; actionLink: string | null };
-  return { profile: toProfile(res.profile as never), actionLink: res.actionLink };
+  const res = data as { profile: unknown; actionLink: string | null; emailed?: boolean };
+  return {
+    profile: toProfile(res.profile as never),
+    actionLink: res.actionLink,
+    emailed: res.emailed,
+  };
 }
 
 /** Change l'email et/ou le mot de passe d'un compte (Admin). `sendLink` renvoie un lien de définition. */

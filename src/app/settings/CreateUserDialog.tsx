@@ -26,6 +26,7 @@ type Values = z.infer<typeof schema>;
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false);
   const [link, setLink] = useState<string | null>(null);
+  const [emailed, setEmailed] = useState(false);
   const create = useCreateUser();
   const {
     register,
@@ -40,6 +41,7 @@ export function CreateUserDialog() {
   function close() {
     setOpen(false);
     setLink(null);
+    setEmailed(false);
     create.reset();
     reset();
   }
@@ -56,7 +58,12 @@ export function CreateUserDialog() {
         {link ? (
           <>
             <FormBody>
-              <p className="text-sm">Compte créé. Lien de définition du mot de passe :</p>
+              <p className="text-sm">
+                Compte créé.
+                {emailed
+                  ? ' Un e-mail avec le lien d’accès a été envoyé.'
+                  : ' Lien de définition du mot de passe à transmettre :'}
+              </p>
               <code className="bg-surface-2 border-border block overflow-x-auto rounded-lg border p-3 text-xs">
                 {link}
               </code>
@@ -70,6 +77,7 @@ export function CreateUserDialog() {
             className="flex min-h-0 flex-1 flex-col"
             onSubmit={handleSubmit(async (values) => {
               const res = await create.mutateAsync(values);
+              setEmailed(Boolean(res.emailed));
               setLink(res.actionLink ?? 'Aucun lien généré — utilisez « mot de passe oublié ».');
             })}
             noValidate

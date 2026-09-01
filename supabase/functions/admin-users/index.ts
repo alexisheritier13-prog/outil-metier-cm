@@ -15,8 +15,34 @@ import { corsHeaders, json } from '../_shared/cors.ts';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
+const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'Cadence <onboarding@resend.dev>';
 
 const INTERNAL_ROLES = ['cm', 'lead', 'admin'] as const;
+
+/** Envoie le lien d'accès par e-mail si Resend est configuré. Best-effort. */
+async function sendInviteEmail(to: string, link: string): Promise<boolean> {
+  if (!RESEND_API_KEY || !link) return false;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to,
+        subject: 'Votre accès à Cadence',
+        html: `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1c1c22">
+          <p style="font-size:15px;line-height:1.5">Un accès a été créé pour vous sur Cadence.</p>
+          <p style="margin:24px 0"><a href="${link}" style="background:#2f5fe0;color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:14px">Définir mon mot de passe</a></p>
+          <p style="color:#6b6b78;font-size:12px;margin-top:32px">Cadence</p>
+        </div>`,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -93,7 +119,9 @@ Deno.serve(async (req) => {
       email,
       options: redirectTo ? { redirectTo } : undefined,
     });
-    return json(201, { profile: updated, actionLink: link?.properties?.action_link ?? null });
+    const createdLink = link?.properties?.action_link ?? null;
+    const emailed = createdLink ? await sendInviteEmail(email, createdLink) : false;
+    return json(201, { profile: updated, actionLink: createdLink, emailed });
   }
 
   // ───────────────────────── update_user (email / mot de passe) ─────────────────────────
@@ -219,10 +247,13 @@ Deno.serve(async (req) => {
       email,
       options: redirectTo ? { redirectTo } : undefined,
     });
+    const contactLink = link?.properties?.action_link ?? null;
+    const emailed = contactLink ? await sendInviteEmail(email, contactLink) : false;
     return json(201, {
       contact,
       isNewAccount: isNew,
-      actionLink: link?.properties?.action_link ?? null,
+      actionLink: contactLink,
+      emailed,
     });
   }
 
