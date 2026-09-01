@@ -99,6 +99,9 @@ const AccountSettingsPage = lazy(() =>
 const OnboardingWizard = lazy(() =>
   import('@/app/account/OnboardingWizard').then((m) => ({ default: m.OnboardingWizard })),
 );
+const PlatformPage = lazy(() =>
+  import('@/app/platform/PlatformPage').then((m) => ({ default: m.PlatformPage })),
+);
 
 function lazyRoute(node: React.ReactNode) {
   return <Suspense fallback={<FullPageSpinner />}>{node}</Suspense>;
@@ -132,6 +135,7 @@ export const router = createBrowserRouter(
       children: [
         { index: true, element: lazyRoute(<DashboardPage />) },
         { path: 'mon-compte', element: lazyRoute(<MyAccountPage />) },
+        { path: 'plateforme', element: lazyRoute(<PlatformPage />) },
         { path: 'planning', element: lazyRoute(<PlanningPage />) },
         { path: 'a-valider', element: lazyRoute(<ReviewQueuePage />) },
         { path: 'alertes', element: lazyRoute(<AlertsPage />) },

@@ -74,6 +74,23 @@ isolation stricte des données par locataire (exigence n°1 de l'architecture).
   consomme le lien Supabase, propose nom d'agence / nom / mot de passe, appelle
   `accept_org_invitation`, puis redirige vers l'assistant `/bienvenue`.
 
+### Migration 0045 — invitations « lien seul » + écran Admin plateforme
+
+- `create_org_invitation(org_name, email?, full_name?)` : **e-mail optionnel**.
+  Sans e-mail, le jeton est l'unique clé (usage unique) — on envoie le lien par
+  n'importe quel canal, la personne choisit e-mail + mot de passe elle-même.
+- `accept_org_invitation` : ne contrôle l'e-mail que si l'invitation en portait un.
+- `platform_list_organizations()` / `platform_list_invitations()` (SECURITY
+  DEFINER, `is_platform_admin()`).
+- **`JoinOrgPage`** gère les deux cas : session déjà là (lien nominatif → pose le
+  mdp) ou pas de session (lien ouvert → `auth.signUp` puis accept). Si la
+  confirmation d'e-mail est activée côté Supabase, message « confirme ton e-mail ».
+- Écran **`/app/plateforme`** (`PlatformPage`, visible des seuls platform_admins,
+  entrée sidebar « Admin plateforme ») : liste des agences, bouton « Générer une
+  invitation » → lien `/rejoindre/<token>` copiable. Service `platform.ts`.
+- **Prérequis prod** : désactiver « Confirm email » dans Supabase Auth → Email
+  (sinon `signUp` n'ouvre pas de session tant qu'aucun SMTP/Resend n'est branché).
+
 ## Tests
 
 - Helpers d'intégration (`_helpers.ts`) : `createTestOrg` / `defaultTestOrgId`

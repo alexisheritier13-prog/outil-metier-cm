@@ -12,6 +12,7 @@ import {
   LogOut,
   Search,
   Settings,
+  Shield,
   Trash2,
   Users,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { NotificationBell } from '@/components/NotificationBell';
 import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
+import { useIsPlatformAdmin } from '@/app/platform/usePlatform';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { countReviewQueue } from '@/services/posts';
@@ -36,6 +38,7 @@ function hrefForInternal(n: AppNotification): string {
 /** Barre latérale de l'espace agence. */
 export function AppSidebar() {
   const { data: profile } = useCurrentProfile();
+  const { data: isPlatformAdmin } = useIsPlatformAdmin();
   const signOut = useSignOut();
   const isManager = profile?.role === 'lead' || profile?.role === 'admin';
 
@@ -121,6 +124,11 @@ export function AppSidebar() {
         {profile?.role === 'admin' && (
           <Item to="/app/parametres" icon={Settings}>
             Paramètres
+          </Item>
+        )}
+        {isPlatformAdmin && (
+          <Item to="/app/plateforme" icon={Shield}>
+            Admin plateforme
           </Item>
         )}
         <Item to="/app/aide" icon={LifeBuoy}>

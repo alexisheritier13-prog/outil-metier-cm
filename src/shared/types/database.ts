@@ -1088,7 +1088,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           created_at: string
-          email: string
+          email: string | null
           expires_at: string
           full_name: string
           id: string
@@ -1100,7 +1100,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           expires_at?: string
           full_name?: string
           id?: string
@@ -1112,7 +1112,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           expires_at?: string
           full_name?: string
           id?: string
@@ -2144,11 +2144,11 @@ export type Database = {
       client_trash: { Args: { p_client_id: string }; Returns: undefined }
       contact_client_ids: { Args: never; Returns: string[] }
       create_org_invitation: {
-        Args: { p_email: string; p_full_name?: string; p_org_name: string }
+        Args: { p_email?: string; p_full_name?: string; p_org_name: string }
         Returns: {
           accepted_at: string | null
           created_at: string
-          email: string
+          email: string | null
           expires_at: string
           full_name: string
           id: string
@@ -2296,6 +2296,8 @@ export type Database = {
         Returns: undefined
       }
       org_invitation_by_token: { Args: { p_token: string }; Returns: Json }
+      platform_list_invitations: { Args: never; Returns: Json }
+      platform_list_organizations: { Args: never; Returns: Json }
       post_by_approval_token: { Args: { p_token: string }; Returns: Json }
       post_change_status: {
         Args: {

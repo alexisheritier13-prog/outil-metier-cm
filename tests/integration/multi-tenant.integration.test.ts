@@ -129,4 +129,38 @@ maybe('multi-tenant — isolation & invitation', () => {
     await admin().from('organizations').delete().eq('id', orgId);
     await admin().from('org_invitations').delete().eq('token', inv!.token);
   });
+
+  it('invitation « lien seul » (sans e-mail) : create_org_invitation réservé au platform admin, accepté par n\'importe qui', async () => {
+    // adminA n'est pas platform admin → refusé
+    const denied = await adminA.client.rpc('create_org_invitation', { p_org_name: 'X' });
+    expect(denied.error).not.toBeNull();
+
+    // on fait de adminB un platform admin le temps du test
+    await admin().from('platform_admins').insert({ user_id: adminB.id });
+    try {
+      const { data: inv, error } = await adminB.client.rpc('create_org_invitation', {
+        p_org_name: 'Agence Ouverte',
+      });
+      expect(error).toBeNull();
+      const token = (inv as { token: string }).token;
+
+      // un compte tout neuf, sans lien avec l'e-mail de l'invitation
+      const email = `mt-open-${crypto.randomUUID()}@example.test`;
+      const c = await admin().auth.admin.createUser({
+        email,
+        password: 'Test-Passw0rd!',
+        email_confirm: true,
+      });
+      invitees.push(c.data.user!.id);
+      const client = anon();
+      await client.auth.signInWithPassword({ email, password: 'Test-Passw0rd!' });
+      const acc = await client.rpc('accept_org_invitation', { p_token: token, p_org_name: 'Mon agence' });
+      expect(acc.error).toBeNull();
+      const orgId = (acc.data as { organizationId: string }).organizationId;
+      await admin().from('organizations').delete().eq('id', orgId);
+      await admin().from('org_invitations').delete().eq('token', token);
+    } finally {
+      await admin().from('platform_admins').delete().eq('user_id', adminB.id);
+    }
+  });
 });
