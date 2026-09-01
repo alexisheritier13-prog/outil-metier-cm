@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { UserAvatar } from '@/components/UserAvatar';
+import { FirstRunGuide } from './FirstRunGuide';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -142,6 +143,26 @@ export function DashboardPage() {
     month: 'long',
   });
   const firstName = (me.fullName || me.email).split(' ')[0];
+
+  const hasClients = (clientsQ.data ?? []).length > 0;
+  const hasPosts = (pipelineQ.data ?? []).length > 0 || (weekQ.data ?? []).length > 0;
+  const settingUp =
+    !clientsQ.isLoading && !pipelineQ.isLoading && !weekQ.isLoading && (!hasClients || !hasPosts);
+
+  if (settingUp) {
+    return (
+      <div className="animate-in fade-in mx-auto max-w-xl px-5 py-8 duration-300 sm:px-8">
+        <header className="mb-6 flex items-center gap-3">
+          <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
+          <div>
+            <h1 className="text-title tracking-tight">Bonjour {firstName}</h1>
+            <p className="text-muted-foreground text-sm capitalize">{today}</p>
+          </div>
+        </header>
+        <FirstRunGuide hasClients={hasClients} hasPosts={hasPosts} />
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
