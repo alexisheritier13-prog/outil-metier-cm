@@ -30,6 +30,8 @@ export interface Profile {
   role: Role;
   isActive: boolean;
   avatarUrl?: string | null;
+  /** Organisation (locataire) de l'utilisateur. `null` tant qu'il n'a pas rejoint d'agence. */
+  organizationId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +44,7 @@ export function toProfile(row: ProfileRow): Profile {
     role: row.role,
     isActive: row.is_active,
     avatarUrl: row.avatar_url,
+    organizationId: row.organization_id ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

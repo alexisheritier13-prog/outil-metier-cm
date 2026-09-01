@@ -24,17 +24,21 @@ maybe('auto_publish_due (0039)', () => {
   let clientA = '';
   let author: TestUser;
 
-  // Fusionne pour ne pas écraser la config de compte du projet partagé.
+  // Réglage `auto_publish` de l'organisation du test (org_settings, multi-tenant).
   const setAutoPublish = async (on: boolean) => {
     const { data } = await admin()
-      .from('app_settings')
+      .from('org_settings')
       .select('value')
+      .eq('organization_id', author.organizationId)
       .eq('key', 'account')
       .maybeSingle();
     const base = (data?.value ?? {}) as Record<string, unknown>;
     await admin()
-      .from('app_settings')
-      .upsert({ key: 'account', value: { ...base, auto_publish: on } }, { onConflict: 'key' });
+      .from('org_settings')
+      .upsert(
+        { organization_id: author.organizationId, key: 'account', value: { ...base, auto_publish: on } },
+        { onConflict: 'organization_id,key' },
+      );
   };
 
   const mkScheduled = (whenIso: string) =>

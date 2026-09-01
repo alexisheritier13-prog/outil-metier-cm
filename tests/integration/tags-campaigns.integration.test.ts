@@ -60,7 +60,7 @@ maybe('tags / campaigns / post_duplicate (3.6)', () => {
       .single();
     const { data: tag } = await admin()
       .from('tags')
-      .insert({ name: 'ugc-' + crypto.randomUUID() })
+      .insert({ name: 'ugc-' + crypto.randomUUID(), organization_id: cm.organizationId })
       .select('id')
       .single();
     tagIds.push(tag!.id);

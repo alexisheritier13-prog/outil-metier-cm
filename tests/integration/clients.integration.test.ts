@@ -61,7 +61,11 @@ maybe('clients — CRUD & archivage (RLS)', () => {
   it('le filtre is_archived exclut/inclut correctement', async () => {
     const c = await admin()
       .from('clients')
-      .insert({ name: 'Archivé ' + crypto.randomUUID(), is_archived: true })
+      .insert({
+        name: 'Archivé ' + crypto.randomUUID(),
+        is_archived: true,
+        organization_id: cm.organizationId,
+      })
       .select('id')
       .single();
     trash.push(c.data!.id);
@@ -81,7 +85,7 @@ maybe('clients — CRUD & archivage (RLS)', () => {
   it("un CM ne peut pas archiver un client (même assigné)", async () => {
     const c = await admin()
       .from('clients')
-      .insert({ name: 'NoArchive ' + crypto.randomUUID() })
+      .insert({ name: 'NoArchive ' + crypto.randomUUID(), organization_id: cm.organizationId })
       .select('id')
       .single();
     trash.push(c.data!.id);

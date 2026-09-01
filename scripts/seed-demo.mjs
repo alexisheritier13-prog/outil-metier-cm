@@ -66,7 +66,7 @@ async function uploadSampleMedia(postId, index) {
   });
 }
 
-async function ensureUser(email, role, fullName, avatarUrl) {
+async function ensureUser(email, role, fullName, avatarUrl, orgId) {
   const list = await admin.auth.admin.listUsers({ perPage: 1000 });
   let u = list.data.users.find((x) => x.email === email);
   if (!u) {
@@ -78,9 +78,32 @@ async function ensureUser(email, role, fullName, avatarUrl) {
   }
   await admin
     .from('profiles')
-    .update({ role, is_active: true, full_name: fullName, avatar_url: avatarUrl ?? null })
+    .update({
+      role,
+      is_active: true,
+      full_name: fullName,
+      avatar_url: avatarUrl ?? null,
+      organization_id: orgId,
+    })
     .eq('id', u.id);
   return u.id;
+}
+
+/** Organisation de démo « Studio Lumen » (créée si absente). */
+async function ensureOrg() {
+  const { data } = await admin
+    .from('organizations')
+    .select('id')
+    .eq('slug', 'studio-lumen')
+    .maybeSingle();
+  if (data) return data.id;
+  const c = await admin
+    .from('organizations')
+    .insert({ name: 'Studio Lumen', slug: 'studio-lumen', plan: 'beta' })
+    .select('id')
+    .single();
+  if (c.error) throw c.error;
+  return c.data.id;
 }
 
 async function actor(email) {
@@ -99,25 +122,32 @@ async function ins(client, table, rows, label) {
 }
 
 async function main() {
-  console.log('→ comptes');
+  console.log('→ organisation + comptes');
+  const ORG_ID = await ensureOrg();
   const av = (n) => `https://i.pravatar.cc/160?img=${n}`;
-  const adminId = await ensureUser('alexis.heritier13@gmail.com', 'admin', 'Alexis Heritier', av(12));
-  const leadId = await ensureUser('lead.demo@studiolumen.test', 'lead', 'Léa Blanc', av(5));
-  const cmId = await ensureUser('cm.demo@studiolumen.test', 'cm', 'Camille Roy', av(47));
-  const contactId = await ensureUser('client.demo@studiolumen.test', 'client', 'Chris (Studio Lumen)', av(33));
+  const adminId = await ensureUser('alexis.heritier13@gmail.com', 'admin', 'Alexis Heritier', av(12), ORG_ID);
+  const leadId = await ensureUser('lead.demo@studiolumen.test', 'lead', 'Léa Blanc', av(5), ORG_ID);
+  const cmId = await ensureUser('cm.demo@studiolumen.test', 'cm', 'Camille Roy', av(47), ORG_ID);
+  const contactId = await ensureUser('client.demo@studiolumen.test', 'client', 'Chris (Studio Lumen)', av(33), ORG_ID);
 
-  await admin.from('app_settings').upsert({
-    key: 'account',
-    value: {
-      onboarded: true,
-      team_mode: 'team',
-      default_skip_client_review: false,
-      active_networks: null,
-      agency_name: 'Studio Lumen',
-      agency_logo_url: '',
-      auto_publish: false,
+  await admin.from('organizations').update({ owner_id: adminId }).eq('id', ORG_ID);
+
+  await admin.from('org_settings').upsert(
+    {
+      organization_id: ORG_ID,
+      key: 'account',
+      value: {
+        onboarded: true,
+        team_mode: 'team',
+        default_skip_client_review: false,
+        active_networks: null,
+        agency_name: 'Studio Lumen',
+        agency_logo_url: '',
+        auto_publish: false,
+      },
     },
-  });
+    { onConflict: 'organization_id,key' },
+  );
 
   await admin
     .from('user_clients')
@@ -283,7 +313,11 @@ async function main() {
   const tagNames = ['produit', 'coulisses', 'printemps', 'été', 'UGC', 'tuto'];
   const tags = {};
   for (const name of tagNames) {
-    const up = await admin.from('tags').upsert({ name }, { onConflict: 'name' }).select('id').single();
+    const up = await admin
+      .from('tags')
+      .upsert({ name, organization_id: ORG_ID }, { onConflict: 'organization_id,name' })
+      .select('id')
+      .single();
     tags[name] = up.data.id;
   }
 
@@ -432,7 +466,11 @@ async function main() {
       .select('id')
       .single();
     for (const t of tagList ?? []) {
-      const up = await admin.from('tags').upsert({ name: t }, { onConflict: 'name' }).select('id').single();
+      const up = await admin
+        .from('tags')
+        .upsert({ name: t, organization_id: ORG_ID }, { onConflict: 'organization_id,name' })
+        .select('id')
+        .single();
       await owner.from('idea_tags').insert({ idea_id: data.id, tag_id: up.data.id });
     }
     return data.id;

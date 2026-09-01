@@ -21,8 +21,11 @@ maybe('workflow — mode CM seul', () => {
 
   const setSkip = (on: boolean) =>
     admin()
-      .from('app_settings')
-      .upsert({ key: 'workflow', value: { skip_internal_review: on } }, { onConflict: 'key' });
+      .from('org_settings')
+      .upsert(
+        { organization_id: cm.organizationId, key: 'workflow', value: { skip_internal_review: on } },
+        { onConflict: 'organization_id,key' },
+      );
 
   const mkPost = () =>
     cm.client

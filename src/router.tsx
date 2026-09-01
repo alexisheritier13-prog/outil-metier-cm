@@ -13,6 +13,9 @@ const SetPasswordPage = lazy(() =>
 const ApprovePage = lazy(() =>
   import('@/approval/ApprovePage').then((m) => ({ default: m.ApprovePage })),
 );
+const JoinOrgPage = lazy(() =>
+  import('@/onboarding/JoinOrgPage').then((m) => ({ default: m.JoinOrgPage })),
+);
 const MyAccountPage = lazy(() =>
   import('@/app/account/MyAccountPage').then((m) => ({ default: m.MyAccountPage })),
 );
@@ -106,6 +109,7 @@ export const router = createBrowserRouter(
     { path: '/', element: <Navigate to="/app" replace /> },
     { path: '/login', element: lazyRoute(<LoginPage />) },
     { path: '/definir-mot-de-passe', element: lazyRoute(<SetPasswordPage />) },
+    { path: '/rejoindre/:token', element: lazyRoute(<JoinOrgPage />) },
     { path: '/valider/:token', element: lazyRoute(<ApprovePage />) },
     {
       path: '/bienvenue',

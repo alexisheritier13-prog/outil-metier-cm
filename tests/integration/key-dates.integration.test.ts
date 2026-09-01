@@ -29,14 +29,22 @@ maybe('marronniers (7.3)', () => {
     clientResto = (
       await admin()
         .from('clients')
-        .insert({ name: 'KD Resto ' + crypto.randomUUID(), sector: 'restauration' })
+        .insert({
+          name: 'KD Resto ' + crypto.randomUUID(),
+          sector: 'restauration',
+          organization_id: lead.organizationId,
+        })
         .select('id')
         .single()
     ).data!.id;
     clientRetail = (
       await admin()
         .from('clients')
-        .insert({ name: 'KD Retail ' + crypto.randomUUID(), sector: 'retail' })
+        .insert({
+          name: 'KD Retail ' + crypto.randomUUID(),
+          sector: 'retail',
+          organization_id: lead.organizationId,
+        })
         .select('id')
         .single()
     ).data!.id;
@@ -87,8 +95,13 @@ maybe('marronniers (7.3)', () => {
 
   it('key_dates_for_client résout global + secteur du client + spécifiques', async () => {
     const { data } = await lead.client.rpc('key_dates_for_client', { p_client_id: clientResto });
-    const names = (data as { name: string }[]).map((k) => k.name).sort();
-    expect(names).toEqual(['Anniv resto', 'Nouvel An', 'Semaine du goût']);
+    const got = new Set((data as { id: string }[]).map((k) => k.id));
+    // global + secteur du client (restauration) + marronnier propre au client
+    expect(got.has(ids['global'])).toBe(true);
+    expect(got.has(ids['sectorResto'])).toBe(true);
+    expect(got.has(ids['clientResto'])).toBe(true);
+    // pas le marronnier d'un autre secteur
+    expect(got.has(ids['sectorRetail'])).toBe(false);
   });
 
   it('key_date_to_post : post brouillon pré-daté lié au marronnier', async () => {

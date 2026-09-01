@@ -42,22 +42,55 @@ export async function tableExists(name: string): Promise<boolean> {
 
 const PASSWORD = 'Test-Passw0rd!';
 
+/**
+ * Organisation partagée par défaut du fichier de test courant (multi-tenant).
+ * Chaque fichier de test = un module vitest neuf → sa propre organisation, dans
+ * laquelle tous les utilisateurs / clients créés sans `orgId` explicite sont
+ * placés (cas courant : une agence, plusieurs clients). Les tests d'isolation
+ * inter-organisations passent un `orgId` explicite.
+ */
+let _defaultOrgPromise: Promise<string> | null = null;
+export function defaultTestOrgId(): Promise<string> {
+  // Promesse mémoïsée : des appels concurrents (Promise.all sur createTestUser…)
+  // partagent la même organisation au lieu d'en créer plusieurs.
+  if (!_defaultOrgPromise) _defaultOrgPromise = createTestOrg('Test Org');
+  return _defaultOrgPromise;
+}
+
+/** Crée une organisation via service_role, renvoie son id. */
+export async function createTestOrg(name = 'Test Org'): Promise<string> {
+  const { data, error } = await admin()
+    .from('organizations')
+    .insert({ name, plan: 'beta' })
+    .select('id')
+    .single();
+  if (error) throw new Error(`createTestOrg a échoué : ${error.message}`);
+  return data.id as string;
+}
+
+export async function deleteTestOrgs(ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  await admin().from('organizations').delete().in('id', ids);
+}
+
 export interface TestUser {
   id: string;
   email: string;
+  organizationId: string;
   /** Client authentifié en tant que cet utilisateur (JWT réel, RLS active). */
   client: SupabaseClient;
 }
 
 /**
- * Crée un utilisateur auth confirmé, force son `profiles.role` / `is_active`,
- * et renvoie un client Supabase connecté en tant que lui.
+ * Crée un utilisateur auth confirmé, force son `profiles.role` / `is_active` /
+ * `organization_id`, et renvoie un client Supabase connecté en tant que lui.
  */
 export async function createTestUser(
   role: 'cm' | 'lead' | 'admin' | 'client',
-  opts: { isActive?: boolean; prefix?: string } = {},
+  opts: { isActive?: boolean; prefix?: string; orgId?: string } = {},
 ): Promise<TestUser> {
   const isActive = opts.isActive ?? true;
+  const orgId = opts.orgId ?? (await defaultTestOrgId());
   const email = `test+${opts.prefix ?? role}-${crypto.randomUUID()}@example.test`;
   const a = admin();
 
@@ -71,10 +104,10 @@ export async function createTestUser(
   }
   const id = created.data.user.id;
 
-  // Le trigger handle_new_user a créé le profil (role cm, inactif) — on l'ajuste.
+  // Le trigger handle_new_user a créé le profil (role cm, inactif, sans org) — on l'ajuste.
   const upd = await a
     .from('profiles')
-    .update({ role, is_active: isActive })
+    .update({ role, is_active: isActive, organization_id: orgId })
     .eq('id', id);
   if (upd.error) throw new Error(`update profile a échoué : ${upd.error.message}`);
 
@@ -82,7 +115,7 @@ export async function createTestUser(
   const signIn = await client.auth.signInWithPassword({ email, password: PASSWORD });
   if (signIn.error) throw new Error(`signIn a échoué : ${signIn.error.message}`);
 
-  return { id, email, client };
+  return { id, email, organizationId: orgId, client };
 }
 
 /** Supprime des utilisateurs auth (cascade → profiles, user_clients). */
@@ -92,8 +125,13 @@ export async function deleteTestUsers(ids: string[]): Promise<void> {
 }
 
 /** Crée un client (table clients) via service_role, renvoie son id. */
-export async function createTestClient(name: string): Promise<string> {
-  const { data, error } = await admin().from('clients').insert({ name }).select('id').single();
+export async function createTestClient(name: string, orgId?: string): Promise<string> {
+  const organization_id = orgId ?? (await defaultTestOrgId());
+  const { data, error } = await admin()
+    .from('clients')
+    .insert({ name, organization_id })
+    .select('id')
+    .single();
   if (error) throw new Error(`createTestClient a échoué : ${error.message}`);
   return data.id as string;
 }

@@ -1,9 +1,11 @@
 import { getSupabase } from '@/lib/supabase';
+import { requireOrgId } from '@/services/org';
 
 /**
- * Réglage du circuit de validation (`app_settings.workflow`). Mode « CM seul » :
- * la validation interne devient optionnelle (draft → à valider client directement).
- * Miroir applicatif de `workflow_skips_internal()` SQL. Écriture réservée Admin.
+ * Réglage du circuit de validation (`org_settings.workflow`, par organisation).
+ * Mode « CM seul » : la validation interne devient optionnelle (draft → à valider
+ * client directement). Miroir applicatif de `workflow_skips_internal()` SQL.
+ * Écriture réservée au Directeur.
  */
 export interface WorkflowSettings {
   skipInternalReview: boolean;
@@ -13,7 +15,7 @@ export const DEFAULT_WORKFLOW: WorkflowSettings = { skipInternalReview: false };
 
 export async function getWorkflowSettings(): Promise<WorkflowSettings> {
   const { data, error } = await getSupabase()
-    .from('app_settings')
+    .from('org_settings')
     .select('value')
     .eq('key', 'workflow')
     .maybeSingle();
@@ -23,11 +25,12 @@ export async function getWorkflowSettings(): Promise<WorkflowSettings> {
 }
 
 export async function saveWorkflowSettings(s: WorkflowSettings): Promise<void> {
+  const organization_id = await requireOrgId();
   const { error } = await getSupabase()
-    .from('app_settings')
+    .from('org_settings')
     .upsert(
-      { key: 'workflow', value: { skip_internal_review: s.skipInternalReview } },
-      { onConflict: 'key' },
+      { organization_id, key: 'workflow', value: { skip_internal_review: s.skipInternalReview } },
+      { onConflict: 'organization_id,key' },
     );
   if (error) throw error;
 }

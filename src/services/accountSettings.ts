@@ -1,10 +1,12 @@
 import { getSupabase } from '@/lib/supabase';
+import { requireOrgId } from '@/services/org';
 import { NETWORKS, type Network } from '@/shared/constants/networks';
 
 /**
- * Configuration du compte de l'agence (`app_settings.account`). Préréglages posés
- * une fois (assistant de bienvenue), re-modifiables dans Paramètres › Compte.
- * Lecture : tout utilisateur actif (le portail lit le nom / logo). Écriture : Admin.
+ * Configuration du compte de l'agence (`org_settings.account`, par organisation).
+ * Préréglages posés une fois (assistant de bienvenue), re-modifiables dans
+ * Paramètres › Compte. Lecture : tout utilisateur actif de l'organisation (le
+ * portail lit le nom / logo). Écriture : Directeur.
  */
 export interface AccountSettings {
   /** L'assistant de bienvenue a été complété (ou passé). */
@@ -78,8 +80,9 @@ function toRow(s: AccountSettings) {
 }
 
 export async function getAccountSettings(): Promise<AccountSettings> {
+  // RLS restreint `org_settings` à l'organisation de l'appelant → filtre sur la clé suffit.
   const { data, error } = await getSupabase()
-    .from('app_settings')
+    .from('org_settings')
     .select('value')
     .eq('key', 'account')
     .maybeSingle();
@@ -90,9 +93,13 @@ export async function getAccountSettings(): Promise<AccountSettings> {
 export async function saveAccountSettings(patch: Partial<AccountSettings>): Promise<AccountSettings> {
   const current = await getAccountSettings();
   const next = { ...current, ...patch };
+  const organization_id = await requireOrgId();
   const { error } = await getSupabase()
-    .from('app_settings')
-    .upsert({ key: 'account', value: toRow(next) }, { onConflict: 'key' });
+    .from('org_settings')
+    .upsert(
+      { organization_id, key: 'account', value: toRow(next) },
+      { onConflict: 'organization_id,key' },
+    );
   if (error) throw error;
   return next;
 }
