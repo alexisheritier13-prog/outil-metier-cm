@@ -15,6 +15,7 @@ import { getPostTagIds, listTags } from '@/services/tags';
 import { listCampaignsForClient } from '@/services/campaigns';
 import { ORIGIN_TYPE_LABELS, describeOrigin } from '@/services/postOrigin';
 import type { Client, Post, Profile } from '@/shared/types';
+import { approvalUrl, getApprovalToken } from '@/services/approval';
 import { PostForm } from './PostForm';
 import { PerformanceSection } from './PerformanceSection';
 import { StatusActions } from './StatusActions';
@@ -114,6 +115,8 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             <p className="text-muted-foreground mb-1 text-xs">Statut</p>
             {me && <StatusActions post={post} role={me.role} />}
           </div>
+
+          {post.status === 'client_review' && <ApprovalLink postId={post.id} />}
 
           {(mediaQ.data ?? []).length > 0 && (
             <div>
@@ -251,5 +254,45 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
         </FormSheet>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function ApprovalLink({ postId }: { postId: string }) {
+  const token = useQuery({
+    queryKey: ['approval-token', postId],
+    queryFn: () => getApprovalToken(postId),
+  });
+  const [copied, setCopied] = useState(false);
+  const url = token.data ? approvalUrl(token.data) : '';
+
+  if (!url) return null;
+  return (
+    <div className="border-border bg-surface-2/50 space-y-1.5 rounded-lg border p-3">
+      <p className="text-xs font-medium">Lien de validation directe</p>
+      <p className="text-muted-foreground text-xs">
+        À envoyer au client s'il ne veut pas se connecter au portail.
+      </p>
+      <div className="flex items-center gap-1.5">
+        <code className="bg-surface border-border block flex-1 truncate rounded border px-2 py-1 text-xs">
+          {url}
+        </code>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(url);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1400);
+            } catch {
+              /* presse-papiers indisponible */
+            }
+          }}
+        >
+          {copied ? 'Copié' : 'Copier'}
+        </Button>
+      </div>
+    </div>
   );
 }

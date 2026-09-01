@@ -13,8 +13,10 @@ import { cn } from '@/lib/utils';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { mediaUrl } from '@/services/postMedia';
 import type { Network } from '@/shared/constants/networks';
-import type { PostMedia } from '@/shared/types';
+import type { PostMediaKind } from '@/shared/types';
 import { parisDateLabel } from '@/shared/utils/tz';
+
+type PreviewMedia = { storagePath: string; kind: PostMediaKind };
 
 interface Props {
   network: Network;
@@ -22,7 +24,7 @@ interface Props {
   logoUrl?: string | null;
   handle?: string | null;
   caption: string;
-  media: PostMedia[];
+  media: PreviewMedia[];
   scheduledAt: string;
   className?: string;
 }
@@ -83,7 +85,7 @@ function Avatar({ name, logoUrl, size = 32 }: { name: string; logoUrl?: string |
   );
 }
 
-function Media({ media }: { media: PostMedia[] }) {
+function Media({ media }: { media: PreviewMedia[] }) {
   const first = media[0];
   if (!first) {
     return (

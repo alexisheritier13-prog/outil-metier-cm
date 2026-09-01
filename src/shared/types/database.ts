@@ -931,6 +931,35 @@ export type Database = {
           },
         ]
       }
+      post_approval_tokens: {
+        Row: {
+          created_at: string
+          post_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          token?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_approval_tokens_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           author_id: string
@@ -1670,8 +1699,27 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      approve_via_token: { Args: { p_token: string }; Returns: string }
       auth_is_active: { Args: never; Returns: boolean }
       auth_role: { Args: never; Returns: Database["public"]["Enums"]["role_t"] }
+      auto_publish_due: {
+        Args: never
+        Returns: {
+          error: string | null
+          finished_at: string | null
+          id: number
+          job_name: string
+          ok: boolean | null
+          started_at: string
+          stats: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "job_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       can_see_client_request: { Args: { cid: string }; Returns: boolean }
       can_see_idea: { Args: { p_client_id: string }; Returns: boolean }
       can_see_scoped: { Args: { p_client_id: string }; Returns: boolean }
@@ -1817,6 +1865,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      post_by_approval_token: { Args: { p_token: string }; Returns: Json }
       post_change_status: {
         Args: {
           p_comment?: string
@@ -1971,6 +2020,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      reject_via_token: {
+        Args: { p_comment: string; p_token: string }
+        Returns: string
       }
       remind_client_review: { Args: { p_post_id: string }; Returns: undefined }
       request_to_post: {
