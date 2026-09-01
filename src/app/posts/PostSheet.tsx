@@ -7,6 +7,7 @@ import { FormSheet } from '@/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { MediaGallery } from '@/components/MediaGallery';
+import { PostPreview } from '@/components/PostPreview';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
@@ -83,8 +84,26 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
         <Tabs defaultValue="detail" className="flex flex-1 flex-col overflow-hidden">
           <TabsList className="mx-4 mb-1 mt-3">
             <TabsTrigger value="detail">Détail</TabsTrigger>
+            <TabsTrigger value="preview">Aperçu</TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
           </TabsList>
+
+          <TabsContent
+            value="preview"
+            className="bg-surface-2 flex-1 overflow-y-auto p-4 pt-4"
+          >
+            <PostPreview
+              network={post.network}
+              name={client?.name ?? '—'}
+              logoUrl={client?.logoUrl}
+              caption={post.caption}
+              media={mediaQ.data ?? []}
+              scheduledAt={post.scheduledAt}
+            />
+            <p className="text-muted-foreground mx-auto mt-3 max-w-sm text-center text-xs">
+              Rendu indicatif : l'affichage réel dépend du réseau.
+            </p>
+          </TabsContent>
 
           <TabsContent value="history" className="flex-1 overflow-y-auto p-4 pt-4">
             <PostHistory postId={post.id} />

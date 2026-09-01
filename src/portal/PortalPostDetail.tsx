@@ -5,6 +5,8 @@ import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/she
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
 import { MediaGallery } from '@/components/MediaGallery';
+import { PostPreview } from '@/components/PostPreview';
+import { usePortalClient } from './PortalClientContext';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
 import type { Post } from '@/shared/types';
@@ -22,6 +24,7 @@ import {
  * de modification (RPC de la Story 5.3).
  */
 export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose: () => void }) {
+  const client = usePortalClient();
   const comments = usePortalComments(post?.id ?? null);
   const media = usePortalPostMedia(post?.id ?? null);
   const addComment = useAddPortalComment(post?.id ?? '');
@@ -54,7 +57,23 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
         </header>
 
         <div className="flex-1 space-y-5 overflow-y-auto p-4">
-          {(media.data ?? []).length > 0 && <MediaGallery media={media.data!} />}
+          <div className="bg-surface-2 -mx-4 -mt-4 border-b p-4">
+            <PostPreview
+              network={post.network}
+              name={client.name}
+              logoUrl={client.logoUrl}
+              caption={post.caption}
+              media={media.data ?? []}
+              scheduledAt={post.scheduledAt}
+            />
+          </div>
+
+          {(media.data ?? []).length > 1 && (
+            <div>
+              <p className="text-muted-foreground mb-2 text-xs font-medium">Tous les visuels</p>
+              <MediaGallery media={media.data!} thumbSize="sm" />
+            </div>
+          )}
 
           <dl className="grid grid-cols-[6rem_1fr] gap-y-2 text-sm">
             <dt className="text-muted-foreground">Date</dt>

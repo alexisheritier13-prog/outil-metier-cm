@@ -3,9 +3,29 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/test/render';
 import { PortalPostDetail } from '@/portal/PortalPostDetail';
+import { PortalClientContext } from '@/portal/PortalClientContext';
 import * as portalService from '@/services/portal';
 import * as clientReview from '@/services/clientReview';
-import type { Post } from '@/shared/types';
+import type { Client, Post } from '@/shared/types';
+
+const fakeClient: Client = {
+  id: 'c1',
+  name: 'Client Test',
+  logoUrl: null,
+  sector: null,
+  isArchived: false,
+  archivedAt: null,
+  deletedAt: null,
+  createdAt: '',
+  updatedAt: '',
+};
+
+const renderDetail = (p: Post) =>
+  renderWithProviders(
+    <PortalClientContext.Provider value={fakeClient}>
+      <PortalPostDetail post={p} onClose={() => {}} />
+    </PortalClientContext.Provider>,
+  );
 
 vi.mock('@/services/portal');
 vi.mock('@/services/clientReview');
@@ -36,7 +56,7 @@ describe('PortalPostDetail', () => {
 
   it('propose Approuver / Demander une modification sur un post à valider', async () => {
     vi.mocked(portalService.listPortalComments).mockResolvedValue([]);
-    renderWithProviders(<PortalPostDetail post={post({})} onClose={() => {}} />);
+    renderDetail(post({}));
 
     expect(await screen.findByRole('button', { name: 'Approuver' })).toBeInTheDocument();
     expect(
@@ -47,7 +67,7 @@ describe('PortalPostDetail', () => {
   it('le refus exige un commentaire puis appelle rejectPost', async () => {
     vi.mocked(portalService.listPortalComments).mockResolvedValue([]);
     vi.mocked(clientReview.rejectPost).mockResolvedValue(post({ status: 'draft' }));
-    renderWithProviders(<PortalPostDetail post={post({})} onClose={() => {}} />);
+    renderDetail(post({}));
 
     await userEvent.click(await screen.findByRole('button', { name: /demander une modification/i }));
     const send = screen.getByRole('button', { name: /envoyer la demande/i });
@@ -62,9 +82,9 @@ describe('PortalPostDetail', () => {
 
   it('pas d’actions de validation sur un post déjà validé', async () => {
     vi.mocked(portalService.listPortalComments).mockResolvedValue([]);
-    renderWithProviders(<PortalPostDetail post={post({ status: 'approved' })} onClose={() => {}} />);
+    renderDetail(post({ status: 'approved' }));
 
-    expect(await screen.findByText('Une légende')).toBeInTheDocument();
+    expect((await screen.findAllByText('Une légende')).length).toBeGreaterThan(0);
     expect(screen.queryByRole('button', { name: 'Approuver' })).not.toBeInTheDocument();
   });
 
@@ -79,7 +99,7 @@ describe('PortalPostDetail', () => {
       createdAt: '',
       updatedAt: '',
     });
-    renderWithProviders(<PortalPostDetail post={post({ status: 'approved' })} onClose={() => {}} />);
+    renderDetail(post({ status: 'approved' }));
 
     await userEvent.type(await screen.findByLabelText(/nouveau commentaire/i), 'Merci !');
     await userEvent.click(screen.getByRole('button', { name: 'Commenter' }));
