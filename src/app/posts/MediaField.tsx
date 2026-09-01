@@ -1,13 +1,23 @@
 import { useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Play, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Library, Loader2, Play, Trash2, X } from 'lucide-react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Label } from '@/components/ui/label';
-import { ACCEPTED_MIME, MAX_FILE_BYTES, mediaKindOf, mediaUrl } from '@/services/postMedia';
+import { Button } from '@/components/ui/button';
+import {
+  ACCEPTED_MIME,
+  MAX_FILE_BYTES,
+  mediaAsFile,
+  mediaKindOf,
+  mediaUrl,
+} from '@/services/postMedia';
 import { cn } from '@/lib/utils';
 import type { PostMedia } from '@/shared/types';
 import {
+  useClientMedia,
   useDeletePostMedia,
   usePostMedia,
   useReorderPostMedia,
+  useReuseMedia,
   useUploadPostMedia,
 } from './usePostMedia';
 
@@ -43,11 +53,29 @@ export function MediaField({ clientId, postId, stagedFiles, onStagedChange }: Pr
   const del = useDeletePostMedia(postId ?? '');
   const reorder = useReorderPostMedia(postId ?? '');
 
+  const reuse = useReuseMedia(clientId, postId ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  const [libOpen, setLibOpen] = useState(false);
 
   const items = media.data ?? [];
+
+  async function addFromLibrary(source: PostMedia) {
+    if (live) {
+      await reuse.mutateAsync({ source, position: items.length });
+    } else {
+      setBusy(true);
+      try {
+        const file = await mediaAsFile(source);
+        onStagedChange?.([...(stagedFiles ?? []), file]);
+      } catch {
+        setErrors((e) => [...e, 'Ce visuel de la bibliothèque n’a pas pu être ajouté.']);
+      } finally {
+        setBusy(false);
+      }
+    }
+  }
 
   async function addFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -131,6 +159,15 @@ export function MediaField({ clientId, postId, stagedFiles, onStagedChange }: Pr
             <ImagePlus className="h-5 w-5" aria-hidden="true" />
           )}
         </button>
+
+        <button
+          type="button"
+          onClick={() => setLibOpen(true)}
+          className="border-input text-muted-foreground hover:border-border-strong hover:text-foreground grid h-24 w-24 place-items-center gap-1 rounded border border-dashed text-[11px] transition-colors"
+        >
+          <Library className="h-5 w-5" aria-hidden="true" />
+          Bibliothèque
+        </button>
       </div>
 
       <input
@@ -153,7 +190,104 @@ export function MediaField({ clientId, postId, stagedFiles, onStagedChange }: Pr
           {e}
         </p>
       ))}
+
+      <MediaLibraryDialog
+        clientId={clientId}
+        open={libOpen}
+        onOpenChange={setLibOpen}
+        onPick={addFromLibrary}
+        busy={busy || reuse.isPending}
+      />
     </div>
+  );
+}
+
+function MediaLibraryDialog({
+  clientId,
+  open,
+  onOpenChange,
+  onPick,
+  busy,
+}: {
+  clientId: string;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onPick: (m: PostMedia) => Promise<void>;
+  busy: boolean;
+}) {
+  const lib = useClientMedia(clientId, open);
+  const [added, setAdded] = useState<Set<string>>(new Set());
+
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="z-modal-backdrop bg-foreground/20 fixed inset-0 backdrop-blur-[1px]" />
+        <DialogPrimitive.Content className="bg-surface shadow-panel z-modal fixed left-1/2 top-1/2 flex max-h-[80vh] w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border p-0 focus:outline-none">
+          <div className="border-border flex items-center justify-between border-b px-5 py-3.5">
+            <DialogPrimitive.Title className="text-sm font-semibold">
+              Bibliothèque de visuels
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Close asChild>
+              <Button variant="ghost" size="icon" aria-label="Fermer">
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogPrimitive.Close>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+            {lib.isLoading ? (
+              <p className="text-muted-foreground py-8 text-center text-sm">Chargement…</p>
+            ) : (lib.data ?? []).length === 0 ? (
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                Aucun visuel utilisé pour ce client pour l’instant.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {(lib.data ?? []).map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    disabled={busy}
+                    onClick={async () => {
+                      await onPick(m);
+                      setAdded((s) => new Set(s).add(m.id));
+                    }}
+                    className="group relative aspect-square overflow-hidden rounded-lg border disabled:opacity-60"
+                  >
+                    {m.kind === 'image' ? (
+                      <img
+                        src={mediaUrl(m.storagePath)}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={mediaUrl(m.storagePath)}
+                        muted
+                        playsInline
+                        preload="metadata"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                    <span
+                      className={cn(
+                        'absolute inset-0 grid place-items-center text-xs font-medium text-white transition-opacity',
+                        added.has(m.id)
+                          ? 'bg-primary/70 opacity-100'
+                          : 'bg-foreground/0 opacity-0 group-hover:bg-foreground/40 group-hover:opacity-100',
+                      )}
+                    >
+                      {added.has(m.id) ? 'Ajouté' : 'Ajouter'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 

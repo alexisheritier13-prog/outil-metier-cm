@@ -60,6 +60,67 @@ export async function listMediaForPosts(postIds: string[]): Promise<Map<string, 
   return map;
 }
 
+/** Tous les visuels déjà utilisés sur les posts d'un client (bibliothèque). */
+export async function listClientMedia(clientId: string): Promise<PostMedia[]> {
+  const { data, error } = await getSupabase()
+    .from('post_media')
+    .select('*, posts!inner(client_id)')
+    .eq('posts.client_id', clientId)
+    .order('created_at', { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (data as unknown as Parameters<typeof toPostMedia>[0][]).map(toPostMedia);
+}
+
+/**
+ * Réutilise un visuel de la bibliothèque sur un autre post : copie l'objet dans
+ * le dossier du post cible puis crée la ligne `post_media` (aucun ré-upload).
+ */
+export async function reuseMediaToPost(
+  source: PostMedia,
+  targetClientId: string,
+  targetPostId: string,
+  position: number,
+): Promise<PostMedia> {
+  const ext = source.storagePath.includes('.')
+    ? source.storagePath.split('.').pop()!.toLowerCase()
+    : 'bin';
+  const path = `${targetClientId}/${targetPostId}/${crypto.randomUUID()}.${ext}`;
+
+  const cp = await getSupabase().storage.from(BUCKET).copy(source.storagePath, path);
+  if (cp.error) throw cp.error;
+
+  const { data, error } = await getSupabase()
+    .from('post_media')
+    .insert({
+      post_id: targetPostId,
+      storage_path: path,
+      kind: source.kind,
+      mime_type: source.mimeType,
+      size_bytes: source.sizeBytes,
+      width: source.width,
+      height: source.height,
+      duration_seconds: source.durationSeconds,
+      position,
+    })
+    .select('*')
+    .single();
+  if (error) {
+    await getSupabase().storage.from(BUCKET).remove([path]);
+    throw error;
+  }
+  return toPostMedia(data);
+}
+
+/** Télécharge un visuel de la bibliothèque en `File` (pour un nouveau post encore non créé). */
+export async function mediaAsFile(source: PostMedia): Promise<File> {
+  const res = await fetch(mediaUrl(source.storagePath));
+  if (!res.ok) throw new Error('téléchargement du visuel impossible');
+  const blob = await res.blob();
+  const ext = source.storagePath.includes('.') ? source.storagePath.split('.').pop() : 'bin';
+  return new File([blob], `bibliotheque-${source.id}.${ext}`, { type: source.mimeType });
+}
+
 export interface ProbedFile {
   file: File;
   kind: PostMediaKind;

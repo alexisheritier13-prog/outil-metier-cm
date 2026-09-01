@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deletePostMedia,
+  listClientMedia,
   listPostMedia,
   probeFile,
   reorderPostMedia,
+  reuseMediaToPost,
   uploadPostMedia,
 } from '@/services/postMedia';
+import type { PostMedia } from '@/shared/types';
 
 export const postMediaKey = (postId: string | null | undefined) =>
   ['post-media', postId] as const;
@@ -48,5 +51,27 @@ export function useReorderPostMedia(postId: string) {
   return useMutation({
     mutationFn: (orderedIds: string[]) => reorderPostMedia(postId, orderedIds),
     onSuccess: () => qc.invalidateQueries({ queryKey: postMediaKey(postId) }),
+  });
+}
+
+/** Visuels déjà utilisés sur les posts du client (bibliothèque). */
+export function useClientMedia(clientId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['client-media', clientId],
+    queryFn: () => listClientMedia(clientId),
+    enabled: enabled && Boolean(clientId),
+    staleTime: 60_000,
+  });
+}
+
+export function useReuseMedia(clientId: string, postId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ source, position }: { source: PostMedia; position: number }) =>
+      reuseMediaToPost(source, clientId, postId, position),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: postMediaKey(postId) });
+      qc.invalidateQueries({ queryKey: ['posts'] });
+    },
   });
 }

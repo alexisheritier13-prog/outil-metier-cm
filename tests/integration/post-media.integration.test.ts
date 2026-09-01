@@ -81,6 +81,22 @@ maybe('post_media (upload visuel)', () => {
     expect(row.error).toBeNull();
   });
 
+  it('bibliothèque : copie storage + nouvelle ligne post_media (réutilisation)', async () => {
+    const src = `${clientA}/${pubId}/${crypto.randomUUID()}.png`;
+    await cm.client.storage.from('post-media').upload(src, tinyPng, { contentType: 'image/png' });
+
+    const dest = `${clientA}/${draftId}/${crypto.randomUUID()}.png`;
+    const cp = await cm.client.storage.from('post-media').copy(src, dest);
+    expect(cp.error).toBeNull();
+
+    const row = await cm.client
+      .from('post_media')
+      .insert({ post_id: draftId, storage_path: dest, kind: 'image', mime_type: 'image/png' })
+      .select('id')
+      .single();
+    expect(row.error).toBeNull();
+  });
+
   it('un CM sans accès ne peut pas uploader dans le dossier d’un autre client', async () => {
     const path = `${clientB}/${pubId}/${crypto.randomUUID()}.png`;
     const up = await cm.client.storage
