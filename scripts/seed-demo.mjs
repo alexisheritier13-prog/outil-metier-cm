@@ -115,6 +115,7 @@ async function main() {
       active_networks: null,
       agency_name: 'Studio Lumen',
       agency_logo_url: '',
+      auto_publish: false,
     },
   });
 

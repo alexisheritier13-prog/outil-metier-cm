@@ -123,6 +123,24 @@ export function AccountSettingsPage() {
         </section>
 
         <section className="space-y-3">
+          <h2 className="text-sm font-semibold">Publication</h2>
+          <label className="flex items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              className="accent-primary mt-0.5 h-4 w-4"
+              checked={draft.autoPublish}
+              onChange={(e) => setDraft({ ...draft, autoPublish: e.target.checked })}
+            />
+            <span>
+              Passer les posts planifiés en « publié » automatiquement à l'heure prévue
+              <span className="text-muted-foreground block text-xs">
+                Vérifié toutes les 10 minutes. Sinon, marquez « publié » à la main.
+              </span>
+            </span>
+          </label>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-sm font-semibold">Espace client</h2>
           <div className="space-y-1.5">
             <label htmlFor="ac-name" className="text-sm font-medium">

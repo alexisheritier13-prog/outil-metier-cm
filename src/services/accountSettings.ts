@@ -19,6 +19,8 @@ export interface AccountSettings {
   agencyName: string;
   /** Logo de l'agence (URL) affiché dans le portail. */
   agencyLogoUrl: string;
+  /** Passe les posts planifiés en « publié » automatiquement à l'heure prévue. */
+  autoPublish: boolean;
 }
 
 export const DEFAULT_ACCOUNT: AccountSettings = {
@@ -28,6 +30,7 @@ export const DEFAULT_ACCOUNT: AccountSettings = {
   activeNetworks: null,
   agencyName: '',
   agencyLogoUrl: '',
+  autoPublish: false,
 };
 
 /** Résout la liste effective des réseaux (jamais vide). */
@@ -44,6 +47,7 @@ interface AccountRow {
   active_networks?: string[] | null;
   agency_name?: string;
   agency_logo_url?: string;
+  auto_publish?: boolean;
 }
 
 function fromRow(v: AccountRow): AccountSettings {
@@ -57,6 +61,7 @@ function fromRow(v: AccountRow): AccountSettings {
         : null,
     agencyName: typeof v.agency_name === 'string' ? v.agency_name : '',
     agencyLogoUrl: typeof v.agency_logo_url === 'string' ? v.agency_logo_url : '',
+    autoPublish: Boolean(v.auto_publish),
   };
 }
 
@@ -68,6 +73,7 @@ function toRow(s: AccountSettings) {
     active_networks: s.activeNetworks as string[] | null,
     agency_name: s.agencyName.trim(),
     agency_logo_url: s.agencyLogoUrl.trim(),
+    auto_publish: s.autoPublish,
   };
 }
 

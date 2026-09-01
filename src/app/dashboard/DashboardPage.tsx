@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Activity,
   ArrowRight,
@@ -24,6 +24,7 @@ import { isInternalRole } from '@/shared/constants/roles';
 import { POST_STATUSES, POST_STATUS_LABELS, type PostStatus } from '@/shared/constants/postStatus';
 import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
 import { listPosts, listReviewQueue } from '@/services/posts';
+import { useChangePostStatus } from '@/app/posts/usePosts';
 import type { Post } from '@/shared/types';
 import { listClientRequests } from '@/services/clientRequests';
 import { listAlerts } from '@/services/alerts';
@@ -90,6 +91,8 @@ export function DashboardPage() {
       }),
   });
   const activityQ = useQuery({ queryKey: ['dashboard', 'activity'], queryFn: () => listRecentActivity(8) });
+  const changeStatus = useChangePostStatus();
+  const qc = useQueryClient();
   const pipelineQ = useQuery({
     queryKey: ['dashboard', 'pipeline'],
     queryFn: () => listPosts({ statuses: PIPELINE_STATUSES }),
@@ -234,27 +237,50 @@ export function DashboardPage() {
                       {dayLabel(day)}
                     </p>
                     <ul className="space-y-0.5">
-                      {posts.map((p) => (
-                        <li key={p.id}>
-                          <Link
-                            to={`/app/planning?post=${p.id}`}
+                      {posts.map((p) => {
+                        const due =
+                          p.status === 'scheduled' && new Date(p.scheduledAt).getTime() <= Date.now();
+                        return (
+                          <li
+                            key={p.id}
                             className="hover:bg-surface-2 flex items-center gap-3 rounded-md px-1 py-1.5 text-sm"
                           >
-                            <span className="text-muted-foreground w-12 shrink-0 tabular-nums">
-                              {parisTimeLabel(p.scheduledAt)}
-                            </span>
-                            <NetworkIcon network={p.network} />
-                            <span className="min-w-0 flex-1 truncate">
-                              <span className="font-medium">{clientName(p.clientId)}</span>
-                              <span className="text-muted-foreground">
-                                {' · '}
-                                {p.caption || 'Sans légende'}
+                            <Link
+                              to={`/app/planning?post=${p.id}`}
+                              className="flex min-w-0 flex-1 items-center gap-3"
+                            >
+                              <span className="text-muted-foreground w-12 shrink-0 tabular-nums">
+                                {parisTimeLabel(p.scheduledAt)}
                               </span>
-                            </span>
-                            <StatusBadge status={p.status} />
-                          </Link>
-                        </li>
-                      ))}
+                              <NetworkIcon network={p.network} />
+                              <span className="min-w-0 flex-1 truncate">
+                                <span className="font-medium">{clientName(p.clientId)}</span>
+                                <span className="text-muted-foreground">
+                                  {' · '}
+                                  {p.caption || 'Sans légende'}
+                                </span>
+                              </span>
+                            </Link>
+                            {due ? (
+                              <button
+                                type="button"
+                                disabled={changeStatus.isPending}
+                                onClick={() =>
+                                  changeStatus.mutate(
+                                    { id: p.id, to: 'published' },
+                                    { onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard'] }) },
+                                  )
+                                }
+                                className="bg-primary text-primary-foreground shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
+                              >
+                                Publié
+                              </button>
+                            ) : (
+                              <StatusBadge status={p.status} />
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </li>
                 ))}
