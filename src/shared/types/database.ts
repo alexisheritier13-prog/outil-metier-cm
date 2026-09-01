@@ -2164,6 +2164,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      dispatch_emails_tick: { Args: never; Returns: undefined }
       generate_alerts: {
         Args: never
         Returns: {
