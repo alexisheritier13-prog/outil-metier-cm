@@ -13,19 +13,25 @@ import {
   FormSection,
   FormSheet,
 } from '@/components/form';
+import { cn } from '@/lib/utils';
 import { parisDateLabel } from '@/shared/utils/tz';
 import { invitationUrl } from '@/services/platform';
+import { FEEDBACK_KIND_LABELS, type FeedbackStatus } from '@/services/feedback';
 import {
   useCreateInvitation,
   useIsPlatformAdmin,
+  usePlatformFeedback,
   usePlatformInvitations,
   usePlatformOrgs,
+  useSetFeedbackStatus,
 } from './usePlatform';
 
 export function PlatformPage() {
   const admin = useIsPlatformAdmin();
   const orgs = usePlatformOrgs(admin.data === true);
   const invites = usePlatformInvitations(admin.data === true);
+  const feedback = usePlatformFeedback(admin.data === true);
+  const setFbStatus = useSetFeedbackStatus();
   const create = useCreateInvitation();
 
   const [open, setOpen] = useState(false);
@@ -106,6 +112,55 @@ export function PlatformPage() {
                     </>
                   )}
                 </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold">
+          Retours ({(feedback.data ?? []).filter((f) => f.status === 'new').length} nouveaux)
+        </h2>
+        {(feedback.data ?? []).length === 0 ? (
+          <EmptyState
+            title="Aucun retour"
+            description="Les retours envoyés depuis « Faire un retour » (agence ou portail) arrivent ici."
+          />
+        ) : (
+          <ul className="space-y-2">
+            {(feedback.data ?? []).map((f) => (
+              <li
+                key={f.id}
+                className={cn(
+                  'surface-card space-y-2 p-3 text-sm',
+                  f.status === 'done' && 'opacity-60',
+                )}
+              >
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="bg-surface-2 rounded px-1.5 py-0.5 font-medium">
+                    {FEEDBACK_KIND_LABELS[f.kind]}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {f.authorEmail}
+                    {f.orgName ? ` · ${f.orgName}` : ''} · {parisDateLabel(f.createdAt)}
+                    {f.path ? ` · ${f.path}` : ''}
+                  </span>
+                </div>
+                <p className="whitespace-pre-wrap">{f.message}</p>
+                <div className="flex gap-1.5">
+                  {(['new', 'seen', 'done'] as FeedbackStatus[]).map((s) => (
+                    <Button
+                      key={s}
+                      size="sm"
+                      variant={f.status === s ? 'default' : 'outline'}
+                      onClick={() => setFbStatus.mutate({ id: f.id, status: s })}
+                      disabled={setFbStatus.isPending}
+                    >
+                      {s === 'new' ? 'Nouveau' : s === 'seen' ? 'Vu' : 'Traité'}
+                    </Button>
+                  ))}
+                </div>
               </li>
             ))}
           </ul>

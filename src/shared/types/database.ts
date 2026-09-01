@@ -697,6 +697,63 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          admin_note: string
+          author_email: string
+          author_id: string | null
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["feedback_kind_t"]
+          message: string
+          organization_id: string | null
+          path: string
+          status: Database["public"]["Enums"]["feedback_status_t"]
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string
+          author_email?: string
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["feedback_kind_t"]
+          message: string
+          organization_id?: string | null
+          path?: string
+          status?: Database["public"]["Enums"]["feedback_status_t"]
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string
+          author_email?: string
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["feedback_kind_t"]
+          message?: string
+          organization_id?: string | null
+          path?: string
+          status?: Database["public"]["Enums"]["feedback_status_t"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       idea_tags: {
         Row: {
           idea_id: string
@@ -2296,6 +2353,7 @@ export type Database = {
         Returns: undefined
       }
       org_invitation_by_token: { Args: { p_token: string }; Returns: Json }
+      platform_list_feedback: { Args: never; Returns: Json }
       platform_list_invitations: { Args: never; Returns: Json }
       platform_list_organizations: { Args: never; Returns: Json }
       post_by_approval_token: { Args: { p_token: string }; Returns: Json }
@@ -2500,6 +2558,32 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_feedback_status: {
+        Args: { p_id: string; p_note?: string; p_status: string }
+        Returns: undefined
+      }
+      submit_feedback: {
+        Args: { p_kind: string; p_message: string; p_path?: string }
+        Returns: {
+          admin_note: string
+          author_email: string
+          author_id: string | null
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["feedback_kind_t"]
+          message: string
+          organization_id: string | null
+          path: string
+          status: Database["public"]["Enums"]["feedback_status_t"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "feedback"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       transition_needs_comment: {
         Args: {
           p_from: Database["public"]["Enums"]["post_status_t"]
@@ -2561,6 +2645,8 @@ export type Database = {
         | "publish_reminder"
       client_request_status_t: "nouvelle" | "prise_en_compte" | "traitee"
       comment_visibility_t: "internal" | "client"
+      feedback_kind_t: "bug" | "idea" | "other"
+      feedback_status_t: "new" | "seen" | "done"
       key_date_scope_t: "global" | "sector" | "client"
       network_t:
         | "instagram"
@@ -2718,6 +2804,8 @@ export const Constants = {
       ],
       client_request_status_t: ["nouvelle", "prise_en_compte", "traitee"],
       comment_visibility_t: ["internal", "client"],
+      feedback_kind_t: ["bug", "idea", "other"],
+      feedback_status_t: ["new", "seen", "done"],
       key_date_scope_t: ["global", "sector", "client"],
       network_t: [
         "instagram",

@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/NotificationBell';
+import { FeedbackButton } from '@/components/FeedbackButton';
 import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
@@ -140,6 +141,7 @@ export function PortalLayout() {
                   {profile.fullName || profile.email}
                 </NavLink>
               )}
+              <FeedbackButton compact />
               <NotificationBell hrefFor={hrefForClient} align="end" />
               <button
                 type="button"

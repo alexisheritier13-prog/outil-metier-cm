@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { openGlobalSearch } from '@/lib/appShortcuts';
 import { UserAvatar } from '@/components/UserAvatar';
 import { NotificationBell } from '@/components/NotificationBell';
+import { FeedbackButton } from '@/components/FeedbackButton';
 import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useIsPlatformAdmin } from '@/app/platform/usePlatform';
@@ -134,6 +135,7 @@ export function AppSidebar() {
         <Item to="/app/aide" icon={LifeBuoy}>
           Aide
         </Item>
+        <FeedbackButton />
       </div>
 
       <div className="border-border/70 bg-surface shadow-xs m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
