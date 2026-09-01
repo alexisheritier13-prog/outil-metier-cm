@@ -37,6 +37,26 @@ export function useCreatePost() {
   });
 }
 
+/** Crée une série de posts (brouillons), un par date. Renvoie le nombre créé. */
+export function useCreateSeries() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ dates, base }: { dates: string[]; base: Omit<PostInput, 'scheduledAt'> }) => {
+      let ok = 0;
+      for (const scheduledAt of dates) {
+        try {
+          await createPost({ ...base, scheduledAt });
+          ok += 1;
+        } catch {
+          /* on continue : récap à la fin */
+        }
+      }
+      return { created: ok, total: dates.length };
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['posts'] }),
+  });
+}
+
 export function useUpdatePost(id: string) {
   const qc = useQueryClient();
   return useMutation({

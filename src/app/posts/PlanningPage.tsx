@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarArrowDown, Plus } from 'lucide-react';
+import { CalendarArrowDown, CalendarPlus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormSheet } from '@/components/form';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -20,12 +20,13 @@ import { parisDateKey } from '@/shared/utils/tz';
 import { downloadTextFile } from '@/lib/download';
 import type { Post } from '@/shared/types';
 import { PostForm } from './PostForm';
+import { SeriesForm } from './SeriesForm';
 import { PostsTable } from './PostsTable';
 import { PostSheet } from './PostSheet';
 import { BulkActionBar } from './BulkActionBar';
 import { FiltersBar } from './FiltersBar';
 import { useFilters } from './useFilters';
-import { useCreatePost, usePosts } from './usePosts';
+import { useCreatePost, useCreateSeries, usePosts } from './usePosts';
 
 const CalendarView = lazy(() =>
   import('./CalendarView').then((m) => ({ default: m.CalendarView })),
@@ -39,6 +40,7 @@ export function PlanningPage() {
   const canReassign = me?.role === 'lead' || me?.role === 'admin';
   const [mode, setMode] = useState<ViewMode>('month');
   const [createOpen, setCreateOpen] = useState(false);
+  const [seriesOpen, setSeriesOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
   const [showKeyDates, setShowKeyDates] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -64,6 +66,7 @@ export function PlanningPage() {
     enabled: showKeyDates,
   });
   const create = useCreatePost();
+  const series = useCreateSeries();
 
   const keyDateMarkers = useMemo(() => {
     if (!showKeyDates) return [];
@@ -167,6 +170,13 @@ export function PlanningPage() {
             >
               <CalendarArrowDown className="h-4 w-4" /> Exporter .ics
             </Button>
+          <Button
+            variant="outline"
+            disabled={!hasClients}
+            onClick={() => setSeriesOpen(true)}
+          >
+            <CalendarPlus className="h-4 w-4" /> Série
+          </Button>
           <Button disabled={!hasClients} onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" /> Nouveau post
           </Button>
@@ -188,6 +198,39 @@ export function PlanningPage() {
               onCancel={() => setCreateOpen(false)}
               onSubmit={(input) => create.mutateAsync(input)}
               onSuccess={() => setCreateOpen(false)}
+            />
+          </FormSheet>
+          <FormSheet
+            open={seriesOpen}
+            onOpenChange={(v) => {
+              setSeriesOpen(v);
+              if (!v) series.reset();
+            }}
+            title="Planifier une série"
+            description="Un lot de brouillons répartis sur les jours choisis."
+            wide
+          >
+            <SeriesForm
+              clients={clients.data ?? []}
+              templates={templates.data ?? []}
+              authors={authors.data ?? []}
+              canReassign={canReassign}
+              pending={series.isPending}
+              report={series.data ?? null}
+              onCancel={() => setSeriesOpen(false)}
+              onSubmit={(r) =>
+                series.mutate({
+                  dates: r.dates,
+                  base: {
+                    clientId: r.clientId,
+                    network: r.network,
+                    caption: r.caption,
+                    canvaUrl: null,
+                    authorId: r.authorId,
+                    tags: r.tags,
+                  },
+                })
+              }
             />
           </FormSheet>
           </div>
