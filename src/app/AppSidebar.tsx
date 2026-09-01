@@ -10,11 +10,13 @@ import {
   LifeBuoy,
   ListChecks,
   LogOut,
+  Search,
   Settings,
   Trash2,
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { openGlobalSearch } from '@/lib/appShortcuts';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
@@ -48,6 +50,20 @@ export function AppSidebar() {
           C
         </span>
         <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
+      </div>
+
+      <div className="px-3 pb-1 pt-2">
+        <button
+          type="button"
+          onClick={openGlobalSearch}
+          className="border-border bg-surface-2/60 text-muted-foreground hover:bg-surface-2 hover:text-foreground flex w-full items-center gap-2.5 rounded-lg border px-3 py-2 text-sm transition-colors"
+        >
+          <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className="flex-1 text-left">Rechercher</span>
+          <kbd className="border-border bg-surface text-muted-foreground rounded border px-1 text-[10px] font-medium">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">

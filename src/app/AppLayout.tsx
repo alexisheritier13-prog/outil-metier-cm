@@ -3,6 +3,8 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useAccountSettings } from '@/app/account/useAccount';
+import { GlobalSearch } from '@/components/GlobalSearch';
+import { useGlobalShortcuts } from '@/lib/appShortcuts';
 import { AppSidebar } from './AppSidebar';
 
 export function AppLayout() {
@@ -11,6 +13,7 @@ export function AppLayout() {
   const { data: me } = useCurrentProfile();
   const account = useAccountSettings();
 
+  useGlobalShortcuts();
   useEffect(() => setDrawer(false), [pathname]);
 
   // Admin sur un compte non configuré → assistant de bienvenue.
@@ -45,6 +48,8 @@ export function AppLayout() {
           </main>
         </div>
       </div>
+
+      <GlobalSearch />
 
       {/* Drawer (mobile / tablette) */}
       {drawer && (

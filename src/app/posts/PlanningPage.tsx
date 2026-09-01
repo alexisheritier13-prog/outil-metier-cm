@@ -90,6 +90,15 @@ export function PlanningPage() {
     if (p) setOpenPost(p);
   }, [deepLinkId, posts.data, openPost?.id]);
 
+  // Nouveau post via ?new=1 (raccourci « n »).
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setCreateOpen(true);
+      searchParams.delete('new');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   // Une sélection ne survit pas à un changement de filtre (les ids affichés changent).
   useEffect(() => setSelected(new Set()), [filterKey]);
 

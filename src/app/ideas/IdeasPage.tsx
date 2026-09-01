@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Lightbulb, Plus, Trash2, X } from 'lucide-react';
 import { listPostsByOrigin } from '@/services/postOrigin';
@@ -29,6 +30,16 @@ export function IdeasPage() {
   const [tagFilter, setTagFilter] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const id = searchParams.get('open');
+    if (id) {
+      setOpenId(id);
+      searchParams.delete('open');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const clients = useQuery({
     queryKey: ['clients', { includeArchived: false }],
