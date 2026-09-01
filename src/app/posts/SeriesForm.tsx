@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { parisDateLabel } from '@/shared/utils/tz';
 import type { Client, PostTemplate, Profile } from '@/shared/types';
+import { listClientPillars } from '@/services/clientPillars';
 import { seriesDates, type SeriesConfig } from './series';
 import { templatePrefill } from './applyTemplate';
 
@@ -36,6 +38,7 @@ export interface SeriesResult {
   network: Network;
   caption: string;
   authorId?: string;
+  pillarId: string | null;
   tags: string[];
 }
 
@@ -64,7 +67,14 @@ export function SeriesForm({
   const [network, setNetwork] = useState<Network>('instagram');
   const [caption, setCaption] = useState('');
   const [tagsText, setTagsText] = useState('');
+  const [pillarId, setPillarId] = useState('');
   const [authorId, setAuthorId] = useState<string | undefined>(undefined);
+
+  const pillars = useQuery({
+    queryKey: ['client-pillars', clientId],
+    queryFn: () => listClientPillars(clientId),
+    enabled: Boolean(clientId),
+  });
 
   const [startDate, setStartDate] = useState(todayISO());
   const [weekdays, setWeekdays] = useState<number[]>([2, 4]);
@@ -101,6 +111,7 @@ export function SeriesForm({
           clientId,
           network,
           caption,
+          pillarId: pillarId || null,
           authorId: canReassign ? authorId : undefined,
           tags: tagsText
             .split(',')
@@ -177,9 +188,28 @@ export function SeriesForm({
             />
           </FormField>
 
-          <FormField label="Tags" htmlFor="sr-tags" hint="Séparés par des virgules.">
-            <Input id="sr-tags" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
-          </FormField>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField label="Tags" htmlFor="sr-tags" hint="Séparés par des virgules.">
+              <Input id="sr-tags" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+            </FormField>
+            {(pillars.data ?? []).length > 0 && (
+              <FormField label="Rubrique" htmlFor="sr-pillar">
+                <select
+                  id="sr-pillar"
+                  className={selectClass}
+                  value={pillarId}
+                  onChange={(e) => setPillarId(e.target.value)}
+                >
+                  <option value="">Non classé</option>
+                  {(pillars.data ?? []).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+            )}
+          </div>
 
           {canReassign && authors.length > 0 && (
             <FormField label="Rédacteur" htmlFor="sr-author">

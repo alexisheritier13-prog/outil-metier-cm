@@ -51,6 +51,7 @@ export interface PostInput {
   canvaUrl: string | null;
   authorId?: string;
   campaignId?: string | null;
+  pillarId?: string | null;
   /** Noms de tags (créés à la volée si besoin). */
   tags?: string[];
 }
@@ -73,6 +74,7 @@ export async function createPost(input: PostInput): Promise<Post> {
       caption: input.caption,
       canva_url: input.canvaUrl,
       campaign_id: input.campaignId ?? null,
+      pillar_id: input.pillarId ?? null,
       author_id: input.authorId ?? userRes.user?.id ?? '',
     })
     .select('*')
@@ -92,6 +94,7 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
       caption: input.caption,
       canva_url: input.canvaUrl,
       campaign_id: input.campaignId ?? null,
+      pillar_id: input.pillarId ?? null,
       ...(input.authorId ? { author_id: input.authorId } : {}),
     })
     .eq('id', id)

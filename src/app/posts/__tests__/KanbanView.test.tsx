@@ -17,6 +17,7 @@ const mk = (over: Partial<Post>): Post => ({
   status: 'draft',
   authorId: 'me',
   campaignId: null,
+  pillarId: null,
   originType: null,
   originId: null,
   performanceNote: null,

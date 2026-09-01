@@ -211,6 +211,16 @@ async function main() {
     start_date: '2026-03-01',
     notes: 'Engagement 6 mois, reconduction tacite. Shooting produit non inclus (refacturé).',
   });
+  await admin.from('client_pillars').delete().eq('client_id', CLIENT_ID);
+  const { data: demoPillars } = await admin
+    .from('client_pillars')
+    .insert([
+      { client_id: CLIENT_ID, label: 'Produit', target_pct: 40, sort_order: 0 },
+      { client_id: CLIENT_ID, label: 'Coulisses', target_pct: 30, sort_order: 1 },
+      { client_id: CLIENT_ID, label: 'UGC', target_pct: 30, sort_order: 2 },
+    ])
+    .select('id');
+
   await admin.from('client_credentials').delete().eq('client_id', CLIENT_ID);
   await admin.from('client_credentials').insert([
     {
@@ -495,6 +505,24 @@ async function main() {
     p_year: new Date().getFullYear() + 1,
     p_network: 'instagram',
   });
+
+  console.log('→ rubriques sur les posts du mois');
+  {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+    const { data: monthPosts } = await admin
+      .from('posts')
+      .select('id')
+      .eq('client_id', CLIENT_ID)
+      .is('deleted_at', null)
+      .gte('scheduled_at', start)
+      .lt('scheduled_at', end);
+    const pids = (demoPillars ?? []).map((p) => p.id);
+    for (let i = 0; i < (monthPosts ?? []).length && pids.length; i += 1) {
+      await admin.from('posts').update({ pillar_id: pids[i % pids.length] }).eq('id', monthPosts[i].id);
+    }
+  }
 
   console.log('→ génération des alertes');
   await admin.from('alerts').delete().eq('client_id', CLIENT_ID);

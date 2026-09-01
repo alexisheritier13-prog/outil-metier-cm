@@ -32,6 +32,7 @@ const mkPost = (over: Partial<Post>): Post =>
     status: over.status ?? 'scheduled',
     authorId: 'me',
     campaignId: null,
+    pillarId: null,
     originType: null,
     originId: null,
     performanceNote: over.performanceNote ?? null,

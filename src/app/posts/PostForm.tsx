@@ -18,6 +18,7 @@ import { useActiveNetworks } from '@/app/account/useAccount';
 import { Info } from 'lucide-react';
 import { parisWallTimeToUtc, toParisParts } from '@/shared/utils/tz';
 import { listCampaignsForClient } from '@/services/campaigns';
+import { listClientPillars } from '@/services/clientPillars';
 import { listNetworks } from '@/services/socialAccounts';
 import { probeFile, uploadPostMedia } from '@/services/postMedia';
 import type { Client, Post, PostTemplate, Profile } from '@/shared/types';
@@ -32,6 +33,7 @@ const schema = z.object({
   caption: z.string(),
   authorId: z.string().optional(),
   campaignId: z.string().optional(),
+  pillarId: z.string().optional(),
   tagsText: z.string(),
 });
 type Values = z.infer<typeof schema>;
@@ -59,6 +61,7 @@ interface Props {
     canvaUrl: string | null;
     authorId: string;
     campaignId: string | null;
+    pillarId: string | null;
     tags: string[];
   }>;
   submitLabel: string;
@@ -100,6 +103,7 @@ export function PostForm({
       caption: defaults?.caption ?? '',
       authorId: defaults?.authorId,
       campaignId: defaults?.campaignId ?? '',
+      pillarId: defaults?.pillarId ?? '',
       tagsText: (defaults?.tags ?? []).join(', '),
     },
   });
@@ -128,6 +132,11 @@ export function PostForm({
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', clientId],
     queryFn: () => listCampaignsForClient(clientId),
+    enabled: Boolean(clientId),
+  });
+  const pillars = useQuery({
+    queryKey: ['client-pillars', clientId],
+    queryFn: () => listClientPillars(clientId),
     enabled: Boolean(clientId),
   });
   const networks = useQuery({ queryKey: ['networks'], queryFn: listNetworks, staleTime: 5 * 60_000 });
@@ -162,6 +171,7 @@ export function PostForm({
           canvaUrl: canvaUrl.trim() || null,
           authorId: canReassign ? v.authorId : undefined,
           campaignId: v.campaignId || null,
+          pillarId: v.pillarId || null,
           tags: v.tagsText
             .split(',')
             .map((t) => t.trim())
@@ -291,6 +301,18 @@ export function PostForm({
                 ))}
               </select>
             </FormField>
+            {(pillars.data ?? []).length > 0 && (
+              <FormField label="Rubrique" htmlFor="pf-pillar">
+                <select id="pf-pillar" className={selectClass} {...register('pillarId')}>
+                  <option value="">Non classé</option>
+                  {(pillars.data ?? []).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+            )}
             <FormField
               label="Tags"
               htmlFor="pf-tags"

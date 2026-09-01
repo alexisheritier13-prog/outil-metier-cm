@@ -227,6 +227,7 @@ export function PlanningPage() {
                     caption: r.caption,
                     canvaUrl: null,
                     authorId: r.authorId,
+                    pillarId: r.pillarId,
                     tags: r.tags,
                   },
                 })

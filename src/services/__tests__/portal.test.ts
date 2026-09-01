@@ -12,6 +12,7 @@ const base: Post = {
   status: 'published',
   authorId: 'a1',
   campaignId: null,
+  pillarId: null,
   originType: null,
   originId: null,
   performanceNote: 'CPC interne',

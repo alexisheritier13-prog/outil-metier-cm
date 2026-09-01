@@ -40,6 +40,7 @@ const post = (over: Partial<Post>): Post => ({
   status: 'client_review',
   authorId: 'a1',
   campaignId: null,
+  pillarId: null,
   originType: null,
   originId: null,
   performanceNote: null,

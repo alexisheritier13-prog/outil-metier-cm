@@ -10,6 +10,7 @@ import {
   saveEditorialGuideline,
   type EditorialGuidelineInput,
 } from '@/services/editorialGuidelines';
+import { PillarsEditor } from './PillarsEditor';
 
 const TEXT_FIELDS: {
   key: Exclude<keyof EditorialGuidelineInput, 'brandColors' | 'typography'>;
@@ -75,6 +76,7 @@ export function GuidelinesTab({ clientId }: { clientId: string }) {
   const setColors = (brandColors: BrandColor[]) => setForm((p) => ({ ...p, brandColors }));
 
   return (
+    <div className="space-y-10">
     <form
       className="max-w-2xl space-y-8"
       onSubmit={(e) => {
@@ -195,5 +197,8 @@ export function GuidelinesTab({ clientId }: { clientId: string }) {
         )}
       </div>
     </form>
+
+    <PillarsEditor clientId={clientId} />
+    </div>
   );
 }

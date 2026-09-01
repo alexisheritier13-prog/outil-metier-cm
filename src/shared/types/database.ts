@@ -344,6 +344,48 @@ export type Database = {
           },
         ]
       }
+      client_pillars: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          target_pct: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          target_pct?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          target_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_pillars_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_pillars_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_request_comments: {
         Row: {
           author_id: string
@@ -1176,6 +1218,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1198,6 +1241,7 @@ export type Database = {
           origin_type?: string | null
           performance_note?: string | null
           performance_visible_to_client?: boolean
+          pillar_id?: string | null
           scheduled_at: string
           search_tsv?: unknown
           status?: Database["public"]["Enums"]["post_status_t"]
@@ -1220,6 +1264,7 @@ export type Database = {
           origin_type?: string | null
           performance_note?: string | null
           performance_visible_to_client?: boolean
+          pillar_id?: string | null
           scheduled_at?: string
           search_tsv?: unknown
           status?: Database["public"]["Enums"]["post_status_t"]
@@ -1268,6 +1313,13 @@ export type Database = {
             columns: ["deleted_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_pillar_id_fkey"
+            columns: ["pillar_id"]
+            isOneToOne: false
+            referencedRelation: "client_pillars"
             referencedColumns: ["id"]
           },
           {
@@ -1565,6 +1617,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1599,6 +1652,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1671,6 +1725,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1707,6 +1762,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1775,6 +1831,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1806,6 +1863,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1841,6 +1899,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1891,6 +1950,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]
@@ -1927,6 +1987,7 @@ export type Database = {
           origin_type: string | null
           performance_note: string | null
           performance_visible_to_client: boolean
+          pillar_id: string | null
           scheduled_at: string
           search_tsv: unknown
           status: Database["public"]["Enums"]["post_status_t"]

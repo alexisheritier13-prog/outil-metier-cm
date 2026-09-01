@@ -3,8 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NetworkIcon } from '@/components/NetworkIcon';
+import { PillarBalance } from '@/components/PillarBalance';
 import { parisDateLabel, parisDateTimeLabel } from '@/shared/utils/tz';
 import type { Client } from '@/shared/types';
+import { listClientPillars } from '@/services/clientPillars';
+import { listPosts } from '@/services/posts';
 import { getEditorialGuideline } from '@/services/editorialGuidelines';
 import { getClientContract } from '@/services/clientContract';
 import { listClientContacts } from '@/services/clientContacts';
@@ -40,6 +43,15 @@ export function OverviewTab({
   const activity = useQuery({
     queryKey: ['client-activity', id, '', ''],
     queryFn: () => listClientActivity(id),
+  });
+  const pillars = useQuery({ queryKey: ['client-pillars', id], queryFn: () => listClientPillars(id) });
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+  const monthPosts = useQuery({
+    queryKey: ['posts', { clientIds: [id], from: monthStart, to: monthEnd }],
+    queryFn: () => listPosts({ clientIds: [id], from: monthStart, to: monthEnd }),
+    enabled: (pillars.data ?? []).length > 0,
   });
 
   const ob = onboarding.data ?? [];
@@ -120,6 +132,19 @@ export function OverviewTab({
           </div>
         )}
       </Panel>
+
+      {(pillars.data ?? []).length > 0 && (
+        <Panel
+          title="Équilibre du mois"
+          onOpen={() => onNavigate('guidelines')}
+          className="lg:col-span-2"
+        >
+          <PillarBalance
+            pillars={pillars.data ?? []}
+            posts={(monthPosts.data ?? []).map((p) => ({ pillarId: p.pillarId }))}
+          />
+        </Panel>
+      )}
 
       <Panel title="Contacts" count={contacts.data?.length} onOpen={() => onNavigate('contacts')}>
         {(contacts.data ?? []).length === 0 ? (
@@ -206,16 +231,18 @@ function Panel({
   count,
   onOpen,
   noArrow,
+  className,
   children,
 }: {
   title: string;
   count?: number;
   onOpen: () => void;
   noArrow?: boolean;
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <section className="surface-card flex flex-col p-4">
+    <section className={cn('surface-card flex flex-col p-4', className)}>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">
           {title}

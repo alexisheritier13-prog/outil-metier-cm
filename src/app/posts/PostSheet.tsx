@@ -241,6 +241,7 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               canvaUrl: post.canvaUrl,
               authorId: post.authorId,
               campaignId: post.campaignId,
+              pillarId: post.pillarId,
               tags: tagNames,
             }}
             onCancel={() => setEditOpen(false)}

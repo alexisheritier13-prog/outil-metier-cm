@@ -302,6 +302,7 @@ export interface Post {
   status: PostStatus;
   authorId: string;
   campaignId: string | null;
+  pillarId: string | null;
   originType: PostOriginType | null;
   originId: string | null;
   performanceNote: string | null;
@@ -313,6 +314,26 @@ export interface Post {
 }
 
 export type PostOriginType = 'idea' | 'key_date' | 'client_request' | 'duplicate';
+
+type ClientPillarRow = Database['public']['Tables']['client_pillars']['Row'];
+
+export interface ClientPillar {
+  id: string;
+  clientId: string;
+  label: string;
+  targetPct: number;
+  sortOrder: number;
+}
+
+export function toClientPillar(row: ClientPillarRow): ClientPillar {
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    label: row.label,
+    targetPct: row.target_pct,
+    sortOrder: row.sort_order,
+  };
+}
 
 export type PostMediaKind = 'image' | 'video';
 
@@ -357,6 +378,7 @@ export function toPost(row: PostRow): Post {
     status: row.status,
     authorId: row.author_id,
     campaignId: row.campaign_id,
+    pillarId: row.pillar_id,
     originType: (row.origin_type as Post['originType']) ?? null,
     originId: row.origin_id,
     performanceNote: row.performance_note,
