@@ -18,12 +18,20 @@ import {
 import { cn } from '@/lib/utils';
 import { openGlobalSearch } from '@/lib/appShortcuts';
 import { UserAvatar } from '@/components/UserAvatar';
+import { NotificationBell } from '@/components/NotificationBell';
+import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { countReviewQueue } from '@/services/posts';
 import { countNewAlerts } from '@/services/alerts';
 import { useOpenRequestCount } from '@/app/requests/useRequests';
+
+function hrefForInternal(n: AppNotification): string {
+  if (n.type === 'job_failed') return '/app/parametres/jobs';
+  if (n.postId) return `/app/planning?post=${n.postId}`;
+  return '/app';
+}
 
 /** Barre latérale de l'espace agence. */
 export function AppSidebar() {
@@ -45,11 +53,12 @@ export function AppSidebar() {
 
   return (
     <div className="bg-surface flex h-full w-[248px] shrink-0 flex-col">
-      <div className="flex items-center gap-2.5 px-5 pb-2 pt-5">
-        <span className="bg-primary text-primary-foreground shadow-card grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
+      <div className="flex items-center gap-2.5 px-4 pb-2 pt-4">
+        <span className="bg-primary text-primary-foreground shadow-card grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm font-bold">
           C
         </span>
-        <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
+        <span className="flex-1 text-[15px] font-semibold tracking-tight">Cadence</span>
+        <NotificationBell hrefFor={hrefForInternal} align="start" />
       </div>
 
       <div className="px-3 pb-1 pt-2">

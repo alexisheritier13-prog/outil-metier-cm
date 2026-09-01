@@ -938,6 +938,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           id: string
+          kind: string
           post_id: string
           updated_at: string
           visibility: Database["public"]["Enums"]["comment_visibility_t"]
@@ -948,6 +949,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           id?: string
+          kind?: string
           post_id: string
           updated_at?: string
           visibility?: Database["public"]["Enums"]["comment_visibility_t"]
@@ -958,6 +960,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           id?: string
+          kind?: string
           post_id?: string
           updated_at?: string
           visibility?: Database["public"]["Enums"]["comment_visibility_t"]
@@ -1680,6 +1683,10 @@ export type Database = {
           p_to: Database["public"]["Enums"]["post_status_t"]
         }
         Returns: boolean
+      }
+      client_contact_user_ids: {
+        Args: { p_client_id: string }
+        Returns: string[]
       }
       client_restore: { Args: { p_client_id: string }; Returns: undefined }
       client_trash: { Args: { p_client_id: string }; Returns: undefined }

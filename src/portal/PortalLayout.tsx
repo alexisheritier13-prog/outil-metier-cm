@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/NotificationBell';
+import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useSignOut } from '@/auth/useAuthActions';
 import { getAccountSettings } from '@/services/accountSettings';
@@ -14,6 +16,12 @@ import { PortalClientContext } from './PortalClientContext';
 import { usePortalPendingCount } from './usePortal';
 
 const STORE_KEY = 'portal.clientId';
+
+function hrefForClient(n: AppNotification): string {
+  if (n.type === 'post_awaiting_client') return '/portail/a-valider';
+  if (n.type === 'comment_agency') return '/portail/a-valider';
+  return '/portail';
+}
 
 function readStored(): string | null {
   try {
@@ -123,15 +131,16 @@ export function PortalLayout() {
               )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5">
               {profile && (
                 <NavLink
                   to="/portail/mon-compte"
-                  className="text-muted-foreground hover:text-foreground hidden text-sm sm:inline"
+                  className="text-muted-foreground hover:text-foreground mr-1 hidden text-sm sm:inline"
                 >
                   {profile.fullName || profile.email}
                 </NavLink>
               )}
+              <NotificationBell hrefFor={hrefForClient} align="end" />
               <button
                 type="button"
                 onClick={() => signOut.mutate()}

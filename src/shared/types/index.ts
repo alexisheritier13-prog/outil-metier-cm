@@ -490,6 +490,11 @@ export type NotificationType =
   | 'post_returned'
   | 'post_client_approved'
   | 'post_client_rejected'
+  | 'post_awaiting_client'
+  | 'comment_client'
+  | 'comment_agency'
+  | 'comment_internal'
+  | 'job_failed'
   | (string & {});
 
 export interface AppNotification {
