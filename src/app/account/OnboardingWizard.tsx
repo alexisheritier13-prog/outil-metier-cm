@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Users, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -188,17 +189,12 @@ export function OnboardingWizard() {
                 placeholder="Studio Lumen"
               />
             </div>
-            <div className="space-y-1.5">
-              <label htmlFor="ob-logo" className="text-sm font-medium">
-                Logo (URL)
-              </label>
-              <Input
-                id="ob-logo"
-                value={agencyLogoUrl}
-                onChange={(e) => setAgencyLogoUrl(e.target.value)}
-                placeholder="https://…"
-              />
-            </div>
+            <ImageUploadField
+              label="Logo (facultatif)"
+              folder="orgs"
+              value={agencyLogoUrl}
+              onChange={setAgencyLogoUrl}
+            />
           </div>
         )}
 

@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Page, PageHeader } from '@/components/Page';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { UserAvatar } from '@/components/UserAvatar';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { useCurrentProfile, CURRENT_PROFILE_KEY } from '@/auth/useCurrentProfile';
@@ -51,17 +52,13 @@ function ProfileCard({ me }: { me: Profile }) {
             </label>
             <Input id="ma-name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
-          <div className="grid gap-1 text-sm">
-            <label htmlFor="ma-avatar" className="text-muted-foreground text-xs">
-              Photo de profil (URL)
-            </label>
-            <Input
-              id="ma-avatar"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://…"
-            />
-          </div>
+          <ImageUploadField
+            label="Photo de profil"
+            folder="avatars"
+            shape="circle"
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+          />
           {save.isError && <p className="text-danger-strong text-xs">L'enregistrement a échoué.</p>}
           <div>
             <Button size="sm" disabled={!dirty || save.isPending} onClick={() => save.mutate()}>

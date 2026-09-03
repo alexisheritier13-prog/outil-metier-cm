@@ -4,11 +4,12 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FormBody, FormField, FormFooter, FormSection } from '@/components/form';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import type { ClientInput } from '@/services/clients';
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Nom requis'),
-  logoUrl: z.string().trim().url('URL invalide').or(z.literal('')),
+  logoUrl: z.string().trim(),
   sector: z.string().trim(),
   skipClientReview: z.boolean(),
 });
@@ -27,6 +28,8 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -60,19 +63,13 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
           <FormField label="Secteur d'activité" htmlFor="cf-sector">
             <Input id="cf-sector" placeholder="Restauration, mode, immobilier…" {...register('sector')} />
           </FormField>
-          <FormField
-            label="Logo (URL)"
-            htmlFor="cf-logo"
-            hint="Affiché sur la fiche et dans les listes."
-            error={errors.logoUrl?.message}
-          >
-            <Input
-              id="cf-logo"
-              placeholder="https://…"
-              {...register('logoUrl')}
-              aria-invalid={errors.logoUrl ? true : undefined}
-            />
-          </FormField>
+          <ImageUploadField
+            label="Logo"
+            hint="Affiché sur la fiche, dans les listes et dans l'espace client."
+            folder="clients"
+            value={watch('logoUrl')}
+            onChange={(url) => setValue('logoUrl', url, { shouldDirty: true })}
+          />
         </FormSection>
 
         <FormSection title="Circuit de validation">

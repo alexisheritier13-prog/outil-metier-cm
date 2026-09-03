@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { Page, PageHeader } from '@/components/Page';
+import { ImageUploadField } from '@/components/ImageUploadField';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
@@ -153,17 +154,13 @@ export function AccountSettingsPage() {
               placeholder="Cadence"
             />
           </div>
-          <div className="space-y-1.5">
-            <label htmlFor="ac-logo" className="text-sm font-medium">
-              Logo (URL)
-            </label>
-            <Input
-              id="ac-logo"
-              value={draft.agencyLogoUrl}
-              onChange={(e) => setDraft({ ...draft, agencyLogoUrl: e.target.value })}
-              placeholder="https://…"
-            />
-          </div>
+          <ImageUploadField
+            label="Logo de l'agence"
+            hint="Affiché dans l'espace client."
+            folder="orgs"
+            value={draft.agencyLogoUrl}
+            onChange={(url) => setDraft({ ...draft, agencyLogoUrl: url })}
+          />
         </section>
 
         <div className="flex items-center gap-3">

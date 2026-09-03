@@ -77,6 +77,9 @@ jamais mêlées aux logos couleur des clients.
 - `<Skeleton>` / `<TableSkeleton>` : chargement (préféré au spinner central).
 - Classe `.field` (globals.css `@layer components`) : `<select>` / `<input type=date>`
   natifs à hauteur et style constants (`h-9`, `border-input`).
+- `<ImageUploadField>` : logos / photos par **upload** (jamais un champ URL) —
+  vignette de prévisualisation (`square` logo / `circle` avatar) + *Ajouter* /
+  *Remplacer* / *Retirer*, bucket public `brand-assets`.
 
 **Composants métier :**
 - `StatusBadge` : icône + libellé + fond teinté du statut (`toneClasses` +
