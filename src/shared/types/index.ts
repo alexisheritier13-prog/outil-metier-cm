@@ -58,6 +58,8 @@ export interface Client {
   isArchived: boolean;
   /** Ce client ne valide pas les posts : l'étape « à valider client » est sautée. */
   skipClientReview?: boolean;
+  /** Client du jeu de démonstration, supprimable en bloc. */
+  isDemo?: boolean;
   archivedAt: string | null;
   deletedAt: string | null;
   createdAt: string;
@@ -72,6 +74,7 @@ export function toClient(row: ClientRow): Client {
     sector: row.sector,
     isArchived: row.is_archived,
     skipClientReview: row.skip_client_review,
+    isDemo: row.is_demo,
     archivedAt: row.archived_at,
     deletedAt: row.deleted_at,
     createdAt: row.created_at,

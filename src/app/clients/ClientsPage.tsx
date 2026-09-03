@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Building2, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Building2, ChevronDown, ChevronUp, FlaskConical, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Page, PageHeader } from '@/components/Page';
 import { Input } from '@/components/ui/input';
@@ -11,8 +12,9 @@ import { TableSkeleton } from '@/components/ui/skeleton';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import type { ClientOverview } from '@/shared/types';
+import { deleteOrgDemo } from '@/services/clients';
 import { useAccountSettings } from '@/app/account/useAccount';
-import { useClientOverview, useCreateClient } from './useClients';
+import { useClientOverview, useClients, useCreateClient } from './useClients';
 import { ClientForm } from './ClientForm';
 import { parisDateLabel } from '@/shared/utils/tz';
 
@@ -38,8 +40,19 @@ export function ClientsPage() {
     dir: 'asc',
   });
   const clients = useClientOverview(includeArchived);
+  const rawClients = useClients(false);
   const create = useCreateClient();
   const account = useAccountSettings();
+  const qc = useQueryClient();
+
+  const demoIds = useMemo(
+    () => new Set((rawClients.data ?? []).filter((c) => c.isDemo).map((c) => c.id)),
+    [rawClients.data],
+  );
+  const removeDemo = useMutation({
+    mutationFn: deleteOrgDemo,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),
+  });
 
   const rows = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -96,6 +109,28 @@ export function ClientsPage() {
           )
         }
       />
+
+      {me.role === 'admin' && demoIds.size > 0 && (
+        <div className="border-border bg-surface-2/60 mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border p-3">
+          <FlaskConical className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
+          <p className="text-muted-foreground min-w-0 flex-1 text-sm">
+            <span className="text-foreground font-medium">« Studio Lumen (démo) »</span> est un
+            client fictif pour explorer Cadence. Supprimez-le quand vous n'en avez plus besoin.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={removeDemo.isPending}
+            onClick={() => {
+              if (confirm('Supprimer le client de démonstration et tous ses posts ?')) {
+                removeDemo.mutate();
+              }
+            }}
+          >
+            {removeDemo.isPending ? 'Suppression…' : 'Supprimer la démo'}
+          </Button>
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap items-center gap-4">
         <Input
@@ -163,6 +198,11 @@ export function ClientsPage() {
                     >
                       <ClientAvatar name={c.name} logoUrl={c.logoUrl} size="sm" />
                       {c.name}
+                      {demoIds.has(c.id) && (
+                        <span className="border-border text-muted-foreground rounded-full border px-1.5 py-px text-[11px] font-normal">
+                          démo
+                        </span>
+                      )}
                       {c.isArchived && (
                         <span className="text-muted-foreground text-xs">(archivé)</span>
                       )}

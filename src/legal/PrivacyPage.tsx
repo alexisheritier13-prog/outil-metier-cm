@@ -2,8 +2,7 @@ import { LegalLayout } from './LegalLayout';
 
 /**
  * Politique de confidentialité (RGPD). Modèle à faire relire par un juriste / DPO
- * avant ouverture large. Mention restant à compléter : l'adresse postale (n° et
- * rue) de l'Éditeur — cherchez « [À COMPLÉTER ».
+ * avant ouverture large.
  */
 export function PrivacyPage() {
   return (
@@ -19,7 +18,7 @@ export function PrivacyPage() {
         Pour les données liées au fonctionnement du Service (comptes, journaux, communications
         avec le support), le responsable de traitement est{' '}
         <strong>Alexis Heritier, entrepreneur individuel</strong> (SIREN 914 882 303),{' '}
-        <strong>[À COMPLÉTER : n° et rue], 84120 Pertuis</strong>, contact{' '}
+        <strong>1280 avenue Pierre Augier, 84120 Pertuis</strong>, contact{' '}
         <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>{' '}
         (l'« Éditeur »).
       </p>

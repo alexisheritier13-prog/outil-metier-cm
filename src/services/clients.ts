@@ -26,6 +26,17 @@ export async function listClientOverview(includeArchived = false): Promise<Clien
   return data.map(toClientOverview);
 }
 
+/**
+ * Supprime le jeu de démonstration de l'organisation (client « Studio Lumen
+ * (démo) » + ses posts / campagne / rubriques). Réservé au Directeur.
+ * @returns nombre de clients de démo supprimés (0 ou 1).
+ */
+export async function deleteOrgDemo(): Promise<number> {
+  const { data, error } = await getSupabase().rpc('delete_org_demo');
+  if (error) throw error;
+  return data ?? 0;
+}
+
 export async function getClient(id: string): Promise<Client | null> {
   const { data, error } = await getSupabase()
     .from('clients')

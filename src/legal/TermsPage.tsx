@@ -2,8 +2,7 @@ import { LegalLayout } from './LegalLayout';
 
 /**
  * Conditions générales d'utilisation. Modèle à faire relire par un juriste avant
- * ouverture large. Mention restant à compléter : l'adresse postale (n° et rue) de
- * l'Éditeur — cherchez « [À COMPLÉTER ».
+ * ouverture large.
  */
 export function TermsPage() {
   return (
@@ -13,7 +12,7 @@ export function TermsPage() {
         l'utilisation de l'application <strong>Cadence</strong> (le « Service »), éditée par{' '}
         <strong>Alexis Heritier, entrepreneur individuel</strong>, immatriculé sous le numéro{' '}
         <strong>SIRET 914 882 303 00029</strong> (SIREN 914 882 303), dont le siège est situé{' '}
-        <strong>[À COMPLÉTER : n° et rue], 84120 Pertuis, France</strong> (l'« Éditeur »).
+        <strong>1280 avenue Pierre Augier, 84120 Pertuis, France</strong> (l'« Éditeur »).
       </p>
       <p>
         Contact :{' '}
