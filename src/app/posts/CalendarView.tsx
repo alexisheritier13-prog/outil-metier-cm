@@ -3,7 +3,11 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import type {
+  DateClickArg,
+} from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg, EventDropArg } from '@fullcalendar/core';
+import { parisWallTimeToUtc } from '@/shared/utils/tz';
 import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { NETWORK_BRAND } from '@/components/networkBrand';
@@ -26,6 +30,8 @@ interface Props {
   keyDates?: KeyDateMarker[];
   /** Occupe toute la hauteur du conteneur parent (au lieu de s'ajuster au contenu). */
   fill?: boolean;
+  /** Clic sur une case vide → créer un post à cette date (ISO UTC). */
+  onCreateAt?: (dateIso: string) => void;
 }
 
 export function CalendarView({
@@ -36,8 +42,24 @@ export function CalendarView({
   editable,
   keyDates = [],
   fill = false,
+  onCreateAt,
 }: Props) {
   const reschedule = useReschedulePost();
+
+  function handleDateClick(arg: DateClickArg) {
+    if (!onCreateAt) return;
+    const d = arg.date;
+    const iso = arg.allDay
+      ? parisWallTimeToUtc({
+          year: d.getFullYear(),
+          month: d.getMonth() + 1,
+          day: d.getDate(),
+          hour: 10,
+          minute: 0,
+        }).toISOString()
+      : d.toISOString();
+    onCreateAt(iso);
+  }
 
   const events = useMemo(
     () => [
@@ -99,6 +121,7 @@ export function CalendarView({
         nowIndicator
         eventDrop={handleDrop}
         eventClick={handleClick}
+        dateClick={onCreateAt ? handleDateClick : undefined}
         eventContent={(arg: EventContentArg) => {
           const kd = arg.event.extendedProps.keyDate as KeyDateMarker | undefined;
           if (kd) {

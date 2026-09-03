@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FormSheet } from '@/components/form';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
 import { TableSkeleton } from '@/components/ui/skeleton';
-import { Page, PageHeader } from '@/components/Page';
+import { PageHeader } from '@/components/Page';
 import { Segmented } from '@/components/Segmented';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
@@ -47,6 +47,7 @@ export function PlanningPage() {
       : 'month',
   );
   const [createOpen, setCreateOpen] = useState(false);
+  const [createDate, setCreateDate] = useState<string | null>(null);
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
   const [showKeyDates, setShowKeyDates] = useState(false);
@@ -151,7 +152,8 @@ export function PlanningPage() {
   const hasClients = (clients.data ?? []).length > 0;
 
   return (
-    <Page>
+    <div className="animate-in fade-in flex flex-col px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title="Planning"
         aside={
@@ -202,16 +204,21 @@ export function PlanningPage() {
             </Button>
           <FormSheet
             open={createOpen}
-            onOpenChange={setCreateOpen}
+            onOpenChange={(v) => {
+              setCreateOpen(v);
+              if (!v) setCreateDate(null);
+            }}
             title="Nouveau post"
             description="Programmez un post et joignez ses visuels."
             wide
           >
             <PostForm
+              key={createDate ?? 'new'}
               clients={clients.data ?? []}
               authors={authors.data ?? []}
               canReassign={canReassign}
               templates={templates.data ?? []}
+              initialScheduledAt={createDate ?? undefined}
               submitLabel="Créer le post"
               pending={create.isPending}
               error={create.isError ? create.error : undefined}
@@ -264,47 +271,62 @@ export function PlanningPage() {
         onReset={resetFilters}
         isEmpty={filtersEmpty}
       />
+      </div>
 
-      {loading && <TableSkeleton rows={8} />}
+      <div className="mt-3 min-h-0 flex-1 overflow-hidden">
+        {loading && <TableSkeleton rows={8} />}
 
-      {!loading && mode === 'list' && (
-        <PostsTable
-          posts={rows}
-          clientName={clientName}
-          onOpen={setOpenPost}
-          hasClients={hasClients}
-          selectedIds={selected}
-          onToggleSelect={toggleSelect}
-          onToggleAll={toggleAll}
-        />
-      )}
-      {!loading && mode === 'kanban' && (
-        <Suspense fallback={<FullPageSpinner />}>
-          <KanbanView
-            posts={rows}
-            role={me.role}
-            clientName={clientName}
-            onOpen={setOpenPost}
-            selectedIds={selected}
-            onToggleSelect={toggleSelect}
-          />
-        </Suspense>
-      )}
-      {!loading && (mode === 'month' || mode === 'week') && (
-        <Suspense fallback={<FullPageSpinner />}>
-          <div className="min-h-[34rem] lg:h-[calc(100dvh-14rem)]">
-            <CalendarView
+        {!loading && mode === 'list' && (
+          <div className="h-full overflow-y-auto lg:min-h-0">
+            <PostsTable
               posts={rows}
-              view={mode === 'month' ? 'dayGridMonth' : 'timeGridWeek'}
               clientName={clientName}
               onOpen={setOpenPost}
-              editable
-              keyDates={keyDateMarkers}
-              fill
+              hasClients={hasClients}
+              selectedIds={selected}
+              onToggleSelect={toggleSelect}
+              onToggleAll={toggleAll}
             />
           </div>
-        </Suspense>
-      )}
+        )}
+        {!loading && mode === 'kanban' && (
+          <div className="h-full overflow-auto lg:min-h-0">
+            <Suspense fallback={<FullPageSpinner />}>
+              <KanbanView
+                posts={rows}
+                role={me.role}
+                clientName={clientName}
+                onOpen={setOpenPost}
+                selectedIds={selected}
+                onToggleSelect={toggleSelect}
+              />
+            </Suspense>
+          </div>
+        )}
+        {!loading && (mode === 'month' || mode === 'week') && (
+          <Suspense fallback={<FullPageSpinner />}>
+            <div className="min-h-[34rem] lg:h-full lg:min-h-0">
+              <CalendarView
+                posts={rows}
+                view={mode === 'month' ? 'dayGridMonth' : 'timeGridWeek'}
+                clientName={clientName}
+                onOpen={setOpenPost}
+                onCreateAt={
+                  hasClients
+                    ? (iso) => {
+                        setCreateDate(iso);
+                        setCreateOpen(true);
+                      }
+                    : undefined
+                }
+                editable
+                keyDates={keyDateMarkers}
+                fill
+              />
+            </div>
+          </Suspense>
+        )}
+      </div>
 
       <PostSheet
         post={currentOpen}
@@ -325,6 +347,6 @@ export function PlanningPage() {
           onClear={() => setSelected(new Set())}
         />
       )}
-    </Page>
+    </div>
   );
 }

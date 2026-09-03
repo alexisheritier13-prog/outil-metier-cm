@@ -62,6 +62,8 @@ interface Props {
     campaignId: string | null;
     pillarId: string | null;
   }>;
+  /** En création : pré-remplit uniquement la date (clic sur une case du calendrier). */
+  initialScheduledAt?: string;
   submitLabel: string;
   pending: boolean;
   error?: unknown;
@@ -79,6 +81,7 @@ export function PostForm({
   templates = [],
   postId,
   defaults,
+  initialScheduledAt,
   submitLabel,
   pending,
   error,
@@ -97,7 +100,11 @@ export function PostForm({
     defaultValues: {
       clientId: defaults?.clientId ?? clients[0]?.id ?? '',
       network: defaults?.network ?? 'instagram',
-      scheduledLocal: defaults?.scheduledAt ? toLocalInput(defaults.scheduledAt) : '',
+      scheduledLocal: defaults?.scheduledAt
+        ? toLocalInput(defaults.scheduledAt)
+        : initialScheduledAt
+          ? toLocalInput(initialScheduledAt)
+          : '',
       caption: defaults?.caption ?? '',
       authorId: defaults?.authorId,
       campaignId: defaults?.campaignId ?? '',
