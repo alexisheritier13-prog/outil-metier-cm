@@ -8,7 +8,7 @@ const tpl = (over: Partial<PostTemplate>): PostTemplate => ({
   description: '',
   network: 'instagram',
   captionTemplate: 'Citation :\n\n« … »\n\n#motivation',
-  defaultTags: ['citation', 'lundi'],
+  defaultTags: [],
   clientId: null,
   createdBy: 'u1',
   createdAt: '',
@@ -17,19 +17,17 @@ const tpl = (over: Partial<PostTemplate>): PostTemplate => ({
 });
 
 describe('templatePrefill', () => {
-  it('reprend réseau, légende et tags du template', () => {
+  it('reprend réseau et légende du template', () => {
     expect(templatePrefill(tpl({}))).toEqual({
       network: 'instagram',
       caption: 'Citation :\n\n« … »\n\n#motivation',
-      tagsText: 'citation, lundi',
     });
   });
 
-  it('réseau nul → pas de réseau imposé, tags vides → chaîne vide', () => {
-    expect(templatePrefill(tpl({ network: null, defaultTags: [] }))).toEqual({
+  it('réseau nul → pas de réseau imposé', () => {
+    expect(templatePrefill(tpl({ network: null }))).toEqual({
       network: null,
       caption: 'Citation :\n\n« … »\n\n#motivation',
-      tagsText: '',
     });
   });
 });

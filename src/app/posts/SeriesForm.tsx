@@ -39,7 +39,6 @@ export interface SeriesResult {
   caption: string;
   authorId?: string;
   pillarId: string | null;
-  tags: string[];
 }
 
 interface Props {
@@ -66,7 +65,6 @@ export function SeriesForm({
   const [clientId, setClientId] = useState(clients[0]?.id ?? '');
   const [network, setNetwork] = useState<Network>('instagram');
   const [caption, setCaption] = useState('');
-  const [tagsText, setTagsText] = useState('');
   const [pillarId, setPillarId] = useState('');
   const [authorId, setAuthorId] = useState<string | undefined>(undefined);
 
@@ -91,7 +89,6 @@ export function SeriesForm({
     const pre = templatePrefill(t);
     if (pre.network) setNetwork(pre.network);
     if (pre.caption) setCaption(pre.caption);
-    if (pre.tagsText) setTagsText(pre.tagsText);
   }
 
   const cfg: SeriesConfig = { startDate, weekdays, time, mode, count, until };
@@ -113,10 +110,6 @@ export function SeriesForm({
           caption,
           pillarId: pillarId || null,
           authorId: canReassign ? authorId : undefined,
-          tags: tagsText
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
         });
       }}
     >
@@ -189,9 +182,6 @@ export function SeriesForm({
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Tags" htmlFor="sr-tags" hint="Séparés par des virgules.">
-              <Input id="sr-tags" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
-            </FormField>
             {(pillars.data ?? []).length > 0 && (
               <FormField label="Rubrique" htmlFor="sr-pillar">
                 <select

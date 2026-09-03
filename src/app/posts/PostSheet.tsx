@@ -11,7 +11,6 @@ import { PostPreview } from '@/components/PostPreview';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
-import { getPostTagIds, listTags } from '@/services/tags';
 import { listCampaignsForClient } from '@/services/campaigns';
 import { ORIGIN_TYPE_LABELS, describeOrigin } from '@/services/postOrigin';
 import type { Client, Post, Profile } from '@/shared/types';
@@ -40,12 +39,6 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
   const duplicate = useDuplicatePost();
   const [editOpen, setEditOpen] = useState(false);
 
-  const tagIds = useQuery({
-    queryKey: ['post-tags', post?.id],
-    queryFn: () => getPostTagIds(post!.id),
-    enabled: Boolean(post),
-  });
-  const allTags = useQuery({ queryKey: ['tags'], queryFn: listTags });
   const mediaQ = usePostMedia(post?.id);
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', post?.clientId],
@@ -60,9 +53,6 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
 
   if (!post) return null;
   const client = clients.find((c) => c.id === post.clientId);
-  const tagNames = (allTags.data ?? [])
-    .filter((t) => (tagIds.data ?? []).includes(t.id))
-    .map((t) => t.name);
   const campaignName = (campaigns.data ?? []).find((c) => c.id === post.campaignId)?.name;
 
   return (
@@ -174,15 +164,6 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             </div>
           )}
 
-          {tagNames.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {tagNames.map((t) => (
-                <span key={t} className="bg-surface-2 rounded-sm border px-1.5 py-0.5 text-xs">
-                  {t}
-                </span>
-              ))}
-            </div>
-          )}
 
           <PerformanceSection post={post} />
 
@@ -245,7 +226,6 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
               authorId: post.authorId,
               campaignId: post.campaignId,
               pillarId: post.pillarId,
-              tags: tagNames,
             }}
             onCancel={() => setEditOpen(false)}
             onSubmit={(input) => update.mutateAsync(input)}

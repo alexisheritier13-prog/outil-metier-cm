@@ -166,11 +166,11 @@ function PostTab() {
         <p>
           Bouton <strong>Nouveau post</strong> dans <Ref to="/app/planning">Planning</Ref>, ou
           touche <Kbd>n</Kbd>. Un panneau latéral s'ouvre : client, réseau, date et heure{' '}
-          <strong>en heure de Paris</strong>, légende, rubrique, tags, campagne, lien de
+          <strong>en heure de Paris</strong>, légende, rubrique, campagne, lien de
           travail Canva (interne, jamais montré au client).
         </p>
         <p>
-          <strong>Partir d'un template</strong> pré-remplit légende et tags. Les specs du
+          <strong>Partir d'un template</strong> pré-remplit la légende. Les specs du
           réseau choisi s'affichent en repère.
         </p>
       </Topic>
@@ -202,7 +202,7 @@ function PostTab() {
             template (jours de la semaine, heure, nombre ou date de fin).
           </li>
           <li>
-            <strong>Dupliquer</strong> un post avec décalage de date : reprend légende, tags,
+            <strong>Dupliquer</strong> un post avec décalage de date : reprend légende, rubrique,
             campagne.
           </li>
           <li>
@@ -319,7 +319,7 @@ function LibraryTab() {
         <Defs
           items={[
             ['Idées', 'Idées de posts non datées. Sans client : visible de toute l’agence. Avec client : suit l’accès. Transformable en brouillon.'],
-            ['Templates', 'Modèles réutilisables (légende, réseau, tags). Globaux ou rattachés à un client. Utilisés à la création et par les séries.'],
+            ['Templates', 'Modèles réutilisables (légende, réseau).  Globaux ou rattachés à un client. Utilisés à la création et par les séries.'],
             ['Marronniers', 'Dates clés récurrentes (~70 pré-remplies) : globales, par secteur, ou propres à un client. Alerte à l’approche sans post prévu. Transformable en brouillon pré-daté.'],
             ['Campagnes', 'Regrouper des posts (nom, dates, description). Vue avec le nombre de posts.'],
           ]}

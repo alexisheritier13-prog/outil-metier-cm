@@ -58,7 +58,7 @@ describe('PostForm', () => {
     );
   });
 
-  it('« Partir d\'un template » pré-remplit réseau, légende et tags', async () => {
+  it('« Partir d\'un template » pré-remplit réseau et légende', async () => {
     const onSubmit = vi.fn<(i: PostInput) => Promise<never>>().mockResolvedValue(undefined as never);
     render(
       <PostForm
@@ -73,7 +73,7 @@ describe('PostForm', () => {
             description: '',
             network: 'linkedin',
             captionTemplate: 'Citation de la semaine',
-            defaultTags: ['citation'],
+            defaultTags: [],
             clientId: null,
             createdBy: 'u1',
             createdAt: '',
@@ -86,7 +86,6 @@ describe('PostForm', () => {
     await userEvent.selectOptions(screen.getByLabelText(/partir d'un template/i), 't1');
     expect(screen.getByLabelText(/légende/i)).toHaveValue('Citation de la semaine');
     expect(screen.getByLabelText(/^réseau$/i)).toHaveValue('linkedin');
-    expect(screen.getByLabelText(/^tags$/i)).toHaveValue('citation');
   });
 
   it('pré-remplit en édition et reconvertit UTC → heure de Paris', async () => {

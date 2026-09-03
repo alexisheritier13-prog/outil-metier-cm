@@ -34,7 +34,6 @@ const schema = z.object({
   authorId: z.string().optional(),
   campaignId: z.string().optional(),
   pillarId: z.string().optional(),
-  tagsText: z.string(),
 });
 type Values = z.infer<typeof schema>;
 
@@ -62,7 +61,6 @@ interface Props {
     authorId: string;
     campaignId: string | null;
     pillarId: string | null;
-    tags: string[];
   }>;
   submitLabel: string;
   pending: boolean;
@@ -104,7 +102,6 @@ export function PostForm({
       authorId: defaults?.authorId,
       campaignId: defaults?.campaignId ?? '',
       pillarId: defaults?.pillarId ?? '',
-      tagsText: (defaults?.tags ?? []).join(', '),
     },
   });
 
@@ -127,7 +124,6 @@ export function PostForm({
     const pre = templatePrefill(t);
     if (pre.network) setValue('network', pre.network);
     if (pre.caption) setValue('caption', pre.caption);
-    if (pre.tagsText) setValue('tagsText', pre.tagsText);
   }
   const campaigns = useQuery({
     queryKey: ['campaigns-for-client', clientId],
@@ -172,10 +168,6 @@ export function PostForm({
           authorId: canReassign ? v.authorId : undefined,
           campaignId: v.campaignId || null,
           pillarId: v.pillarId || null,
-          tags: v.tagsText
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
         });
 
         // Visuels mis en attente à la création → upload contre le post créé.
@@ -313,13 +305,6 @@ export function PostForm({
                 </select>
               </FormField>
             )}
-            <FormField
-              label="Tags"
-              htmlFor="pf-tags"
-              hint="Séparés par des virgules. Créés à la volée."
-            >
-              <Input id="pf-tags" placeholder="urgent, promo, UGC" {...register('tagsText')} />
-            </FormField>
           </div>
 
           {canReassign && authors.length > 0 && (

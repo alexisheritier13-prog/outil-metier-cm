@@ -104,11 +104,6 @@ export function TemplatesPage() {
               <pre className="bg-surface-2 mt-2 max-h-32 overflow-auto whitespace-pre-wrap rounded border p-2 text-xs">
                 {t.captionTemplate || '(légende vide)'}
               </pre>
-              {t.defaultTags.length > 0 && (
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Tags : {t.defaultTags.join(', ')}
-                </p>
-              )}
             </li>
           ))}
         </ul>
@@ -133,7 +128,6 @@ function TemplateForm({
   const [description, setDescription] = useState(template?.description ?? '');
   const [network, setNetwork] = useState<Network | ''>(template?.network ?? '');
   const [caption, setCaption] = useState(template?.captionTemplate ?? '');
-  const [tags, setTags] = useState((template?.defaultTags ?? []).join(', '));
   const [clientId, setClientId] = useState(template?.clientId ?? '');
 
   const save = useMutation({
@@ -156,7 +150,7 @@ function TemplateForm({
           description,
           network: network || null,
           captionTemplate: caption,
-          defaultTags: tags.split(',').map((s) => s.trim()).filter(Boolean),
+          defaultTags: [],
           clientId: clientId || null,
         });
       }}
@@ -216,13 +210,6 @@ function TemplateForm({
           onChange={(e) => setCaption(e.target.value)}
         />
       </label>
-      <input
-        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
-        placeholder="Tags par défaut (séparés par des virgules)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        aria-label="Tags par défaut"
-      />
       <div className="flex gap-2">
         <Button type="submit" disabled={save.isPending || !name.trim()}>
           {template ? 'Enregistrer' : 'Créer'}

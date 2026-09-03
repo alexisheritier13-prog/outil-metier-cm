@@ -12,12 +12,10 @@ import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { listClients } from '@/services/clients';
-import { listTags } from '@/services/tags';
 import type { Idea } from '@/shared/types';
 import {
   useCreateIdea,
   useDeleteIdea,
-  useIdeaTagIds,
   useIdeaToPost,
   useIdeas,
   useUpdateIdea,
@@ -27,7 +25,6 @@ export function IdeasPage() {
   const { data: me } = useCurrentProfile();
   const [q, setQ] = useState('');
   const [clientFilter, setClientFilter] = useState('');
-  const [tagFilter, setTagFilter] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,11 +42,9 @@ export function IdeasPage() {
     queryKey: ['clients', { includeArchived: false }],
     queryFn: () => listClients(false),
   });
-  const tags = useQuery({ queryKey: ['tags'], queryFn: listTags });
   const ideas = useIdeas({
     q: q.trim() || undefined,
     clientId: clientFilter === 'none' ? null : clientFilter || undefined,
-    tagId: tagFilter || undefined,
   });
 
   const clientName = useMemo(() => {
@@ -101,19 +96,6 @@ export function IdeasPage() {
           {(clients.data ?? []).map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className="field"
-          value={tagFilter}
-          onChange={(e) => setTagFilter(e.target.value)}
-          aria-label="Filtrer par tag"
-        >
-          <option value="">Tous les tags</option>
-          {(tags.data ?? []).map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
             </option>
           ))}
         </select>
@@ -170,19 +152,10 @@ function IdeaForm({
 }) {
   const create = useCreateIdea();
   const update = useUpdateIdea(idea?.id ?? '');
-  const existingTags = useIdeaTagIds(idea?.id ?? null);
-  const allTags = useQuery({ queryKey: ['tags'], queryFn: listTags });
 
   const [title, setTitle] = useState(idea?.title ?? '');
   const [description, setDescription] = useState(idea?.description ?? '');
   const [clientId, setClientId] = useState(idea?.clientId ?? '');
-  const [tagsText, setTagsText] = useState('');
-
-  const initialTagNames = (allTags.data ?? [])
-    .filter((t) => (existingTags.data ?? []).includes(t.id))
-    .map((t) => t.name)
-    .join(', ');
-  const tagsValue = tagsText || (idea ? initialTagNames : '');
 
   const pending = create.isPending || update.isPending;
 
@@ -193,10 +166,6 @@ function IdeaForm({
       title,
       description,
       clientId: clientId || null,
-      tags: tagsValue
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
     };
     const m = idea ? update : create;
     m.mutate(input, { onSuccess: onDone });
@@ -234,14 +203,6 @@ function IdeaForm({
               </option>
             ))}
           </select>
-        </label>
-        <label className="text-sm flex-1">
-          <span className="text-muted-foreground mb-1 block text-xs">Tags (séparés par des virgules)</span>
-          <input
-            className="field w-full"
-            value={tagsValue}
-            onChange={(e) => setTagsText(e.target.value)}
-          />
         </label>
       </div>
       <div className="flex gap-2">

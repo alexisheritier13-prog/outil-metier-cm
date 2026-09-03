@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createIdea,
   deleteIdea,
-  getIdeaTagIds,
   ideaToPost,
   listIdeas,
   updateIdea,
@@ -16,14 +15,6 @@ const invalidate = (qc: ReturnType<typeof useQueryClient>) =>
 
 export function useIdeas(filters: IdeaFilters = {}) {
   return useQuery({ queryKey: ['ideas', 'list', filters], queryFn: () => listIdeas(filters) });
-}
-
-export function useIdeaTagIds(ideaId: string | null) {
-  return useQuery({
-    queryKey: ['ideas', 'tags', ideaId],
-    queryFn: () => getIdeaTagIds(ideaId as string),
-    enabled: Boolean(ideaId),
-  });
 }
 
 export function useCreateIdea() {
