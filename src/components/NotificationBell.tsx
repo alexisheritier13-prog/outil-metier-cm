@@ -18,15 +18,7 @@ import {
   useNotifications,
   useUnreadCount,
 } from '@/app/notifications/useNotifications';
-
-function relative(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const h = Math.round(diff / 3_600_000);
-  if (h < 1) return "à l'instant";
-  if (h < 24) return `il y a ${h} h`;
-  const d = Math.round(h / 24);
-  return d <= 1 ? 'hier' : `il y a ${d} j`;
-}
+import { relativeAge as relative } from '@/lib/relativeTime';
 
 const ICONS: Partial<Record<NotificationType, typeof Bell>> = {
   post_submitted: Send,
