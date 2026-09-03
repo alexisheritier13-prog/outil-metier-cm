@@ -1,24 +1,7 @@
-import {
-  CircleDashed,
-  Eye,
-  Send,
-  CheckCircle2,
-  CalendarClock,
-  CheckCheck,
-  type LucideIcon,
-} from 'lucide-react';
 import { POST_STATUS_LABELS, POST_STATUS_TONE, type PostStatus } from '@/shared/constants/postStatus';
+import { POST_STATUS_ICONS as ICONS } from '@/components/postStatusIcons';
 import { toneClasses } from '@/components/statusTone';
 import { cn } from '@/lib/utils';
-
-const ICONS: Record<PostStatus, LucideIcon> = {
-  draft: CircleDashed,
-  internal_review: Eye,
-  client_review: Send,
-  approved: CheckCircle2,
-  scheduled: CalendarClock,
-  published: CheckCheck,
-};
 
 /**
  * Statut d'un post : toujours icône + libellé + couleur du statut (jamais la couleur

@@ -7,6 +7,7 @@ import type { EventClickArg, EventContentArg, EventDropArg } from '@fullcalendar
 import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { NETWORK_BRAND } from '@/components/networkBrand';
+import { POST_STATUS_ICONS } from '@/components/postStatusIcons';
 import type { Post } from '@/shared/types';
 import { useReschedulePost } from './usePosts';
 
@@ -98,6 +99,7 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
             );
           }
           const post = arg.event.extendedProps.post as Post;
+          const StatusIcon = POST_STATUS_ICONS[post.status];
           return (
             <div
               className="flex w-full items-center gap-1 overflow-hidden px-1 text-[11px] leading-tight"
@@ -113,7 +115,12 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
                 <path d={NETWORK_BRAND[post.network].path} />
               </svg>
               <span className="truncate">{clientName(post.clientId)}</span>
-              <StatusDot status={post.status} />
+              <StatusIcon
+                className={`ml-auto size-3 shrink-0 ${STATUS_ICON_COLOR[post.status]}`}
+                strokeWidth={2.5}
+                aria-hidden="true"
+              />
+              <span className="sr-only">{POST_STATUS_LABELS[post.status]}</span>
             </div>
           );
         }}
@@ -122,21 +129,15 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
   );
 }
 
-/** Pastille de statut colorée (info/attention/succès) — doublée du libellé dans le title. */
-const DOT_COLOR: Record<Post['status'], string> = {
-  draft: 'border-muted-foreground',
-  internal_review: 'border-info bg-info',
-  client_review: 'border-warning bg-warning',
-  approved: 'border-success bg-success',
-  scheduled: 'border-success bg-success',
-  published: 'border-muted-foreground bg-muted-foreground',
+/**
+ * Couleur de l'icône de statut sur l'événement. Le SENS est porté par la FORME de
+ * l'icône (icône différente par statut) ; la couleur ne fait que renforcer.
+ */
+const STATUS_ICON_COLOR: Record<Post['status'], string> = {
+  draft: 'text-muted-foreground',
+  internal_review: 'text-info-strong',
+  client_review: 'text-warning-strong',
+  approved: 'text-success-strong',
+  scheduled: 'text-success-strong',
+  published: 'text-muted-foreground',
 };
-
-function StatusDot({ status }: { status: Post['status'] }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`ml-auto inline-block h-2 w-2 shrink-0 rounded-full border ${DOT_COLOR[status]}`}
-    />
-  );
-}

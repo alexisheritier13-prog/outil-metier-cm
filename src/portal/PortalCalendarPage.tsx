@@ -54,6 +54,11 @@ export function PortalCalendarPage() {
         />
       ) : mode === 'month' ? (
         <Suspense fallback={<FullPageSpinner />}>
+          <div className="mb-3 flex flex-wrap gap-2">
+            {(['client_review', 'approved', 'scheduled', 'published'] as const).map((s) => (
+              <StatusBadge key={s} status={s} />
+            ))}
+          </div>
           <CalendarView
             posts={rows}
             view="dayGridMonth"
