@@ -58,9 +58,6 @@ export function AppSidebar() {
   return (
     <div className="bg-surface flex h-full w-[248px] shrink-0 flex-col">
       <div className="flex items-center gap-2.5 px-4 pb-2 pt-4">
-        <span className="bg-primary text-primary-foreground shadow-card grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm font-bold">
-          C
-        </span>
         <span className="flex-1 text-[15px] font-semibold tracking-tight">Cadence</span>
         <NotificationBell hrefFor={hrefForInternal} align="start" />
       </div>

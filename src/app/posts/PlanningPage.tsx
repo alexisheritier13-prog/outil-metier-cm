@@ -292,14 +292,17 @@ export function PlanningPage() {
       )}
       {!loading && (mode === 'month' || mode === 'week') && (
         <Suspense fallback={<FullPageSpinner />}>
-          <CalendarView
-            posts={rows}
-            view={mode === 'month' ? 'dayGridMonth' : 'timeGridWeek'}
-            clientName={clientName}
-            onOpen={setOpenPost}
-            editable
-            keyDates={keyDateMarkers}
-          />
+          <div className="min-h-[34rem] lg:h-[calc(100dvh-14rem)]">
+            <CalendarView
+              posts={rows}
+              view={mode === 'month' ? 'dayGridMonth' : 'timeGridWeek'}
+              clientName={clientName}
+              onOpen={setOpenPost}
+              editable
+              keyDates={keyDateMarkers}
+              fill
+            />
+          </div>
         </Suspense>
       )}
 

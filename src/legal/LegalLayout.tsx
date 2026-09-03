@@ -19,9 +19,6 @@ export function LegalLayout({
       <header className="border-b">
         <div className="mx-auto flex max-w-[72ch] items-center justify-between px-5 py-4 sm:px-6">
           <Link to="/login" className="flex items-center gap-2.5">
-            <span className="bg-primary text-primary-foreground grid h-7 w-7 place-items-center rounded-lg text-sm font-bold">
-              C
-            </span>
             <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
           </Link>
           <Link

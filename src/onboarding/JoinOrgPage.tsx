@@ -95,9 +95,6 @@ export function JoinOrgPage() {
     <main className="bg-background flex min-h-dvh items-center justify-center p-4">
       <div className="bg-surface shadow-panel w-full max-w-md space-y-6 rounded-3xl border p-8">
         <div className="flex items-center gap-2.5">
-          <span className="bg-primary text-primary-foreground grid h-8 w-8 place-items-center rounded-lg text-sm font-bold">
-            C
-          </span>
           <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
         </div>
 

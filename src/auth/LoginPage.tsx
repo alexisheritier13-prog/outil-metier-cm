@@ -41,9 +41,6 @@ export function LoginPage() {
       <div className="bg-surface flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16">
         <div className="animate-in fade-in slide-in-from-bottom-2 mx-auto w-full max-w-sm space-y-8 duration-500 ease-out">
           <div className="flex items-center gap-2.5">
-            <span className="bg-primary text-primary-foreground shadow-card grid h-8 w-8 place-items-center rounded-lg text-sm font-bold">
-              C
-            </span>
             <span className="text-[15px] font-semibold tracking-tight">Cadence</span>
           </div>
 

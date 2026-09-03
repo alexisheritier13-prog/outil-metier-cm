@@ -192,7 +192,7 @@
 }
 /* Cases du mois : hauteur mini + libellé de jour plus discret */
 .fc-monochrome .fc-daygrid-day-frame {
-  min-height: 5.5rem;
+  min-height: 6.25rem;
 }
 .fc-monochrome .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
   background: var(--foreground);

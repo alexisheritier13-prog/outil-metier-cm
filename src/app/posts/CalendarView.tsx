@@ -24,9 +24,19 @@ interface Props {
   onOpen: (post: Post) => void;
   editable: boolean;
   keyDates?: KeyDateMarker[];
+  /** Occupe toute la hauteur du conteneur parent (au lieu de s'ajuster au contenu). */
+  fill?: boolean;
 }
 
-export function CalendarView({ posts, view, clientName, onOpen, editable, keyDates = [] }: Props) {
+export function CalendarView({
+  posts,
+  view,
+  clientName,
+  onOpen,
+  editable,
+  keyDates = [],
+  fill = false,
+}: Props) {
   const reschedule = useReschedulePost();
 
   const events = useMemo(
@@ -67,7 +77,7 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
   }
 
   return (
-    <div className="fc-monochrome">
+    <div className={fill ? 'fc-monochrome h-full' : 'fc-monochrome'}>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={view}
@@ -79,13 +89,13 @@ export function CalendarView({ posts, view, clientName, onOpen, editable, keyDat
         buttonIcons={false}
         buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
         buttonHints={{ prev: 'Période précédente', next: 'Période suivante', today: "Aller à aujourd'hui" }}
-        height="auto"
+        height={fill ? '100%' : 'auto'}
         events={events}
         editable={editable}
         eventStartEditable={editable}
         eventDurationEditable={false}
         droppable={false}
-        dayMaxEvents={4}
+        dayMaxEvents={fill ? true : 4}
         nowIndicator
         eventDrop={handleDrop}
         eventClick={handleClick}
