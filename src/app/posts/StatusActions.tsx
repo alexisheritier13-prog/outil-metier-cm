@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { textareaClass } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -112,7 +113,7 @@ export function StatusActions({ post, role }: { post: Post; role: Role }) {
             Un commentaire est obligatoire pour expliquer ce qui doit être revu.
           </p>
           <textarea
-            className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+            className={textareaClass}
             rows={3}
             value={comment}
             onChange={(e) => setComment(e.target.value)}

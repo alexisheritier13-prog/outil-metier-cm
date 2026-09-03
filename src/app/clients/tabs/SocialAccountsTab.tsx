@@ -3,6 +3,7 @@ import { Info, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { selectClass } from '@/components/form';
 import { EmptyState } from '@/components/EmptyState';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { NETWORKS, type Network } from '@/shared/constants/networks';
@@ -99,7 +100,7 @@ export function SocialAccountsTab({ clientId }: { clientId: string }) {
               <Label htmlFor="sa-network">Réseau</Label>
               <select
                 id="sa-network"
-                className="border-input bg-surface h-10 rounded-md border px-3 text-sm"
+                className={selectClass}
                 value={network}
                 onChange={(e) => setNetwork(e.target.value as Network)}
               >

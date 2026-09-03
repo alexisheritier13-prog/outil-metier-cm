@@ -61,7 +61,7 @@ export function AlertSettingsPage() {
               type="number"
               min={f.min}
               max={f.max}
-              className="border-input bg-surface h-9 w-24 rounded-md border px-2 text-sm"
+              className="field w-24"
               value={draft[f.key]}
               onChange={(e) =>
                 setDraft({ ...draft, [f.key]: Number(e.target.value) })

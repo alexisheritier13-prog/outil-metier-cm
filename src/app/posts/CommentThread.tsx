@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { textareaClass } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Segmented } from '@/components/Segmented';
 import { cn } from '@/lib/utils';
@@ -60,7 +61,7 @@ export function CommentThread({ postId }: { postId: string }) {
             {editing?.id === c.id ? (
               <div className="space-y-1.5">
                 <textarea
-                  className="border-input bg-surface w-full rounded border px-2 py-1 text-sm"
+                  className={textareaClass}
                   rows={2}
                   value={editing.body}
                   onChange={(e) => setEditing({ id: c.id, body: e.target.value })}

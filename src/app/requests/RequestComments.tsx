@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { textareaClass } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { useAddRequestComment, useRequestComments } from './useRequests';
 import { parisDateLabel } from '@/shared/utils/tz';
@@ -41,7 +42,7 @@ export function RequestComments({
         }}
       >
         <textarea
-          className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className={textareaClass}
           rows={2}
           placeholder="Répondre…"
           value={body}

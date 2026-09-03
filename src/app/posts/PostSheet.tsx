@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Copy, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { FormSheet } from '@/components/form';
+import { FormSheet, textareaClass } from '@/components/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { MediaGallery } from '@/components/MediaGallery';
@@ -343,7 +343,7 @@ function InlineCaption({
           if (e.key === 'Escape') setEditing(false);
           if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) e.currentTarget.form?.requestSubmit();
         }}
-        className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+        className={textareaClass}
         aria-label="Légende"
       />
       <div className="flex gap-2">

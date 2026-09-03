@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { selectClass, textareaClass } from '@/components/form';
 import type { Client } from '@/shared/types';
 import type { CampaignInput } from '@/services/campaigns';
 
@@ -58,7 +59,7 @@ export function CampaignForm({ clients, defaults, submitLabel, pending, error, o
         <Label htmlFor="cf-client">Client</Label>
         <select
           id="cf-client"
-          className="border-input bg-surface h-10 w-full rounded-md border px-3 text-sm"
+          className={selectClass}
           {...register('clientId')}
         >
           {clients.map((c) => (
@@ -89,7 +90,7 @@ export function CampaignForm({ clients, defaults, submitLabel, pending, error, o
         <textarea
           id="cf-desc"
           rows={3}
-          className="border-input bg-surface focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className={textareaClass}
           {...register('description')}
         />
       </div>

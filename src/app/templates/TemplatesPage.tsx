@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Page, PageHeader } from '@/components/Page';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { textareaClass } from '@/components/form';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
@@ -156,14 +157,14 @@ function TemplateForm({
       }}
     >
       <input
-        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
+        className="field w-full"
         placeholder="Nom du template"
         value={name}
         onChange={(e) => setName(e.target.value)}
         aria-label="Nom"
       />
       <input
-        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
+        className="field w-full"
         placeholder="Description courte (optionnel)"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
@@ -204,7 +205,7 @@ function TemplateForm({
       <label className="block text-sm">
         <span className="text-muted-foreground mb-1 block text-xs">Gabarit de légende</span>
         <textarea
-          className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
+          className={textareaClass}
           rows={5}
           value={caption}
           onChange={(e) => setCaption(e.target.value)}

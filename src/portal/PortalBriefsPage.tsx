@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { textareaClass } from '@/components/form';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
 import { RequestStatusBadge } from '@/app/requests/RequestStatusBadge';
@@ -73,14 +74,14 @@ export function PortalBriefsPage() {
       {creating && (
         <form onSubmit={submitNew} className="surface-card mb-6 space-y-3 p-4">
           <input
-            className="border-input bg-surface focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
+            className="field w-full"
             placeholder="Titre de la demande"
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             aria-label="Titre"
           />
           <textarea
-            className="border-input bg-surface focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
+            className={textareaClass}
             rows={3}
             placeholder="Décrivez ce que vous souhaitez…"
             value={draft.description}
@@ -181,13 +182,13 @@ export function PortalBriefsPage() {
                 {edit ? (
                   <div className="space-y-3">
                     <input
-                      className="border-input bg-surface focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
+                      className="field w-full"
                       value={edit.title}
                       onChange={(e) => setEdit({ ...edit, title: e.target.value })}
                       aria-label="Titre"
                     />
                     <textarea
-                      className="border-input bg-surface focus-visible:border-primary w-full rounded-md border px-2.5 py-1.5 text-sm outline-none transition-colors"
+                      className={textareaClass}
                       rows={4}
                       value={edit.description}
                       onChange={(e) => setEdit({ ...edit, description: e.target.value })}

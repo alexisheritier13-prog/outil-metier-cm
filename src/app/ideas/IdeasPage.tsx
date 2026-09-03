@@ -8,6 +8,7 @@ import { Page, PageHeader } from '@/components/Page';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { EmptyState } from '@/components/EmptyState';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
+import { textareaClass } from '@/components/form';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { NETWORKS, NETWORK_LABELS, type Network } from '@/shared/constants/networks';
@@ -174,14 +175,14 @@ function IdeaForm({
   return (
     <form onSubmit={submit} className="surface-card mb-6 space-y-3 p-4">
       <input
-        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
+        className="field w-full"
         placeholder="Titre de l'idée"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         aria-label="Titre"
       />
       <textarea
-        className="border-input bg-surface w-full rounded border px-2 py-1.5 text-sm"
+        className={textareaClass}
         rows={3}
         placeholder="Description, angle, référence…"
         value={description}

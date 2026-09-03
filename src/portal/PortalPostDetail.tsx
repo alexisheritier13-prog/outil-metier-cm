@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { textareaClass } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { NetworkIcon } from '@/components/NetworkIcon';
@@ -126,7 +127,7 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
               }}
             >
               <textarea
-                className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+                className={textareaClass}
                 rows={2}
                 placeholder="Ajouter un commentaire…"
                 value={body}
@@ -156,7 +157,7 @@ export function PortalPostDetail({ post, onClose }: { post: Post | null; onClose
                 </label>
                 <textarea
                   id="reject-comment"
-                  className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+                  className={textareaClass}
                   rows={3}
                   value={rejectComment}
                   onChange={(e) => setRejectComment(e.target.value)}
