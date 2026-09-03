@@ -169,12 +169,12 @@ export function DashboardPage() {
 
   return (
     <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
-      <header className="flex shrink-0 items-center gap-3">
-        <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
-        <div>
-          <h1 className="text-title tracking-tight">Bonjour {firstName}</h1>
-          <p className="text-muted-foreground text-sm capitalize">{today}</p>
-        </div>
+      <header className="flex shrink-0 items-center gap-2.5">
+        <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="md" />
+        <h1 className="text-title tracking-tight">
+          Bonjour {firstName}
+          <span className="text-muted-foreground ml-2 text-sm font-normal capitalize">{today}</span>
+        </h1>
       </header>
 
       {/* À traiter */}
@@ -451,23 +451,16 @@ function ProductionPanel({
 }) {
   return (
     <section className="surface-card p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="bg-primary text-primary-foreground grid h-7 w-7 shrink-0 place-items-center rounded-lg">
-            <GaugeCircle className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <div>
-            <h2 className="text-section leading-tight">Production en cours</h2>
-            <p className="text-muted-foreground text-xs">Hors publiés</p>
-          </div>
+      <div className="mb-3 flex items-center gap-2.5">
+        <span className="bg-primary text-primary-foreground grid h-7 w-7 shrink-0 place-items-center rounded-lg">
+          <GaugeCircle className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="text-section leading-tight">Production en cours</h2>
+          <p className="text-muted-foreground text-xs">
+            {loading ? '…' : `${total} post${total > 1 ? 's' : ''} hors publiés`}
+          </p>
         </div>
-        {loading ? (
-          <Skeleton className="h-6 w-9" />
-        ) : (
-          <span className="text-xl font-semibold tabular-nums leading-none tracking-tight">
-            {total}
-          </span>
-        )}
       </div>
 
       {loading ? (

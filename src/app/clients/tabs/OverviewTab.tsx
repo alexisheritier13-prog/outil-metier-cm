@@ -64,7 +64,21 @@ export function OverviewTab({
         <Dl>
           <Row k="Secteur" v={c.sector || '—'} />
           <Row k="Validation client" v={c.skipClientReview ? 'Désactivée' : 'Activée'} />
-          <Row k="Logo" v={c.logoUrl ? <Trunc>{c.logoUrl}</Trunc> : '—'} />
+          <Row
+            k="Logo"
+            v={
+              c.logoUrl ? (
+                <img
+                  src={c.logoUrl}
+                  alt=""
+                  loading="lazy"
+                  className="border-border h-8 w-8 rounded border object-contain"
+                />
+              ) : (
+                '—'
+              )
+            }
+          />
           <Row k="Créé le" v={parisDateLabel(c.createdAt)} />
         </Dl>
       </Panel>

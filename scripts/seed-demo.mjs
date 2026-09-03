@@ -287,7 +287,7 @@ async function main() {
       .eq('id', row.id);
   }
 
-  console.log('→ campagnes + tags');
+  console.log('→ campagnes');
   const camp = await admin
     .from('campaigns')
     .insert([
@@ -310,17 +310,6 @@ async function main() {
   const campPrintemps = camp.data.find((c) => c.name.startsWith('Collection')).id;
   const campEte = camp.data.find((c) => c.name.startsWith('Été')).id;
 
-  const tagNames = ['produit', 'coulisses', 'printemps', 'été', 'UGC', 'tuto'];
-  const tags = {};
-  for (const name of tagNames) {
-    const up = await admin
-      .from('tags')
-      .upsert({ name, organization_id: ORG_ID }, { onConflict: 'organization_id,name' })
-      .select('id')
-      .single();
-    tags[name] = up.data.id;
-  }
-
   console.log('→ posts');
   const mkPost = async (p) => {
     const { data, error } = await admin
@@ -340,11 +329,6 @@ async function main() {
       .select('id')
       .single();
     if (error) throw error;
-    if (p.tags) {
-      await admin
-        .from('post_tags')
-        .insert(p.tags.map((t) => ({ post_id: data.id, tag_id: tags[t] })));
-    }
     for (let i = 0; i < (p.media ?? 0); i++) await uploadSampleMedia(data.id, i);
     return data.id;
   };
@@ -465,14 +449,6 @@ async function main() {
       .insert({ title, description, client_id: clientId, created_by: ownerId })
       .select('id')
       .single();
-    for (const t of tagList ?? []) {
-      const up = await admin
-        .from('tags')
-        .upsert({ name: t, organization_id: ORG_ID }, { onConflict: 'organization_id,name' })
-        .select('id')
-        .single();
-      await owner.from('idea_tags').insert({ idea_id: data.id, tag_id: up.data.id });
-    }
     return data.id;
   };
   await mkIdea('Série « Le geste juste » — tutos courts', 'Format récurrent : 1 geste d’entretien / semaine.', null, ['tuto']);

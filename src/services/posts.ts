@@ -94,7 +94,7 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
   return toPost(data);
 }
 
-/** Duplique un post (légende, réseau, client, campagne, tags) — statut brouillon, date décalée. */
+/** Duplique un post (légende, réseau, client, campagne) — statut brouillon, date décalée. */
 export async function duplicatePost(id: string, shiftDays = 7): Promise<Post> {
   const { data, error } = await getSupabase().rpc('post_duplicate', {
     p_post_id: id,
