@@ -268,14 +268,13 @@ function PostTab() {
 function ClientsTab() {
   return (
     <Accordion>
-      <Topic title="La fiche client" defaultOpen teaser="8 onglets par client">
+      <Topic title="La fiche client" defaultOpen teaser="7 onglets par client">
         <Defs
           items={[
             ['Vue d’ensemble', 'Synthèse des autres onglets et jauge d’équilibre du mois. Chaque encart ouvre son onglet.'],
             ['Contrat', 'Les grandes lignes de la prestation : périmètre, rythme, réseaux, début, conditions.'],
-            ['Comptes sociaux', 'Les comptes du client par réseau.'],
             ['Contacts', 'Les personnes qui valident côté client. Bouton Inviter pour créer leur accès. Un directeur gère leur e-mail et mot de passe.'],
-            ['Accès', 'Tous les codes de connexion (comptes sociaux, outils), masqués par défaut, révélables et copiables. Interne uniquement, jamais au portail.'],
+            ['Accès', 'Les comptes sociaux du client et tous les codes de connexion (mots de passe, outils), masqués par défaut, révélables et copiables. Interne uniquement, jamais au portail.'],
             ['Charte', 'Charte éditoriale (ton, mots à éviter ou privilégier, direction artistique), charte graphique (couleurs, typos), rubriques de contenu et cibles.'],
             ['Onboarding', 'Checklist de démarrage, pré-remplie depuis un modèle, réordonnable.'],
             ['Activité', 'Le journal des actions sur ce client (filtres type et période).'],
@@ -328,7 +327,8 @@ function LibraryTab() {
 
       <Topic title="Alertes" teaser="7 situations détectées automatiquement">
         <p>
-          <Ref to="/app/alertes">Alertes</Ref> : détection chaque nuit et en journée de :
+          <Ref to="/app/alertes">Alertes</Ref> : détection chaque nuit et en journée,
+          regroupée par situation, de :
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>validation en attente depuis trop longtemps</li>
@@ -445,7 +445,7 @@ const NAV_MAP: [string, string, string][] = [
   ['/app/planning', 'Planning', 'calendrier, liste, kanban des posts'],
   ['/app/a-valider', 'À valider', 'posts en attente, interne puis client'],
   ['/app/demandes', 'Demandes clients', 'briefs déposés par les clients'],
-  ['/app/clients', 'Clients', 'une fiche à 8 onglets par client'],
+  ['/app/clients', 'Clients', 'une fiche à 7 onglets par client'],
   ['/app/alertes', 'Alertes', 'retards, trous de calendrier, marronniers'],
 ];
 
