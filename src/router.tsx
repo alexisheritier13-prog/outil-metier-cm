@@ -16,6 +16,10 @@ const ApprovePage = lazy(() =>
 const JoinOrgPage = lazy(() =>
   import('@/onboarding/JoinOrgPage').then((m) => ({ default: m.JoinOrgPage })),
 );
+const TermsPage = lazy(() => import('@/legal/TermsPage').then((m) => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() =>
+  import('@/legal/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
+);
 const MyAccountPage = lazy(() =>
   import('@/app/account/MyAccountPage').then((m) => ({ default: m.MyAccountPage })),
 );
@@ -114,6 +118,8 @@ export const router = createBrowserRouter(
     { path: '/definir-mot-de-passe', element: lazyRoute(<SetPasswordPage />) },
     { path: '/rejoindre/:token', element: lazyRoute(<JoinOrgPage />) },
     { path: '/valider/:token', element: lazyRoute(<ApprovePage />) },
+    { path: '/cgu', element: lazyRoute(<TermsPage />) },
+    { path: '/confidentialite', element: lazyRoute(<PrivacyPage />) },
     {
       path: '/bienvenue',
       element: <RequireRole roles={['admin']}>{lazyRoute(<OnboardingWizard />)}</RequireRole>,

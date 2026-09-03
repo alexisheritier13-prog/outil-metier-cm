@@ -21,6 +21,7 @@ export function JoinOrgPage() {
   const [orgName, setOrgName] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [accepted, setAccepted] = useState(false);
 
   const invitation = useQuery({
     queryKey: ['org-invitation', token],
@@ -87,6 +88,7 @@ export function JoinOrgPage() {
     emailOk &&
     password.length >= 8 &&
     confirm === password &&
+    accepted &&
     !accept.isPending;
 
   return (
@@ -212,6 +214,36 @@ export function JoinOrgPage() {
                 <p className="text-danger-strong text-xs">Les mots de passe ne correspondent pas.</p>
               )}
             </div>
+
+            <label className="text-muted-foreground flex items-start gap-2 text-xs">
+              <input
+                type="checkbox"
+                className="accent-primary mt-0.5"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+              />
+              <span>
+                J'accepte les{' '}
+                <a
+                  href="/cgu"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary font-medium hover:underline"
+                >
+                  conditions générales d'utilisation
+                </a>{' '}
+                et la{' '}
+                <a
+                  href="/confidentialite"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary font-medium hover:underline"
+                >
+                  politique de confidentialité
+                </a>
+                .
+              </span>
+            </label>
 
             {accept.isError && (
               <p className="text-danger-strong text-sm" role="alert">

@@ -182,13 +182,20 @@ export function PortalLayout() {
 
         <Outlet />
 
-        <footer className="text-muted-foreground mx-auto max-w-5xl px-4 pb-8 pt-4 text-xs sm:px-6">
+        <footer className="text-muted-foreground mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 pb-8 pt-4 text-xs sm:px-6">
           <span className="inline-flex items-center gap-1.5">
             {account.data?.agencyLogoUrl && (
               <img src={account.data.agencyLogoUrl} alt="" className="h-4 w-auto" loading="lazy" />
             )}
             Espace client — {agencyName}
           </span>
+          <span aria-hidden="true">·</span>
+          <a href="/cgu" className="hover:underline">
+            CGU
+          </a>
+          <a href="/confidentialite" className="hover:underline">
+            Confidentialité
+          </a>
         </footer>
       </div>
     </PortalClientContext.Provider>

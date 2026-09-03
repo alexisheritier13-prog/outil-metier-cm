@@ -157,6 +157,17 @@ export function LoginPage() {
           <p className="text-muted-foreground border-t pt-6 text-xs">
             Un souci d'accès ? Contactez un directeur ou un chef de projet de votre agence.
           </p>
+          <p className="text-muted-foreground text-xs">
+            En vous connectant, vous acceptez les{' '}
+            <a href="/cgu" className="hover:underline">
+              conditions générales d'utilisation
+            </a>{' '}
+            et la{' '}
+            <a href="/confidentialite" className="hover:underline">
+              politique de confidentialité
+            </a>
+            .
+          </p>
         </div>
       </div>
 
