@@ -38,7 +38,14 @@ type ViewMode = 'month' | 'week' | 'list' | 'kanban';
 export function PlanningPage() {
   const { data: me } = useCurrentProfile();
   const canReassign = me?.role === 'lead' || me?.role === 'admin';
-  const [mode, setMode] = useState<ViewMode>('month');
+  // Sur petit écran la grille du calendrier est illisible : on démarre sur la liste.
+  const [mode, setMode] = useState<ViewMode>(() =>
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(max-width: 640px)').matches
+      ? 'list'
+      : 'month',
+  );
   const [createOpen, setCreateOpen] = useState(false);
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
@@ -148,20 +155,43 @@ export function PlanningPage() {
       <PageHeader
         title="Planning"
         aside={
-          <Segmented
-            ariaLabel="Vue du calendrier"
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'month', label: 'Mois' },
-              { value: 'week', label: 'Semaine' },
-              { value: 'list', label: 'Liste' },
-              { value: 'kanban', label: 'Kanban' },
-            ]}
-          />
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <Segmented
+              ariaLabel="Vue du calendrier"
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'month', label: 'Mois' },
+                { value: 'week', label: 'Semaine' },
+                { value: 'list', label: 'Liste' },
+                { value: 'kanban', label: 'Kanban' },
+              ]}
+            />
+            {(mode === 'month' || mode === 'week') && (
+              <label className="text-muted-foreground flex cursor-pointer items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  className="accent-primary"
+                  checked={showKeyDates}
+                  onChange={(e) => setShowKeyDates(e.target.checked)}
+                />
+                Marronniers
+              </label>
+            )}
+          </div>
         }
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button disabled={!hasClients} onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" /> Nouveau post
+            </Button>
+            <Button
+              variant="outline"
+              disabled={!hasClients}
+              onClick={() => setSeriesOpen(true)}
+            >
+              <CalendarPlus className="h-4 w-4" /> Série
+            </Button>
             <Button
               variant="outline"
               onClick={exportIcs}
@@ -170,16 +200,6 @@ export function PlanningPage() {
             >
               <CalendarArrowDown className="h-4 w-4" /> Exporter .ics
             </Button>
-          <Button
-            variant="outline"
-            disabled={!hasClients}
-            onClick={() => setSeriesOpen(true)}
-          >
-            <CalendarPlus className="h-4 w-4" /> Série
-          </Button>
-          <Button disabled={!hasClients} onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" /> Nouveau post
-          </Button>
           <FormSheet
             open={createOpen}
             onOpenChange={setCreateOpen}
@@ -245,18 +265,6 @@ export function PlanningPage() {
         onReset={resetFilters}
         isEmpty={filtersEmpty}
       />
-
-      {(mode === 'month' || mode === 'week') && (
-        <label className="text-muted-foreground mb-3 mt-1 flex w-fit cursor-pointer items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="accent-foreground"
-            checked={showKeyDates}
-            onChange={(e) => setShowKeyDates(e.target.checked)}
-          />
-          Afficher les marronniers
-        </label>
-      )}
 
       {loading && <TableSkeleton rows={8} />}
 
