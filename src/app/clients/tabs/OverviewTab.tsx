@@ -166,7 +166,7 @@ export function OverviewTab({
       <Panel
         title="Comptes sociaux"
         count={social.data?.length}
-        onOpen={() => onNavigate('social')}
+        onOpen={() => onNavigate('access')}
       >
         {(social.data ?? []).length === 0 ? (
           <Empty>Aucun compte</Empty>
@@ -185,7 +185,7 @@ export function OverviewTab({
       <Panel
         title="Codes de connexion"
         count={creds.data?.length}
-        onOpen={() => onNavigate('credentials')}
+        onOpen={() => onNavigate('access')}
       >
         {(creds.data ?? []).length === 0 ? (
           <Empty>Aucun accès enregistré</Empty>

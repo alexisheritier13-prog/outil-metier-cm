@@ -144,9 +144,8 @@ export function ClientDetailPage() {
         <TabsList>
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="contract">Contrat</TabsTrigger>
-          <TabsTrigger value="social">Comptes sociaux</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="credentials">Accès</TabsTrigger>
+          <TabsTrigger value="access">Accès</TabsTrigger>
           <TabsTrigger value="guidelines">Charte</TabsTrigger>
           <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
           <TabsTrigger value="activity">Activité</TabsTrigger>
@@ -160,16 +159,19 @@ export function ClientDetailPage() {
           <ContractTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="social" className="surface-card mt-4 p-5">
-          <SocialAccountsTab clientId={c.id} />
-        </TabsContent>
-
         <TabsContent value="contacts" className="surface-card mt-4 p-5">
           <ContactsTab clientId={c.id} />
         </TabsContent>
 
-        <TabsContent value="credentials" className="surface-card mt-4 p-5">
-          <CredentialsTab clientId={c.id} />
+        <TabsContent value="access" className="mt-4 space-y-4">
+          <section className="surface-card p-5">
+            <h2 className="text-section mb-3">Comptes sociaux</h2>
+            <SocialAccountsTab clientId={c.id} />
+          </section>
+          <section className="surface-card p-5">
+            <h2 className="text-section mb-3">Codes de connexion</h2>
+            <CredentialsTab clientId={c.id} />
+          </section>
         </TabsContent>
 
         <TabsContent value="guidelines" className="surface-card mt-4 p-5">
