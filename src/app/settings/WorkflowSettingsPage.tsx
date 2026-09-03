@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,13 @@ export function WorkflowSettingsPage() {
             </p>
           </div>
         </div>
+
+        <p className="text-muted-foreground border-t pt-4 text-sm">
+          Ce réglage vaut pour <strong className="text-foreground">toute l'agence</strong>.
+          Pour qu'<em className="not-italic">un client précis</em> ne valide pas ses posts,
+          cochez « Ce client ne valide pas les posts » dans le formulaire de ce client
+          (<Link to="/app/clients" className="text-primary font-medium hover:underline">Clients</Link>).
+        </p>
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={save.isPending || !dirty}>

@@ -85,8 +85,9 @@ export function ClientForm({ defaultValues, submitLabel, pending, error, onSubmi
             <span>
               <span className="font-medium">Ce client ne valide pas les posts</span>
               <span className="text-muted-foreground block text-xs">
-                L'étape « à valider client » est sautée : un rôle interne publie sans passer par le
-                client.
+                L'étape « à valider client » est sautée : un rôle interne passe le post directement
+                en validé. Le mode « CM seul » (Paramètres → Circuit de validation) fait de même pour
+                la validation interne, sur toute l'agence.
               </span>
             </span>
           </label>

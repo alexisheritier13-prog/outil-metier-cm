@@ -47,6 +47,19 @@ export function StatusActions({ post, role }: { post: Post; role: Role }) {
 
   const targets = allowedTransitions(post.status, role, workflow);
 
+  const earlyPhase =
+    post.status === 'draft' ||
+    post.status === 'internal_review' ||
+    post.status === 'client_review';
+  const circuitNote =
+    earlyPhase && workflow.skipClientReview && workflow.skipInternalReview
+      ? 'Ce client ne valide pas ses posts et le mode « CM seul » est actif : un brouillon peut passer directement en validé.'
+      : earlyPhase && workflow.skipClientReview
+        ? 'Ce client ne valide pas ses posts : l’étape « à valider client » est sautée, un rôle interne passe le post directement en validé.'
+        : earlyPhase && workflow.skipInternalReview
+          ? 'Mode « CM seul » : un brouillon peut être envoyé directement au client, sans validation interne.'
+          : null;
+
   function run(to: PostStatus) {
     const label = actionLabel(post.status, to);
     if (transitionNeedsComment(post.status, to)) {
@@ -60,6 +73,12 @@ export function StatusActions({ post, role }: { post: Post; role: Role }) {
   return (
     <div className="space-y-2">
       <StatusBadge status={post.status} />
+
+      {circuitNote && (
+        <p className="text-muted-foreground bg-surface-2 rounded-md px-2 py-1.5 text-xs">
+          {circuitNote}
+        </p>
+      )}
 
       {targets.length > 0 && (
         <div className="flex flex-wrap gap-2">
