@@ -2,11 +2,12 @@ import { LegalLayout } from './LegalLayout';
 
 /**
  * Politique de confidentialité (RGPD). Modèle à faire relire par un juriste / DPO
- * avant ouverture large. Les mentions entre crochets [ ] sont à compléter.
+ * avant ouverture large. Mention restant à compléter : l'adresse postale (n° et
+ * rue) de l'Éditeur — cherchez « [À COMPLÉTER ».
  */
 export function PrivacyPage() {
   return (
-    <LegalLayout title="Politique de confidentialité" updatedAt="[À COMPLÉTER : date]">
+    <LegalLayout title="Politique de confidentialité" updatedAt="3 septembre 2026">
       <p>
         La présente politique décrit comment l'application <strong>Cadence</strong> (le
         « Service ») traite les données à caractère personnel, conformément au Règlement
@@ -17,9 +18,10 @@ export function PrivacyPage() {
       <p>
         Pour les données liées au fonctionnement du Service (comptes, journaux, communications
         avec le support), le responsable de traitement est{' '}
-        <strong>[À COMPLÉTER : raison sociale ou nom de l'éditeur]</strong>,{' '}
-        <strong>[À COMPLÉTER : adresse]</strong>, contact{' '}
-        <a href="mailto:[À COMPLÉTER : email]">[À COMPLÉTER : email]</a> (l'« Éditeur »).
+        <strong>Alexis Heritier, entrepreneur individuel</strong> (SIREN 914 882 303),{' '}
+        <strong>[À COMPLÉTER : n° et rue], 84120 Pertuis</strong>, contact{' '}
+        <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>{' '}
+        (l'« Éditeur »).
       </p>
       <p>
         Pour les données que chaque organisation importe dans le Service au sujet de ses
@@ -86,9 +88,8 @@ export function PrivacyPage() {
       <ul>
         <li>
           <strong>Supabase</strong> — base de données, authentification, stockage de fichiers.
-          Données hébergées dans l'Union européenne (région{' '}
-          <strong>[À COMPLÉTER : région, ex. Irlande / eu-west-1]</strong>), infrastructure
-          Amazon Web Services.
+          Données hébergées dans l'Union européenne (région <strong>eu-west-1, Irlande</strong>),
+          infrastructure Amazon Web Services.
         </li>
         <li>
           <strong>Vercel</strong> — hébergement et distribution de l'application web.
@@ -108,21 +109,20 @@ export function PrivacyPage() {
       <ul>
         <li>
           <strong>Compte et contenus</strong> : conservés tant que l'organisation utilise le
-          Service, puis supprimés ou anonymisés dans un délai de{' '}
-          <strong>[À COMPLÉTER : ex. 30 jours]</strong> après la fermeture de l'organisation
-          ou la demande de suppression.
+          Service, puis supprimés ou anonymisés dans un délai de <strong>30 jours</strong>{' '}
+          après la fermeture de l'organisation ou la demande de suppression.
         </li>
         <li>
           <strong>Corbeille</strong> : les posts et clients supprimés sont purgés
           automatiquement après 60 jours.
         </li>
         <li>
-          <strong>Journaux techniques</strong> : conservés{' '}
-          <strong>[À COMPLÉTER : ex. 12 mois]</strong> à des fins de sécurité.
+          <strong>Journaux techniques</strong> : conservés <strong>12 mois</strong> à des fins
+          de sécurité.
         </li>
         <li>
-          <strong>Échanges avec le support</strong> :{' '}
-          <strong>[À COMPLÉTER : ex. 3 ans]</strong> après le dernier contact.
+          <strong>Échanges avec le support</strong> : <strong>3 ans</strong> après le dernier
+          contact.
         </li>
       </ul>
 
@@ -135,9 +135,9 @@ export function PrivacyPage() {
       </p>
       <p>
         Pour les autres demandes, écrivez à{' '}
-        <a href="mailto:[À COMPLÉTER : email]">[À COMPLÉTER : email]</a>. Si vos données ont
-        été fournies par votre organisation (vous êtes un contact client), adressez-vous
-        d'abord à celle-ci, responsable de traitement.
+        <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>. Si vos
+        données ont été fournies par votre organisation (vous êtes un contact client),
+        adressez-vous d'abord à celle-ci, responsable de traitement.
       </p>
       <p>
         Vous pouvez introduire une réclamation auprès de la <strong>CNIL</strong> (
@@ -173,7 +173,7 @@ export function PrivacyPage() {
       <h2>10. Contact</h2>
       <p>
         Pour toute question relative à la protection de vos données :{' '}
-        <a href="mailto:[À COMPLÉTER : email]">[À COMPLÉTER : email]</a>.
+        <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>.
       </p>
     </LegalLayout>
   );

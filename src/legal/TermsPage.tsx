@@ -2,23 +2,23 @@ import { LegalLayout } from './LegalLayout';
 
 /**
  * Conditions générales d'utilisation. Modèle à faire relire par un juriste avant
- * ouverture large. Les mentions entre crochets [ ] sont à compléter par l'éditeur.
+ * ouverture large. Mention restant à compléter : l'adresse postale (n° et rue) de
+ * l'Éditeur — cherchez « [À COMPLÉTER ».
  */
 export function TermsPage() {
   return (
-    <LegalLayout title="Conditions générales d'utilisation" updatedAt="[À COMPLÉTER : date]">
+    <LegalLayout title="Conditions générales d'utilisation" updatedAt="3 septembre 2026">
       <p>
         Les présentes conditions générales d'utilisation (les « CGU ») régissent l'accès et
         l'utilisation de l'application <strong>Cadence</strong> (le « Service »), éditée par{' '}
-        <strong>[À COMPLÉTER : raison sociale ou nom de l'éditeur, forme juridique, capital le
-        cas échéant]</strong>, immatriculée sous le numéro{' '}
-        <strong>[À COMPLÉTER : SIREN / SIRET]</strong>, dont le siège est situé{' '}
-        <strong>[À COMPLÉTER : adresse]</strong> (l'« Éditeur »).
+        <strong>Alexis Heritier, entrepreneur individuel</strong>, immatriculé sous le numéro{' '}
+        <strong>SIRET 914 882 303 00029</strong> (SIREN 914 882 303), dont le siège est situé{' '}
+        <strong>[À COMPLÉTER : n° et rue], 84120 Pertuis, France</strong> (l'« Éditeur »).
       </p>
       <p>
-        Contact : <a href="mailto:[À COMPLÉTER : email]">[À COMPLÉTER : email de contact]</a>.
-        Directeur de la publication : <strong>[À COMPLÉTER : nom]</strong>. Hébergement : voir
-        l'article 9.
+        Contact :{' '}
+        <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>. Directeur
+        de la publication : <strong>Alexis Heritier</strong>. Hébergement : voir l'article 9.
       </p>
 
       <h2>1. Objet</h2>
@@ -123,8 +123,7 @@ export function TermsPage() {
       <ul>
         <li>
           <strong>Supabase</strong> (base de données, authentification, stockage), données
-          hébergées dans l'Union européenne (région{' '}
-          <strong>[À COMPLÉTER : région du projet, ex. eu-west-1 / Irlande]</strong>) ;
+          hébergées dans l'Union européenne (région <strong>eu-west-1, Irlande</strong>) ;
         </li>
         <li>
           <strong>Vercel</strong> (hébergement et distribution de l'application) ;
@@ -183,14 +182,14 @@ export function TermsPage() {
       <p>
         Les présentes CGU sont soumises au droit français. En cas de litige, les parties
         rechercheront une solution amiable ; à défaut, compétence est attribuée aux tribunaux
-        du ressort de <strong>[À COMPLÉTER : ville du siège de l'Éditeur]</strong>, sous
-        réserve des règles impératives applicables aux consommateurs le cas échéant.
+        compétents d'<strong>Avignon</strong>, sous réserve des règles impératives applicables
+        aux consommateurs le cas échéant.
       </p>
 
       <h2>15. Contact</h2>
       <p>
         Toute question relative aux présentes CGU peut être adressée à{' '}
-        <a href="mailto:[À COMPLÉTER : email]">[À COMPLÉTER : email de contact]</a>.
+        <a href="mailto:alexis.heritier13@gmail.com">alexis.heritier13@gmail.com</a>.
       </p>
     </LegalLayout>
   );
