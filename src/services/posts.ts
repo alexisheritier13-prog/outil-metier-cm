@@ -52,15 +52,6 @@ export interface PostInput {
   authorId?: string;
   campaignId?: string | null;
   pillarId?: string | null;
-  /** Noms de tags (créés à la volée si besoin). */
-  tags?: string[];
-}
-
-async function applyTags(postId: string, names: string[] | undefined): Promise<void> {
-  if (names === undefined) return;
-  const { createTag, setPostTags } = await import('@/services/tags');
-  const ids = await Promise.all(names.filter((n) => n.trim()).map((n) => createTag(n).then((t) => t.id)));
-  await setPostTags(postId, [...new Set(ids)]);
 }
 
 export async function createPost(input: PostInput): Promise<Post> {
@@ -80,7 +71,6 @@ export async function createPost(input: PostInput): Promise<Post> {
     .select('*')
     .single();
   if (error) throw error;
-  await applyTags(data.id, input.tags);
   return toPost(data);
 }
 
@@ -101,7 +91,6 @@ export async function updatePost(id: string, input: PostInput): Promise<Post> {
     .select('*')
     .single();
   if (error) throw error;
-  await applyTags(id, input.tags);
   return toPost(data);
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Copy, Trash2, X } from 'lucide-react';
+import { Copy, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { FormSheet } from '@/components/form';
@@ -127,21 +127,39 @@ export function PostSheet({ post, clients, authors, onClose }: Props) {
             <dt className="text-muted-foreground">Lien Canva</dt>
             <dd className="truncate">
               {post.canvaUrl ? (
-                <a href={post.canvaUrl} target="_blank" rel="noreferrer" className="hover:underline">
-                  Ouvrir
-                </a>
+                <>
+                  <a
+                    href={post.canvaUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
+                    Ouvrir
+                  </a>
+                  <span className="text-muted-foreground"> · interne, jamais montré au client</span>
+                </>
               ) : (
                 <span className="text-muted-foreground">—</span>
               )}
             </dd>
           </dl>
 
-          <div>
-            <p className="text-muted-foreground mb-1 text-xs">Légende</p>
-            <p className="whitespace-pre-wrap text-sm">
-              {post.caption || <span className="text-muted-foreground italic">Sans légende</span>}
-            </p>
-          </div>
+          <InlineCaption
+            caption={post.caption}
+            pending={update.isPending}
+            onSave={(caption) =>
+              update.mutateAsync({
+                clientId: post.clientId,
+                network: post.network,
+                scheduledAt: post.scheduledAt,
+                caption,
+                canvaUrl: post.canvaUrl,
+                campaignId: post.campaignId,
+                pillarId: post.pillarId,
+                authorId: post.authorId,
+              })
+            }
+          />
 
           {campaignName && (
             <div>
@@ -271,6 +289,76 @@ function ApprovalLink({ postId }: { postId: string }) {
           }}
         >
           {copied ? 'Copié' : 'Copier'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/** Légende éditable en place — évite d'ouvrir le formulaire complet pour un ajustement de texte. */
+function InlineCaption({
+  caption,
+  pending,
+  onSave,
+}: {
+  caption: string;
+  pending: boolean;
+  onSave: (caption: string) => Promise<unknown>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(caption);
+
+  if (!editing) {
+    return (
+      <div className="group/cap relative">
+        <p className="text-muted-foreground mb-1 text-xs">Légende</p>
+        <p className="whitespace-pre-wrap pr-8 text-sm">
+          {caption || <span className="text-muted-foreground italic">Sans légende</span>}
+        </p>
+        <button
+          type="button"
+          aria-label="Modifier la légende"
+          onClick={() => {
+            setDraft(caption);
+            setEditing(true);
+          }}
+          className="text-muted-foreground hover:bg-surface-2 hover:text-foreground focus-visible:ring-primary/30 absolute right-0 top-0 rounded p-1 opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 group-hover/cap:opacity-100"
+        >
+          <Pencil className="size-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-muted-foreground text-xs">Légende</p>
+      <textarea
+        // eslint-disable-next-line jsx-a11y/no-autofocus -- édition inline déclenchée par l'utilisateur
+        autoFocus
+        rows={4}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setEditing(false);
+          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) e.currentTarget.form?.requestSubmit();
+        }}
+        className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+        aria-label="Légende"
+      />
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          disabled={pending || draft === caption}
+          onClick={async () => {
+            await onSave(draft);
+            setEditing(false);
+          }}
+        >
+          Enregistrer
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
+          Annuler
         </Button>
       </div>
     </div>

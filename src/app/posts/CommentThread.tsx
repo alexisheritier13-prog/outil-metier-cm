@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Segmented } from '@/components/Segmented';
+import { cn } from '@/lib/utils';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { listInternalUsers } from '@/services/users';
 import {
@@ -119,32 +121,42 @@ export function CommentThread({ postId }: { postId: string }) {
           setBody('');
         }}
       >
+        <Segmented
+          ariaLabel="Destinataire du commentaire"
+          value={visibility}
+          onChange={setVisibility}
+          options={[
+            { value: 'internal', label: 'Interne' },
+            { value: 'client', label: 'Visible client' },
+          ]}
+        />
         <textarea
-          className="border-input bg-surface focus-visible:ring-ring w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className={cn(
+            'bg-surface w-full rounded border px-2 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2',
+            visibility === 'client'
+              ? 'border-warning-border focus-visible:ring-warning-border'
+              : 'border-input focus-visible:ring-ring',
+          )}
           rows={2}
-          placeholder="Ajouter un commentaire…"
+          placeholder={
+            visibility === 'client'
+              ? 'Message adressé au client…'
+              : 'Note interne, non visible du client…'
+          }
           value={body}
           onChange={(e) => setBody(e.target.value)}
           aria-label="Nouveau commentaire"
         />
-        <div className="flex items-center gap-3">
-          <label className="text-muted-foreground flex items-center gap-1.5 text-xs">
-            <input
-              type="checkbox"
-              checked={visibility === 'client'}
-              onChange={(e) => setVisibility(e.target.checked ? 'client' : 'internal')}
-            />
-            Visible par le client
-          </label>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-muted-foreground text-xs">
+            {visibility === 'client'
+              ? 'Le client verra ce message dans son espace de validation.'
+              : 'Visible uniquement de l’équipe.'}
+          </p>
           <Button size="sm" type="submit" disabled={add.isPending}>
-            Commenter
+            {visibility === 'client' ? 'Envoyer au client' : 'Commenter'}
           </Button>
         </div>
-        {visibility === 'client' && (
-          <p className="text-muted-foreground text-xs">
-            Le client verra ce commentaire dans son espace de validation.
-          </p>
-        )}
       </form>
     </div>
   );
