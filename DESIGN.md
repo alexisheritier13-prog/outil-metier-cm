@@ -42,17 +42,20 @@ Le badge de compteur « Alertes » dans la nav est rouge (attention) ; les autre
 
 ## Typography
 
-Une seule famille : **Inter Variable** (self-host), repli `ui-sans-serif, system-ui,
-"Segoe UI", Roboto, sans-serif`. Mono `ui-monospace, "SF Mono", Menlo` pour liens Canva /
-ids. Échelle rem fixe (pas de `clamp`), ratio ~1.2 :
+Deux familles : **Poppins** (self-host, poids 500/600/700) pour les titres, sections et
+libellés forts (`h1`–`h3`, `.text-title`, `.text-section`, `.font-display`) — géométrique,
+`letter-spacing` négatif — et **Inter Variable** (self-host) pour tout le corps, les
+tableaux denses et les libellés de champ, repli `ui-sans-serif, system-ui, "Segoe UI",
+Roboto, sans-serif`. Mono `ui-monospace, "SF Mono", Menlo` pour liens Canva / ids. Échelle
+rem fixe (pas de `clamp`), ratio ~1.2 :
 
-| Élément | Taille | Poids |
-|---|---|---|
-| Titre de page (`text-title`) | 20 px | 600 |
-| Section (`text-section`) | 16 px | 600 |
-| Corps | 14 px | 400 |
-| Corps dense (`text-dense`) | 13 px | 400 |
-| Méta | 12 px | 400–500 |
+| Élément | Taille | Poids | Famille |
+|---|---|---|---|
+| Titre de page (`text-title`) | 22 px | 600 | Poppins |
+| Section (`text-section`) | 16 px | 600 | Poppins |
+| Corps | 14 px | 400 | Inter |
+| Corps dense (`text-dense`) | 13 px | 400 | Inter |
+| Méta | 12 px | 400–500 | Inter |
 
 `text-wrap: balance` sur h1–h3. Prose (charte, aide) plafonnée à ~70ch. Pas d'ALL CAPS en
 corps ; réservé aux badges / libellés ≤ 3 mots.
@@ -89,8 +92,11 @@ jamais mêlées aux logos couleur des clients.
 - Vues calendrier / listes / tableaux : **pleine largeur** du viewport (padding latéral
   24–32 px). Pas de conteneur centré étroit. Seule la prose est bornée (~70ch).
 - Rayons : `--radius` 8 px (cartes, panneaux), 6 px (inputs, boutons), 4 px (badges).
-- Deux couches neutres : `--surface` (contenu) / `--surface-2` (barres d'outils, en-têtes
-  de tableau).
+- Trois couches neutres : `--surface` (blanc pur — cartes, contenu) / `--surface-2` (sol
+  teinté légèrement froid — corps des tiroirs de formulaire, barres d'outils, en-têtes de
+  tableau, survols) / `--surface-3` (creux appuyé, blocs pré/code). Un `<FormSheet>` empile
+  les trois : en-tête blanc, corps `surface-2` sur lequel flottent les `<FormSection>`
+  blancs (carte `border` + `shadow-xs`), pied blanc.
 - Z-index sémantique : dropdown 1000 → sticky 1100 → panel 1200 → modal-backdrop 1300 →
   modal 1400 → toast 1500 → tooltip 1600.
 - Espacement multiples de 4 px ; rythme vertical varié (sections 24–32, intra-panneau

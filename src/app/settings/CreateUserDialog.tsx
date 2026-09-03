@@ -58,15 +58,17 @@ export function CreateUserDialog() {
         {link ? (
           <>
             <FormBody>
-              <p className="text-sm">
-                Compte créé.
-                {emailed
-                  ? ' Un e-mail avec le lien d’accès a été envoyé.'
-                  : ' Lien de définition du mot de passe à transmettre :'}
-              </p>
-              <code className="bg-surface-2 border-border block overflow-x-auto rounded-lg border p-3 text-xs">
-                {link}
-              </code>
+              <FormSection>
+                <p className="text-sm">
+                  Compte créé.
+                  {emailed
+                    ? ' Un e-mail avec le lien d’accès a été envoyé.'
+                    : ' Lien de définition du mot de passe à transmettre :'}
+                </p>
+                <code className="bg-surface-2 border-border block overflow-x-auto rounded-lg border p-3 text-xs">
+                  {link}
+                </code>
+              </FormSection>
             </FormBody>
             <FormFooter>
               <Button onClick={close}>Fermer</Button>

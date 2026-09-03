@@ -91,10 +91,13 @@ export default {
         md: 'var(--shadow-md)',
         panel: 'var(--shadow-panel)',
       },
+      fontFamily: {
+        display: ['Poppins', 'Inter Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       fontSize: {
         // Échelle rem fixe (registre produit) — pas de clamp.
-        title: ['1.375rem', { lineHeight: '1.25', fontWeight: '600', letterSpacing: '-0.014em' }],
-        section: ['1rem', { lineHeight: '1.4', fontWeight: '600', letterSpacing: '-0.006em' }],
+        title: ['1.375rem', { lineHeight: '1.2', fontWeight: '600', letterSpacing: '-0.02em' }],
+        section: ['1rem', { lineHeight: '1.35', fontWeight: '600', letterSpacing: '-0.011em' }],
         dense: ['0.8125rem', { lineHeight: '1.45' }],
       },
       zIndex: {

@@ -7,6 +7,7 @@ import {
   FormBody,
   FormField,
   FormFooter,
+  FormSection,
   FormSheet,
   selectClass,
   textareaClass,
@@ -86,7 +87,9 @@ export function FeedbackButton({
         {send.isSuccess ? (
           <>
             <FormBody>
-              <p className="text-sm">Merci ! C'est bien envoyé. 🙏</p>
+              <FormSection>
+                <p className="text-sm">Merci ! C'est bien envoyé. 🙏</p>
+              </FormSection>
             </FormBody>
             <FormFooter>
               <Button onClick={close}>Fermer</Button>
@@ -102,29 +105,31 @@ export function FeedbackButton({
             }}
           >
             <FormBody>
-              <FormField label="Type" htmlFor="fb-kind">
-                <select
-                  id="fb-kind"
-                  className={selectClass}
-                  value={kind}
-                  onChange={(e) => setKind(e.target.value as FeedbackKind)}
-                >
-                  {(Object.keys(FEEDBACK_KIND_LABELS) as FeedbackKind[]).map((k) => (
-                    <option key={k} value={k}>
-                      {FEEDBACK_KIND_LABELS[k]}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-              <FormField label="Message" htmlFor="fb-msg">
-                <textarea
-                  id="fb-msg"
-                  className={cn(textareaClass, 'min-h-32')}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ce qui s'est passé, ce que tu attendais, ton idée…"
-                />
-              </FormField>
+              <FormSection>
+                <FormField label="Type" htmlFor="fb-kind">
+                  <select
+                    id="fb-kind"
+                    className={selectClass}
+                    value={kind}
+                    onChange={(e) => setKind(e.target.value as FeedbackKind)}
+                  >
+                    {(Object.keys(FEEDBACK_KIND_LABELS) as FeedbackKind[]).map((k) => (
+                      <option key={k} value={k}>
+                        {FEEDBACK_KIND_LABELS[k]}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+                <FormField label="Message" htmlFor="fb-msg">
+                  <textarea
+                    id="fb-msg"
+                    className={cn(textareaClass, 'min-h-32')}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Ce qui s'est passé, ce que tu attendais, ton idée…"
+                  />
+                </FormField>
+              </FormSection>
               {send.isError && (
                 <p className="text-destructive text-sm" role="alert">
                   L'envoi a échoué. Réessaie.

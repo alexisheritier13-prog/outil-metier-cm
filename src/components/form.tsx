@@ -28,9 +28,9 @@ export function FormSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className={cn('gap-0 p-0', wide && 'sm:max-w-[560px]')}>
-        <div className="flex items-start justify-between gap-3 border-b px-6 py-4">
+        <div className="bg-surface flex items-start justify-between gap-3 border-b px-6 py-4">
           <div className="space-y-1">
-            <SheetTitle>{title}</SheetTitle>
+            <SheetTitle className="text-title">{title}</SheetTitle>
             {description && <p className="text-muted-foreground text-sm">{description}</p>}
           </div>
           <SheetClose asChild>
@@ -45,23 +45,36 @@ export function FormSheet({
   );
 }
 
-/** Corps défilant d'un formulaire en panneau. */
+/**
+ * Corps défilant d'un formulaire en panneau. Fond « sol » teinté (`surface-2`) sur
+ * lequel flottent les `<FormSection>` blancs — différenciation de couche.
+ */
 export function FormBody({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex-1 space-y-7 overflow-y-auto px-6 py-6', className)}>{children}</div>
-  );
-}
-
-/** Pied collant : actions alignées à droite. */
-export function FormFooter({ children }: { children: ReactNode }) {
-  return (
-    <div className="border-border bg-surface flex items-center justify-end gap-2 border-t px-6 py-4">
+    <div
+      className={cn(
+        'bg-surface-2 flex-1 space-y-3.5 overflow-y-auto px-5 py-5',
+        className,
+      )}
+    >
       {children}
     </div>
   );
 }
 
-/** Groupe de champs avec un intitulé optionnel. `cols=2` => 2 colonnes ≥ sm. */
+/** Pied collant : actions alignées à droite. Blanc, pour trancher avec le corps teinté. */
+export function FormFooter({ children }: { children: ReactNode }) {
+  return (
+    <div className="border-border bg-surface relative flex items-center justify-end gap-2 border-t px-5 py-3.5 shadow-[0_-10px_24px_-16px_oklch(0.42_0.04_262/0.18)]">
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Groupe de champs présenté comme une carte blanche posée sur le corps teinté.
+ * `cols=2` => 2 colonnes ≥ sm.
+ */
 export function FormSection({
   title,
   description,
@@ -74,10 +87,10 @@ export function FormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-3">
+    <section className="bg-surface rounded-xl border p-4 shadow-xs">
       {(title || description) && (
-        <div className="space-y-0.5">
-          {title && <h3 className="text-sm font-semibold">{title}</h3>}
+        <div className="mb-3 space-y-0.5">
+          {title && <h3 className="text-section">{title}</h3>}
           {description && <p className="text-muted-foreground text-xs">{description}</p>}
         </div>
       )}

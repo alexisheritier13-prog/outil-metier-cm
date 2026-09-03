@@ -1,4 +1,8 @@
 @import '@fontsource-variable/inter';
+/* Poppins : titres et libellés forts uniquement (géométrique, pas pour le corps dense). */
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/poppins/700.css';
 
 @tailwind base;
 @tailwind components;
@@ -16,24 +20,25 @@
     --background: oklch(0.966 0.008 258); /* #F4F6FB — gris bleuté très clair : page sous le conteneur */
     --foreground: oklch(0.24 0.011 262); /* encre, légèrement froide — ~11:1 */
     --surface: oklch(1 0 0); /* conteneur + cartes — blanc pur */
-    --surface-2: oklch(0.966 0.005 262); /* survol / inset léger */
-    --surface-3: oklch(0.938 0.006 262); /* survol appuyé, 3e couche */
+    --surface-2: oklch(0.964 0.006 262); /* 1re couche en creux : fond de panneau, en-tête de table, inset */
+    --surface-3: oklch(0.942 0.007 262); /* 2e couche : survol appuyé, blocs pré/code */
     --muted: oklch(0.966 0.004 262);
     --muted-foreground: oklch(0.445 0.014 262); /* ~5.2:1 sur blanc */
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.24 0.011 262);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.24 0.011 262);
-    --border: oklch(0.916 0.005 262); /* filet fin, discret */
-    --border-strong: oklch(0.852 0.007 262);
+    --border: oklch(0.906 0.005 262); /* filet fin, un peu plus lisible */
+    --border-strong: oklch(0.85 0.007 262);
     --input: oklch(0.876 0.007 262);
 
     /* Ombre douce et diffuse, légèrement froide — pour cartes / panneaux flottants. */
     --shadow-xs: 0 1px 2px 0 oklch(0.42 0.04 262 / 0.06);
     --shadow-sm:
-      0 1px 2px 0 oklch(0.42 0.04 262 / 0.06), 0 3px 8px -2px oklch(0.42 0.04 262 / 0.07);
+      0 1px 2px 0 oklch(0.42 0.04 262 / 0.05), 0 5px 14px -4px oklch(0.42 0.04 262 / 0.09),
+      0 14px 28px -12px oklch(0.42 0.04 262 / 0.06);
     --shadow-md:
-      0 2px 4px -1px oklch(0.42 0.04 262 / 0.07), 0 12px 28px -8px oklch(0.42 0.04 262 / 0.12);
+      0 2px 4px -1px oklch(0.42 0.04 262 / 0.07), 0 14px 32px -8px oklch(0.42 0.04 262 / 0.13);
     --shadow-panel:
       0 1px 2px oklch(0 0 0 / 0.04), 0 16px 44px -12px oklch(0.38 0.04 262 / 0.2);
 
@@ -111,8 +116,13 @@
 
   h1,
   h2,
-  h3 {
+  h3,
+  .text-title,
+  .text-section,
+  .font-display {
+    font-family: 'Poppins', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
     text-wrap: balance;
+    letter-spacing: -0.02em;
   }
 
   /* Anneau de focus homogène sur tout ce qui est focusable au clavier. */
