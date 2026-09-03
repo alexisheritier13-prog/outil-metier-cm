@@ -1,11 +1,14 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import { Page, PageHeader } from '@/components/Page';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusBadge } from '@/components/StatusBadge';
+import { PortalPreviewMock } from '@/onboarding/PortalPreviewMock';
+import { tourStore } from '@/onboarding/tourStore';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
-import { ROLE_LABELS } from '@/shared/constants/roles';
+import { isInternalRole, ROLE_LABELS } from '@/shared/constants/roles';
 
 /**
  * Aide in-app : référence des fonctionnalités, un sujet par ligne dépliable.
@@ -20,6 +23,13 @@ export function HelpPage() {
       <PageHeader
         title="Aide"
         description="Comment Cadence fonctionne, par sujet. Déplie ce dont tu as besoin."
+        actions={
+          me && isInternalRole(me.role) ? (
+            <Button variant="outline" onClick={() => tourStore.openIntro()}>
+              <Sparkles className="h-4 w-4" /> Revoir la visite guidée
+            </Button>
+          ) : null
+        }
         aside={
           me ? (
             <span className="border-border text-muted-foreground rounded-full border px-2.5 py-0.5 text-xs">
@@ -268,7 +278,7 @@ function PostTab() {
 function ClientsTab() {
   return (
     <Accordion>
-      <Topic title="La fiche client" defaultOpen teaser="7 onglets par client">
+      <Topic title="La fiche client" teaser="7 onglets par client">
         <Defs
           items={[
             ['Vue d’ensemble', 'Synthèse des autres onglets et jauge d’équilibre du mois. Chaque encart ouvre son onglet.'],
@@ -285,7 +295,13 @@ function ClientsTab() {
         </p>
       </Topic>
 
-      <Topic title="L'espace client" teaser="ce que voit le contact">
+      <Topic title="L'espace client" defaultOpen teaser="ce que voit le contact">
+        <p>
+          Un espace à part, à l’adresse <strong>/portail</strong>, avec le nom et le logo de votre
+          agence. Le contact s’y connecte avec les identifiants que vous créez depuis{' '}
+          <strong>Clients → onglet Accès</strong> (ou le bouton <em>Inviter</em> d’un contact).
+        </p>
+        <PortalPreviewMock className="my-3" />
         <Defs
           items={[
             ['Calendrier', 'Ses posts en lecture (mois ou liste), aperçu façon réseau.'],

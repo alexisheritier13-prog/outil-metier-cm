@@ -86,6 +86,10 @@ jamais mêlées aux logos couleur des clients.
 - Panneau latéral droit `Sheet` (~480 px, plein écran < 768 px) pour le détail d'un post.
 - Nav `/app` : menu déroulant « Contenu » (Popover) regroupe Campagnes/Idées/Templates/
   Marronniers pour tenir sur une ligne.
+- Didacticiel (`src/onboarding/`) : carrousel `Dialog` de première connexion (6 écrans,
+  illustrations schématiques sans donnée réelle, dont un mock du portail client) +
+  visite guidée maison — surimpression `box-shadow` étalé avec anneau `--primary` sur
+  les cibles `data-tour` de la barre latérale, bulle à côté. Relançable depuis l'Aide.
 
 ## Layout
 

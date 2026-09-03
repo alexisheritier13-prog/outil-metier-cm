@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useAccountSettings } from '@/app/account/useAccount';
 import { GlobalSearch } from '@/components/GlobalSearch';
+import { OnboardingHost } from '@/onboarding/OnboardingHost';
 import { useGlobalShortcuts } from '@/lib/appShortcuts';
 import { AppSidebar } from './AppSidebar';
 
@@ -50,6 +51,7 @@ export function AppLayout() {
       </div>
 
       <GlobalSearch />
+      <OnboardingHost />
 
       {/* Drawer (mobile / tablette) */}
       {drawer && (

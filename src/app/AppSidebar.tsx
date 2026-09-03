@@ -80,11 +80,16 @@ export function AppSidebar() {
         <Item to="/app" end icon={LayoutGrid}>
           Accueil
         </Item>
-        <Item to="/app/planning" icon={CalendarDays}>
+        <Item to="/app/planning" icon={CalendarDays} dataTour="nav-planning">
           Planning
         </Item>
 
-        <Group label="Validation" icon={ListChecks} match={['/app/a-valider', '/app/demandes']}>
+        <Group
+          label="Validation"
+          icon={ListChecks}
+          match={['/app/a-valider', '/app/demandes']}
+          dataTour="nav-validation"
+        >
           <SubItem to="/app/a-valider" badge={reviewCount.data}>
             À valider
           </SubItem>
@@ -93,7 +98,7 @@ export function AppSidebar() {
           </SubItem>
         </Group>
 
-        <Item to="/app/clients" icon={Users}>
+        <Item to="/app/clients" icon={Users} dataTour="nav-clients">
           Clients
         </Item>
 
@@ -101,6 +106,7 @@ export function AppSidebar() {
           label="Bibliothèque"
           icon={Library}
           match={['/app/idees', '/app/templates', '/app/marronniers', '/app/campagnes']}
+          dataTour="nav-library"
         >
           <SubItem to="/app/idees">Idées</SubItem>
           <SubItem to="/app/templates">Templates</SubItem>
@@ -108,7 +114,13 @@ export function AppSidebar() {
           <SubItem to="/app/campagnes">Campagnes</SubItem>
         </Group>
 
-        <Item to="/app/alertes" icon={Bell} badge={alertCount.data} badgeTone="danger">
+        <Item
+          to="/app/alertes"
+          icon={Bell}
+          badge={alertCount.data}
+          badgeTone="danger"
+          dataTour="nav-alerts"
+        >
           Alertes
         </Item>
       </nav>
@@ -129,7 +141,7 @@ export function AppSidebar() {
             Admin plateforme
           </Item>
         )}
-        <Item to="/app/aide" icon={LifeBuoy}>
+        <Item to="/app/aide" icon={LifeBuoy} dataTour="nav-help">
           Aide
         </Item>
         <FeedbackButton />
@@ -184,6 +196,7 @@ function Item({
   children,
   badge,
   badgeTone,
+  dataTour,
 }: {
   to: string;
   end?: boolean;
@@ -191,9 +204,15 @@ function Item({
   children: ReactNode;
   badge?: number;
   badgeTone?: 'danger';
+  dataTour?: string;
 }) {
   return (
-    <NavLink to={to} end={end} className={({ isActive }) => itemClass(isActive)}>
+    <NavLink
+      to={to}
+      end={end}
+      data-tour={dataTour}
+      className={({ isActive }) => itemClass(isActive)}
+    >
       {({ isActive }) => (
         <>
           <Icon
@@ -214,18 +233,20 @@ function Group({
   icon: Icon,
   match,
   children,
+  dataTour,
 }: {
   label: string;
   icon: IconType;
   match: string[];
   children: ReactNode;
+  dataTour?: string;
 }) {
   const { pathname } = useLocation();
   const containsActive = match.some((m) => pathname.startsWith(m));
   const [open, setOpen] = useState(containsActive);
 
   return (
-    <div>
+    <div data-tour={dataTour}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

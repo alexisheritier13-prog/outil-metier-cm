@@ -215,7 +215,7 @@ export function DashboardPage() {
 
       <div className="flex flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* Cette semaine */}
-        <section className="flex min-w-0 flex-col lg:min-h-0 lg:flex-1">
+        <section data-tour="dash-week" className="flex min-w-0 flex-col lg:min-h-0 lg:flex-1">
           <SectionTitle to="/app/planning" icon={CalendarRange} label="Cette semaine" />
           <div className="surface-card overflow-y-auto lg:min-h-0 lg:flex-1">
             {weekQ.isLoading ? (
