@@ -19,7 +19,7 @@ export const INTRO_SLIDES: IntroSlide[] = [
     title: 'Bienvenue sur Cadence',
     body: (
       <>
-        Un seul endroit pour planifier, faire valider et publier le contenu de tous vos clients.
+        Un seul endroit pour préparer, faire valider et planifier le contenu de tous vos clients.
         Fini les docs éparpillés et les allers-retours par mail.
       </>
     ),
@@ -44,8 +44,9 @@ export const INTRO_SLIDES: IntroSlide[] = [
     body: (
       <>
         Chaque post avance étape par étape : brouillon, validation interne, validation client,
-        puis planifié. Le statut est toujours visible, et vous pouvez sauter la validation
-        interne ou client selon le client.
+        puis planifié. La publication reste à faire sur le réseau, à la main ou via votre
+        outil habituel ; dans Cadence vous marquez ensuite le post « publié ». Vous pouvez
+        sauter la validation interne ou client selon le client.
       </>
     ),
     visual: <Pipeline />,

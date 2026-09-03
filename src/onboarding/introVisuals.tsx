@@ -51,7 +51,7 @@ export function Pipeline() {
     { icon: CircleDashed, label: 'Brouillon', who: 'le CM rédige' },
     { icon: Eye, label: 'Validation interne', who: 'relecture agence' },
     { icon: Send, label: 'Validation client', who: 'le client approuve' },
-    { icon: CheckCircle2, label: 'Planifié', who: 'prêt à publier' },
+    { icon: CheckCircle2, label: 'Planifié', who: 'à publier sur le réseau' },
   ];
   return (
     <div className="bg-surface-2 space-y-1.5 rounded-xl border p-3">
