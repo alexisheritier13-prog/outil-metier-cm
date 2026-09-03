@@ -67,7 +67,7 @@ export function BulkActionBar({
         <div
           role="region"
           aria-label="Actions groupées"
-          className="bg-surface shadow-panel pointer-events-auto flex flex-wrap items-center gap-1.5 rounded-xl border p-1.5 pl-3"
+          className="bg-surface supports-[backdrop-filter]:bg-surface/75 shadow-panel pointer-events-auto flex flex-wrap items-center gap-1.5 rounded-xl border p-1.5 pl-3 backdrop-blur-md"
         >
           <span className="text-sm font-medium tabular-nums">
             {selectedIds.length} sélectionné{selectedIds.length > 1 ? 's' : ''}

@@ -96,7 +96,7 @@ export function PortalLayout() {
   return (
     <PortalClientContext.Provider value={active}>
       <div className="bg-background min-h-dvh">
-        <header className="bg-surface sticky top-0 z-sticky border-b">
+        <header className="bg-surface supports-[backdrop-filter]:bg-surface/80 sticky top-0 z-sticky border-b backdrop-blur-md">
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 pt-3 sm:px-6">
             <div className="flex min-w-0 items-center gap-2.5">
               {active.logoUrl && !logoBroken ? (
