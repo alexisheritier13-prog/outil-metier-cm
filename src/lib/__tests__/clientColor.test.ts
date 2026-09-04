@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clientColor } from '../clientColor';
+import { clientColor, clientInitials } from '../clientColor';
 
 describe('clientColor', () => {
   it('est déterministe pour un même id', () => {
@@ -18,5 +18,16 @@ describe('clientColor', () => {
     expect(c.color).toMatch(/^oklch\(/);
     expect(c.soft).toMatch(/^oklch\(/);
     expect(c.ink).toMatch(/^oklch\(/);
+  });
+});
+
+describe('clientInitials', () => {
+  it('prend la 1re lettre des deux premiers mots', () => {
+    expect(clientInitials('Studio Lumen')).toBe('SL');
+    expect(clientInitials('Studio Lumen (démo)')).toBe('SL');
+  });
+
+  it('un seul mot => une seule lettre', () => {
+    expect(clientInitials('Nordvik')).toBe('N');
   });
 });

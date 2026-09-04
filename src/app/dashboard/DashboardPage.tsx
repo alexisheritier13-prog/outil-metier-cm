@@ -1,14 +1,17 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Activity,
   ArrowRight,
+  BellRing,
   CalendarRange,
+  CheckCircle2,
   GaugeCircle,
   Inbox,
   MessageSquareText,
   Send,
+  TrendingUp,
   TriangleAlert,
   Users,
 } from 'lucide-react';
@@ -17,53 +20,44 @@ import { UserAvatar } from '@/components/UserAvatar';
 import { FirstRunGuide } from './FirstRunGuide';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NetworkIcon } from '@/components/NetworkIcon';
-import { StatusBadge } from '@/components/StatusBadge';
-import { cn } from '@/lib/utils';
+import { MiniBarChart, type MiniBar } from '@/components/MiniBarChart';
+import { SectionCard } from './SectionCard';
+import { KpiCard } from './KpiCard';
+import { PostRow } from './PostRow';
+import { clientColor, clientInitials } from '@/lib/clientColor';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
 import { POST_STATUSES, POST_STATUS_LABELS, type PostStatus } from '@/shared/constants/postStatus';
-import { parisDateKey, parisTimeLabel } from '@/shared/utils/tz';
+import { parisDateKey } from '@/shared/utils/tz';
 import { listPosts, listReviewQueue } from '@/services/posts';
+import { listInternalUsers } from '@/services/users';
 import { useChangePostStatus } from '@/app/posts/usePosts';
-import type { Post } from '@/shared/types';
+import type { Alert, Post } from '@/shared/types';
 import { listClientRequests } from '@/services/clientRequests';
-import { listAlerts } from '@/services/alerts';
+import { listAlerts, setAlertStatus } from '@/services/alerts';
 import { listClients } from '@/services/clients';
 import { listRecentActivity } from '@/services/clientActivity';
 import { ALERT_TYPE_LABELS } from '@/shared/types';
 import { activityLabel } from '@/app/clients/tabs/activity';
-
-type IconType = typeof Inbox;
+import { relativeAge } from '@/lib/relativeTime';
+import {
+  fetchFirstTimeApprovalRate,
+  fetchMonthlyPostCounts,
+  pickPriorityAlerts,
+  STEP_BAR_COLOR,
+} from './dashboardMetrics';
 
 const PIPELINE_STATUSES = POST_STATUSES.filter((s) => s !== 'published');
-const STATUS_BAR_COLOR: Record<PostStatus, string> = {
-  draft: 'oklch(0.75 0.015 262)',
-  internal_review: 'var(--info)',
-  client_review: 'var(--warning)',
-  approved: 'var(--success)',
-  scheduled: 'var(--primary)',
-  published: 'var(--muted-foreground)',
-};
-
-const TILE_ACCENT = {
-  primary: 'bg-primary text-primary-foreground',
-  info: 'bg-info text-info-foreground',
-  success: 'bg-success text-success-foreground',
-} as const;
-
+const MONTH_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 const DAY_MS = 86_400_000;
-
-function relative(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const h = Math.round(diff / 3_600_000);
-  if (h < 1) return "à l'instant";
-  if (h < 24) return `il y a ${h} h`;
-  const d = Math.round(h / 24);
-  return d === 1 ? 'hier' : `il y a ${d} j`;
-}
+const ACTIVITY_VISIBLE = 5;
 
 export function DashboardPage() {
   const { data: me } = useCurrentProfile();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [activityExpanded, setActivityExpanded] = useState(false);
+  const year = new Date().getFullYear();
 
   const internalQ = useQuery({
     queryKey: ['review-queue', 'internal'],
@@ -82,6 +76,7 @@ export function DashboardPage() {
     queryKey: ['clients', { includeArchived: true }],
     queryFn: () => listClients(true),
   });
+  const authorsQ = useQuery({ queryKey: ['internal-users-lite'], queryFn: listInternalUsers });
   const weekQ = useQuery({
     queryKey: ['dashboard', 'week'],
     queryFn: () =>
@@ -90,12 +85,26 @@ export function DashboardPage() {
         to: new Date(Date.now() + 7 * DAY_MS).toISOString(),
       }),
   });
-  const activityQ = useQuery({ queryKey: ['dashboard', 'activity'], queryFn: () => listRecentActivity(8) });
+  const activityQ = useQuery({
+    queryKey: ['dashboard', 'activity'],
+    queryFn: () => listRecentActivity(10),
+  });
+  const monthlyQ = useQuery({
+    queryKey: ['dashboard', 'monthly-posts', year],
+    queryFn: () => fetchMonthlyPostCounts(year),
+  });
+  const firstTimeQ = useQuery({
+    queryKey: ['dashboard', 'first-time-approval'],
+    queryFn: fetchFirstTimeApprovalRate,
+  });
   const changeStatus = useChangePostStatus();
-  const qc = useQueryClient();
   const pipelineQ = useQuery({
     queryKey: ['dashboard', 'pipeline'],
     queryFn: () => listPosts({ statuses: PIPELINE_STATUSES }),
+  });
+  const markAlertSeen = useMutation({
+    mutationFn: (id: string) => setAlertStatus(id, 'seen'),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['alerts'] }),
   });
 
   const pipelineCounts = useMemo(() => {
@@ -109,6 +118,11 @@ export function DashboardPage() {
     const m = new Map((clientsQ.data ?? []).map((c) => [c.id, c.name]));
     return (id: string | null) => (id ? (m.get(id) ?? '—') : '—');
   }, [clientsQ.data]);
+
+  const authorById = useMemo(
+    () => new Map((authorsQ.data ?? []).map((a) => [a.id, a])),
+    [authorsQ.data],
+  );
 
   const openRequests = (requestsQ.data ?? []).filter((r) => r.status !== 'traitee');
   const newAlerts = (alertsQ.data ?? []).filter((a) => a.status === 'new');
@@ -125,6 +139,11 @@ export function DashboardPage() {
     }
     return [...groups.entries()];
   }, [weekPosts]);
+  const weekTotal = weekPosts?.length ?? 0;
+  const weekClientCount = useMemo(
+    () => new Set((weekPosts ?? []).map((p) => p.clientId)).size,
+    [weekPosts],
+  );
 
   const watchlist = useMemo(() => {
     const byClient = new Map<string, string[]>();
@@ -137,6 +156,36 @@ export function DashboardPage() {
     }
     return [...byClient.entries()].slice(0, 6);
   }, [alertsQ.data]);
+
+  const priorityAlerts = useMemo(() => pickPriorityAlerts(newAlerts, 2), [newAlerts]);
+
+  const monthlyBars: MiniBar[] = useMemo(
+    () =>
+      (monthlyQ.data ?? []).map((m) => ({
+        key: String(m.month),
+        label: MONTH_LABELS[m.month] ?? '',
+        segments: [
+          { value: m.published, color: 'var(--muted-foreground)', label: 'Publiés' },
+          { value: m.scheduled, color: 'var(--primary)', label: 'Planifiés' },
+        ],
+      })),
+    [monthlyQ.data],
+  );
+  const peakMonthKey = useMemo(() => {
+    let best: { key: string; total: number } | null = null;
+    for (const bar of monthlyBars) {
+      const total = bar.segments.reduce((s, seg) => s + seg.value, 0);
+      if (total > 0 && (!best || total > best.total)) best = { key: bar.key, total };
+    }
+    return best?.key;
+  }, [monthlyBars]);
+
+  function openAlert(a: Alert) {
+    if (a.status === 'new') markAlertSeen.mutate(a.id);
+    if (a.postId) navigate(`/app/planning?post=${a.postId}`);
+    else if (a.clientId) navigate(`/app/clients/${a.clientId}`);
+    else navigate('/app/alertes');
+  }
 
   if (!me || !isInternalRole(me.role)) return null;
 
@@ -167,6 +216,11 @@ export function DashboardPage() {
     );
   }
 
+  const activityRows = activityQ.data ?? [];
+  const activityVisible = activityExpanded ? activityRows : activityRows.slice(0, ACTIVITY_VISIBLE);
+  const activityHidden = activityRows.slice(ACTIVITY_VISIBLE);
+  const oldestHiddenAt = activityHidden[activityHidden.length - 1]?.createdAt;
+
   return (
     <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
       <header className="flex shrink-0 items-center gap-2.5">
@@ -177,266 +231,264 @@ export function DashboardPage() {
         </h1>
       </header>
 
+      <PriorityBanner
+        alerts={priorityAlerts}
+        clientName={clientName}
+        onTreat={() => priorityAlerts[0] && openAlert(priorityAlerts[0])}
+        loading={alertsQ.isLoading}
+      />
+
       {/* À traiter */}
       <div className="grid shrink-0 gap-3 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile
+        <KpiCard
           to="/app/a-valider"
           icon={Inbox}
           accent="primary"
           label="À valider en interne"
           value={internalQ.data?.length}
           loading={internalQ.isLoading}
+          context={oldestContext(internalQ.data, (p) => p.statusChangedAt)}
         />
-        <StatTile
+        <KpiCard
           to="/app/a-valider"
           icon={Send}
           accent="info"
           label="En attente du client"
           value={clientQ.data?.length}
           loading={clientQ.isLoading}
+          context={oldestContext(clientQ.data, (p) => p.statusChangedAt)}
         />
-        <StatTile
+        <KpiCard
           to="/app/demandes"
           icon={MessageSquareText}
           accent="success"
           label="Demandes ouvertes"
           value={openRequests.length}
           loading={requestsQ.isLoading}
+          context={oldestContext(openRequests, (r) => r.createdAt)}
         />
-        <StatTile
+        <KpiCard
           to="/app/alertes"
           icon={TriangleAlert}
           label="Alertes non vues"
           value={newAlerts.length}
           loading={alertsQ.isLoading}
           tone={hasCritical ? 'danger' : newAlerts.length > 0 ? 'warning' : undefined}
+          context={
+            newAlerts.some((a) => a.severity === 'critical')
+              ? `${newAlerts.filter((a) => a.severity === 'critical').length} critique${newAlerts.filter((a) => a.severity === 'critical').length > 1 ? 's' : ''}`
+              : oldestContext(newAlerts, (a) => a.createdAt)
+          }
         />
       </div>
 
       <div className="flex flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* Cette semaine */}
-        <section data-tour="dash-week" className="flex min-w-0 flex-col lg:min-h-0 lg:flex-1">
-          <SectionTitle to="/app/planning" icon={CalendarRange} label="Cette semaine" />
-          <div className="surface-card overflow-y-auto lg:min-h-0 lg:flex-1">
-            {weekQ.isLoading ? (
+        <SectionCard
+          icon={CalendarRange}
+          title="Cette semaine"
+          subtitle={
+            weekTotal > 0
+              ? `${weekTotal} post${weekTotal > 1 ? 's' : ''}, ${weekClientCount} client${weekClientCount > 1 ? 's' : ''}`
+              : undefined
+          }
+          action={
+            <Link
+              to="/app/planning"
+              className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium"
+            >
+              Tout voir <ArrowRight className="h-3 w-3" />
+            </Link>
+          }
+          className="min-w-0 lg:min-h-0 lg:flex-1"
+          bodyClassName="overflow-y-auto lg:min-h-0 lg:flex-1"
+          dataTour="dash-week"
+        >
+          {weekQ.isLoading ? (
+            <div className="space-y-2 p-4">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : byDay.length === 0 ? (
+            <EmptyState
+              title="Rien de prévu"
+              description="Aucun post planifié sur les 7 prochains jours. Ouvrez le planning pour en créer."
+            />
+          ) : (
+            <div className="space-y-3 p-3">
+              {byDay.map(([day, posts]) => (
+                <div key={day}>
+                  <p className="text-muted-foreground mb-1.5 px-1 text-xs font-medium uppercase tracking-wide">
+                    {dayLabel(day)}
+                  </p>
+                  <div className="space-y-1.5">
+                    {posts.map((p) => {
+                      const due =
+                        p.status === 'scheduled' && new Date(p.scheduledAt).getTime() <= Date.now();
+                      return (
+                        <PostRow
+                          key={p.id}
+                          post={p}
+                          clientName={clientName(p.clientId)}
+                          author={authorById.get(p.authorId)}
+                          due={due}
+                          markPending={changeStatus.isPending}
+                          onMarkPublished={() =>
+                            changeStatus.mutate(
+                              { id: p.id, to: 'published' },
+                              { onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard'] }) },
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Colonne droite — défile comme un bloc, en dessous du graphe le reste est secondaire */}
+        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:w-[380px] lg:shrink-0 lg:overflow-y-auto">
+          <SectionCard
+            icon={TrendingUp}
+            title="Posts publiés par mois"
+            subtitle="Tous clients confondus"
+            className="shrink-0"
+            bodyClassName="p-4"
+          >
+            {monthlyQ.isLoading ? (
+              <Skeleton className="h-24 w-full" />
+            ) : (
+              <>
+                <MiniBarChart bars={monthlyBars} highlightKey={peakMonthKey} />
+                <div className="mt-3 flex items-center gap-4 text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <span className="bg-primary h-2 w-2 rounded-full" /> Planifiés
+                  </span>
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <span className="bg-muted-foreground h-2 w-2 rounded-full" /> Publiés
+                  </span>
+                </div>
+              </>
+            )}
+          </SectionCard>
+
+          <div className="shrink-0">
+            <ProductionPanel counts={pipelineCounts} total={pipelineTotal} loading={pipelineQ.isLoading} />
+          </div>
+
+          <div className="surface-card shrink-0 p-4">
+            <p className="text-muted-foreground mb-2 text-xs font-medium">
+              Validé du premier coup <span className="text-muted-foreground/70">· 30 derniers jours</span>
+            </p>
+            {firstTimeQ.isLoading ? (
+              <Skeleton className="mx-auto h-16 w-16 rounded-full" />
+            ) : firstTimeQ.data ? (
+              <FirstTimeGauge rate={firstTimeQ.data.rate} total={firstTimeQ.data.total} />
+            ) : (
+              <p className="text-muted-foreground py-2 text-sm">
+                Pas assez de posts récents pour ce chiffre.
+              </p>
+            )}
+          </div>
+
+          <SectionCard icon={Users} title="Clients à surveiller" accent="warning" className="shrink-0">
+            {alertsQ.isLoading ? (
               <div className="space-y-2 p-4">
-                <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
               </div>
-            ) : byDay.length === 0 ? (
-              <EmptyState
-                title="Rien de prévu"
-                description="Aucun post planifié sur les 7 prochains jours. Ouvrez le planning pour en créer."
-              />
+            ) : watchlist.length === 0 ? (
+              <p className="text-muted-foreground p-4 text-sm">
+                Aucun signal — tous les clients sont à jour.
+              </p>
             ) : (
-              <ul className="divide-border/60 divide-y">
-                {byDay.map(([day, posts]) => (
-                  <li key={day} className="p-3">
-                    <p className="text-muted-foreground mb-1.5 px-1 text-xs font-medium uppercase tracking-wide">
-                      {dayLabel(day)}
-                    </p>
-                    <ul className="space-y-0.5">
-                      {posts.map((p) => {
-                        const due =
-                          p.status === 'scheduled' && new Date(p.scheduledAt).getTime() <= Date.now();
-                        return (
-                          <li
-                            key={p.id}
-                            className="hover:bg-surface-2 flex items-center gap-3 rounded-md px-1 py-1.5 text-sm"
-                          >
-                            <Link
-                              to={`/app/planning?post=${p.id}`}
-                              className="flex min-w-0 flex-1 items-center gap-3"
-                            >
-                              <span className="text-muted-foreground w-12 shrink-0 tabular-nums">
-                                {parisTimeLabel(p.scheduledAt)}
-                              </span>
-                              <NetworkIcon network={p.network} />
-                              <span className="min-w-0 flex-1 truncate">
-                                <span className="font-medium">{clientName(p.clientId)}</span>
-                                <span className="text-muted-foreground">
-                                  {' · '}
-                                  {p.caption || 'Sans légende'}
-                                </span>
-                              </span>
-                            </Link>
-                            {due ? (
-                              <button
-                                type="button"
-                                disabled={changeStatus.isPending}
-                                onClick={() =>
-                                  changeStatus.mutate(
-                                    { id: p.id, to: 'published' },
-                                    { onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard'] }) },
-                                  )
-                                }
-                                className="bg-primary text-primary-foreground shrink-0 rounded-md px-2 py-0.5 text-xs font-medium"
-                              >
-                                Publié
-                              </button>
-                            ) : (
-                              <StatusBadge status={p.status} />
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
-
-        {/* Colonne droite */}
-        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:w-[360px] lg:shrink-0">
-          <div className="shrink-0">
-            <ProductionPanel
-              counts={pipelineCounts}
-              total={pipelineTotal}
-              loading={pipelineQ.isLoading}
-            />
-          </div>
-
-          <section className="flex shrink-0 flex-col">
-            <SectionTitle icon={Users} label="Clients à surveiller" />
-            <div className="surface-card max-h-[38vh] overflow-y-auto">
-              {alertsQ.isLoading ? (
-                <div className="space-y-2 p-4">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              ) : watchlist.length === 0 ? (
-                <p className="text-muted-foreground p-4 text-sm">
-                  Aucun signal — tous les clients sont à jour.
-                </p>
-              ) : (
-                <ul className="divide-border/60 divide-y">
-                  {watchlist.map(([clientId, issues]) => (
+              <ul className="divide-border/60 max-h-[26vh] divide-y overflow-y-auto">
+                {watchlist.map(([clientId, issues]) => {
+                  const cc = clientColor(clientId);
+                  return (
                     <li key={clientId}>
                       <Link
                         to={`/app/clients/${clientId}`}
-                        className="hover:bg-surface-2 flex items-center justify-between gap-3 p-3 text-sm"
+                        className="hover:bg-surface-2 flex items-center gap-3 p-3 text-sm"
                       >
-                        <span className="min-w-0">
+                        <span
+                          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-semibold"
+                          style={{ backgroundColor: cc.soft, color: cc.ink }}
+                          aria-hidden="true"
+                        >
+                          {clientInitials(clientName(clientId))}
+                        </span>
+                        <span className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{clientName(clientId)}</span>
                           <span className="text-warning-strong text-xs">{issues.join(' · ')}</span>
                         </span>
-                        <ArrowRight
-                          className="text-muted-foreground h-4 w-4 shrink-0"
-                          aria-hidden="true"
-                        />
+                        <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
                       </Link>
                     </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </section>
+                  );
+                })}
+              </ul>
+            )}
+          </SectionCard>
 
-          <section className="flex flex-col lg:min-h-0 lg:flex-1">
-            <SectionTitle icon={Activity} label="Activité récente" />
+          <SectionCard icon={Activity} title="Activité récente" className="shrink-0">
             {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone défilable sans enfant focusable, rendue accessible au clavier (axe) */}
-            <div tabIndex={0} role="region" aria-label="Activité récente" className="surface-card overflow-y-auto lg:min-h-0 lg:flex-1">
+            <div tabIndex={0} role="region" aria-label="Activité récente">
               {activityQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-8 w-full" />
                   <Skeleton className="h-8 w-full" />
                   <Skeleton className="h-8 w-full" />
                 </div>
-              ) : (activityQ.data ?? []).length === 0 ? (
+              ) : activityRows.length === 0 ? (
                 <p className="text-muted-foreground p-4 text-sm">Rien à afficher.</p>
               ) : (
-                <ul className="divide-border/60 divide-y">
-                  {(activityQ.data ?? []).map((e) => (
-                    <li key={e.historyId} className="flex items-start gap-3 p-3 text-sm">
-                      <NetworkIcon network={e.network} />
+                <ul className="divide-border/60 relative divide-y">
+                  {activityVisible.map((e, i) => (
+                    <li key={e.historyId} className="relative flex items-start gap-3 p-3 text-sm">
+                      {i < activityVisible.length - 1 && (
+                        <span className="bg-border absolute left-[1.6rem] top-9 h-[calc(100%-0.5rem)] w-px" />
+                      )}
+                      <span className="bg-primary-surface text-primary-strong relative grid h-6 w-6 shrink-0 place-items-center rounded-full">
+                        <NetworkIcon network={e.network} />
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate">
                           {activityLabel(e)}
                           <span className="text-muted-foreground"> · {clientName(e.clientId)}</span>
                         </span>
                         <span className="text-muted-foreground text-xs">
-                          {e.actorName || 'Système'} · {relative(e.createdAt)}
+                          {e.actorName || 'Système'} · {relativeAge(e.createdAt)}
                         </span>
                       </span>
                     </li>
                   ))}
+                  {!activityExpanded && activityHidden.length > 0 && (
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => setActivityExpanded(true)}
+                        className="hover:bg-surface-2 text-muted-foreground flex w-full items-center gap-2 p-3 text-left text-sm transition-colors"
+                      >
+                        <span className="bg-surface-3 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-medium">
+                          +{activityHidden.length}
+                        </span>
+                        {activityHidden.length} action{activityHidden.length > 1 ? 's' : ''} de plus
+                        {oldestHiddenAt && <> · {relativeAge(oldestHiddenAt)}</>}
+                      </button>
+                    </li>
+                  )}
                 </ul>
               )}
             </div>
-          </section>
+          </SectionCard>
         </div>
       </div>
     </div>
-  );
-}
-
-function StatTile({
-  to,
-  icon: Icon,
-  label,
-  value,
-  loading,
-  accent = 'primary',
-  tone,
-}: {
-  to: string;
-  icon: IconType;
-  label: string;
-  value?: number;
-  loading?: boolean;
-  accent?: keyof typeof TILE_ACCENT;
-  tone?: 'danger' | 'warning';
-}) {
-  return (
-    <Link
-      to={to}
-      className={cn(
-        'surface-card group flex items-center gap-3 p-3 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
-        tone === 'danger' && 'ring-danger-border bg-danger-surface ring-1',
-        tone === 'warning' && 'ring-warning-border bg-warning-surface ring-1',
-      )}
-    >
-      <span
-        className={cn(
-          'grid h-9 w-9 shrink-0 place-items-center rounded-lg',
-          tone === 'danger'
-            ? 'bg-danger text-danger-foreground'
-            : tone === 'warning'
-              ? 'bg-warning text-warning-foreground'
-              : TILE_ACCENT[accent],
-        )}
-      >
-        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-      </span>
-      <span className="min-w-0 flex-1">
-        {loading ? (
-          <Skeleton className="h-7 w-10" />
-        ) : (
-          <span className="block text-[1.4rem] font-semibold tabular-nums leading-none tracking-tight">
-            {value ?? 0}
-          </span>
-        )}
-        <span
-          className={cn(
-            'mt-0.5 block truncate text-xs font-medium',
-            tone === 'danger'
-              ? 'text-danger-strong'
-              : tone === 'warning'
-                ? 'text-warning-strong'
-                : 'text-muted-foreground',
-          )}
-        >
-          {label}
-        </span>
-      </span>
-      <ArrowRight
-        className="text-muted-foreground h-4 w-4 shrink-0 -translate-x-1 self-center opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
-        aria-hidden="true"
-      />
-    </Link>
   );
 }
 
@@ -450,19 +502,7 @@ function ProductionPanel({
   loading?: boolean;
 }) {
   return (
-    <section className="surface-card p-4">
-      <div className="mb-3 flex items-center gap-2.5">
-        <span className="bg-primary text-primary-foreground grid h-7 w-7 shrink-0 place-items-center rounded-lg">
-          <GaugeCircle className="h-4 w-4" aria-hidden="true" />
-        </span>
-        <div>
-          <h2 className="text-section leading-tight">Production en cours</h2>
-          <p className="text-muted-foreground text-xs">
-            {loading ? '…' : `${total} post${total > 1 ? 's' : ''} hors publiés`}
-          </p>
-        </div>
-      </div>
-
+    <SectionCard icon={GaugeCircle} title="Production en cours" subtitle={loading ? '…' : `${total} post${total > 1 ? 's' : ''} hors publiés`} bodyClassName="p-4">
       {loading ? (
         <div className="space-y-2">
           {PIPELINE_STATUSES.map((s) => (
@@ -478,10 +518,10 @@ function ProductionPanel({
             const max = Math.max(...PIPELINE_STATUSES.map((k) => counts[k]), 1);
             return (
               <li key={s} className="flex items-center gap-3 text-sm">
-                <span className="text-muted-foreground flex w-40 shrink-0 items-center gap-2">
+                <span className="text-muted-foreground flex w-32 shrink-0 items-center gap-2">
                   <span
                     className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: STATUS_BAR_COLOR[s] }}
+                    style={{ backgroundColor: STEP_BAR_COLOR[s] }}
                     aria-hidden="true"
                   />
                   <span className="truncate">{POST_STATUS_LABELS[s]}</span>
@@ -491,7 +531,7 @@ function ProductionPanel({
                     className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-500 ease-out"
                     style={{
                       width: `${Math.max((n / max) * 100, n > 0 ? 6 : 0)}%`,
-                      backgroundColor: STATUS_BAR_COLOR[s],
+                      backgroundColor: STEP_BAR_COLOR[s],
                     }}
                     aria-hidden="true"
                   />
@@ -502,29 +542,97 @@ function ProductionPanel({
           })}
         </ul>
       )}
-    </section>
+    </SectionCard>
   );
 }
 
-function SectionTitle({ label, to, icon: Icon }: { label: string; to?: string; icon?: IconType }) {
+/** Ligne de contexte honnête : l'âge du plus ancien élément de la liste, jamais une valeur inventée. */
+function oldestContext<T>(items: T[] | undefined, getDate: (item: T) => string): string | undefined {
+  if (!items || items.length === 0) return undefined;
+  const oldest = items.reduce((a, b) => (getDate(a) < getDate(b) ? a : b));
+  return `le plus ancien : ${relativeAge(getDate(oldest))}`;
+}
+
+function PriorityBanner({
+  alerts,
+  clientName,
+  onTreat,
+  loading,
+}: {
+  alerts: Alert[];
+  clientName: (id: string | null) => string;
+  onTreat: () => void;
+  loading: boolean;
+}) {
+  if (loading) return <Skeleton className="h-16 w-full shrink-0 rounded-2xl" />;
+
+  if (alerts.length === 0) {
+    return (
+      <div className="surface-card flex shrink-0 items-center gap-3 p-4">
+        <span className="bg-success text-success-foreground grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+          <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <p className="text-sm font-medium">Rien d'urgent aujourd'hui. Bon travail.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="text-section flex items-center gap-2">
-        {Icon && (
-          <span className="bg-primary text-primary-foreground grid h-6 w-6 shrink-0 place-items-center rounded-md">
-            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-          </span>
-        )}
-        {label}
-      </h2>
-      {to && (
-        <Link
-          to={to}
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs font-medium"
-        >
-          Tout voir <ArrowRight className="h-3 w-3" />
-        </Link>
-      )}
+    <div className="surface-card flex shrink-0 items-center gap-3 p-4">
+      <span className="bg-surface-inverse text-surface-inverse-foreground grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+        <BellRing className="h-5 w-5" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide">Priorité du jour</p>
+        <p className="truncate text-sm">
+          {alerts.map((a, i) => (
+            <span key={a.id}>
+              {i > 0 && ' '}
+              {highlightClient(a.message, a.clientId ? clientName(a.clientId) : null, a.clientId)}
+            </span>
+          ))}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={onTreat}
+        className="bg-primary text-primary-foreground shrink-0 rounded-lg px-4 py-2 text-sm font-medium"
+      >
+        Traiter
+      </button>
+    </div>
+  );
+}
+
+function highlightClient(message: string, name: string | null, clientId: string | null) {
+  if (!name || !clientId || !message.includes(name)) return message;
+  const [before, after] = message.split(name);
+  const cc = clientColor(clientId);
+  return (
+    <>
+      {before}
+      <span style={{ color: cc.ink }} className="font-semibold">
+        {name}
+      </span>
+      {after}
+    </>
+  );
+}
+
+function FirstTimeGauge({ rate, total }: { rate: number; total: number }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="relative grid h-16 w-16 place-items-center rounded-full"
+        style={{
+          background: `conic-gradient(var(--success) ${rate}%, var(--surface-3) ${rate}% 100%)`,
+        }}
+      >
+        <span className="bg-surface absolute inset-1 grid place-items-center rounded-full text-sm font-bold tabular-nums">
+          {rate}%
+        </span>
+      </div>
+      <p className="text-muted-foreground mt-2 text-center text-[11px]">{total} posts · 30 j</p>
     </div>
   );
 }

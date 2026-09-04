@@ -24,7 +24,7 @@ export function AppLayout() {
 
   return (
     <div className="bg-background min-h-dvh lg:h-dvh lg:overflow-hidden">
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1580px] gap-5 p-4 lg:h-dvh lg:overflow-hidden">
+      <div className="flex min-h-dvh w-full gap-5 p-4 lg:h-dvh lg:overflow-hidden">
         {/* Sidebar : panneau blanc flottant, sticky (desktop) */}
         <aside className="hidden shrink-0 lg:block">
           <div className="bg-surface shadow-panel sticky top-4 h-[calc(100dvh-2rem)] w-[248px] overflow-hidden rounded-3xl">

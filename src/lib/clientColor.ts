@@ -28,3 +28,12 @@ export function clientColor(id: string): ClientColor {
     ink: `oklch(0.4 0.13 ${hue})`,
   };
 }
+
+/** Initiales (1-2 lettres) à partir des premiers mots d'un nom — pour les pastilles colorées. */
+export function clientInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('');
+}
