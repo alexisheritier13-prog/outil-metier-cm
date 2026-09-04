@@ -113,6 +113,10 @@ function mapInviteError(code: string | undefined): string {
       return 'Email invalide.';
     case 'client_not_found':
       return 'Client introuvable.';
+    case 'email_is_internal_user':
+      return 'Cette adresse est déjà celle d’un compte interne (CM, chef de projet ou directeur) : elle ne peut pas aussi servir de contact client. Utilisez une autre adresse pour ce contact.';
+    case 'email_in_other_org':
+      return 'Cette adresse est déjà utilisée par un compte rattaché à une autre agence.';
     default:
       return "L'invitation a échoué.";
   }

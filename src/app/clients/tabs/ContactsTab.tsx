@@ -162,12 +162,15 @@ export function ContactsTab({ clientId }: { clientId: string }) {
             Créer un accès à l'espace client (affiche un lien à transmettre)
           </label>
 
-          {(add.isError || invite.isError) && (
-            <p className="text-destructive text-sm" role="alert">
-              {String((add.error ?? invite.error) instanceof Error ? (add.error ?? invite.error) : '') ||
-                "L'enregistrement a échoué."}
-            </p>
-          )}
+          {(add.isError || invite.isError) &&
+            (() => {
+              const err = add.error ?? invite.error;
+              return (
+                <p className="text-destructive text-sm" role="alert">
+                  {err instanceof Error ? err.message : "L'enregistrement a échoué."}
+                </p>
+              );
+            })()}
 
           <div className="flex gap-2">
             <Button type="submit" size="sm" disabled={busy}>

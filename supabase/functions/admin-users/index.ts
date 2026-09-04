@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
     // Un compte déjà rattaché à une autre organisation ne peut pas être réutilisé.
     const { data: existingProfile } = await admin
       .from('profiles')
-      .select('organization_id')
+      .select('organization_id, role')
       .eq('id', authUserId)
       .maybeSingle();
     if (
@@ -261,6 +261,15 @@ Deno.serve(async (req) => {
       existingProfile.organization_id !== client.organization_id
     ) {
       return json(409, { error: 'email_in_other_org' });
+    }
+    // Cette adresse est déjà celle d'un compte interne (CM / chef de projet /
+    // directeur) — même dans la même organisation. La transformer en contact
+    // client écraserait son rôle interne et le bloquerait côté agence.
+    if (
+      existingProfile &&
+      (INTERNAL_ROLES as readonly string[]).includes(existingProfile.role ?? '')
+    ) {
+      return json(409, { error: 'email_is_internal_user' });
     }
 
     // Le profil doit être 'client' + actif + rattaché à l'organisation du client.
