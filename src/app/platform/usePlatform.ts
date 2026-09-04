@@ -4,6 +4,8 @@ import {
   isPlatformAdmin,
   listPlatformInvitations,
   listPlatformOrgs,
+  resetOrganization,
+  revokeInvitation,
 } from '@/services/platform';
 import { listFeedback, setFeedbackStatus, type FeedbackStatus } from '@/services/feedback';
 
@@ -33,6 +35,22 @@ export function useCreateInvitation() {
     mutationFn: (v: { orgName: string; email?: string; fullName?: string }) =>
       createInvitation(v.orgName, v.email, v.fullName),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['platform-invitations'] }),
+  });
+}
+
+export function useRevokeInvitation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (token: string) => revokeInvitation(token),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['platform-invitations'] }),
+  });
+}
+
+export function useResetOrganization() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orgId: string) => resetOrganization(orgId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['platform-orgs'] }),
   });
 }
 

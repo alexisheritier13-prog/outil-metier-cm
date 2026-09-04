@@ -16,8 +16,12 @@ export interface PlatformOrg {
   name: string;
   plan: string;
   createdAt: string;
+  ownerName: string | null;
+  ownerEmail: string | null;
   members: number;
   clients: number;
+  posts: number;
+  lastActivityAt: string;
 }
 
 export async function listPlatformOrgs(): Promise<PlatformOrg[]> {
@@ -28,9 +32,28 @@ export async function listPlatformOrgs(): Promise<PlatformOrg[]> {
     name: o.name,
     plan: o.plan,
     createdAt: o.createdAt,
+    ownerName: o.ownerName || null,
+    ownerEmail: o.ownerEmail || null,
     members: Number(o.members ?? 0),
     clients: Number(o.clients ?? 0),
+    posts: Number(o.posts ?? 0),
+    lastActivityAt: o.lastActivityAt,
   }));
+}
+
+/**
+ * Supprime tout le contenu d'une agence et détache ses membres, qui repassent
+ * à un état « jamais rien fait » (comptes conservés, ré-invitables).
+ */
+export async function resetOrganization(orgId: string): Promise<void> {
+  const { error } = await getSupabase().rpc('platform_reset_organization', { p_org: orgId });
+  if (error) throw error;
+}
+
+/** Révoque un lien d'invitation pas encore accepté. */
+export async function revokeInvitation(token: string): Promise<void> {
+  const { error } = await getSupabase().rpc('platform_revoke_invitation', { p_token: token });
+  if (error) throw error;
 }
 
 export interface PlatformInvitation {

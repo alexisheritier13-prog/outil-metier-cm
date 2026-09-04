@@ -2360,6 +2360,14 @@ export type Database = {
       platform_list_feedback: { Args: never; Returns: Json }
       platform_list_invitations: { Args: never; Returns: Json }
       platform_list_organizations: { Args: never; Returns: Json }
+      platform_reset_organization: {
+        Args: { p_org: string }
+        Returns: undefined
+      }
+      platform_revoke_invitation: {
+        Args: { p_token: string }
+        Returns: undefined
+      }
       post_by_approval_token: { Args: { p_token: string }; Returns: Json }
       post_change_status: {
         Args: {
