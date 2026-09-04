@@ -18,6 +18,7 @@ export default {
           DEFAULT: 'var(--surface)',
           2: 'var(--surface-2)',
           3: 'var(--surface-3)',
+          inverse: 'var(--surface-inverse)',
         },
         primary: {
           DEFAULT: 'var(--primary)',
@@ -66,6 +67,8 @@ export default {
           DEFAULT: 'var(--muted)',
           foreground: 'var(--muted-foreground)',
         },
+        'surface-inverse-foreground': 'var(--surface-inverse-foreground)',
+        'label-foreground': 'var(--label-foreground)',
         accent: {
           DEFAULT: 'var(--accent)',
           foreground: 'var(--accent-foreground)',
@@ -80,24 +83,28 @@ export default {
         },
       },
       borderRadius: {
-        xl: 'calc(var(--radius) + 4px)',
-        lg: 'var(--radius)',
+        xl: 'calc(var(--radius) + 4px)', // 16px — tuiles internes (lignes, cases)
+        lg: 'var(--radius)', // 12px — boutons, champs
         md: 'calc(var(--radius) - 4px)',
         sm: 'calc(var(--radius) - 6px)',
+        '2xl': 'var(--radius-card)', // 20px — cartes
+        '3xl': 'var(--radius-panel)', // 22px — panneaux flottants (sidebar, tiroirs)
       },
       boxShadow: {
         xs: 'var(--shadow-xs)',
         card: 'var(--shadow-sm)',
         md: 'var(--shadow-md)',
         panel: 'var(--shadow-panel)',
+        primary: 'var(--shadow-primary)',
       },
       fontFamily: {
-        display: ['Poppins', 'Inter Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Échelle rem fixe (registre produit) — pas de clamp.
-        title: ['1.375rem', { lineHeight: '1.2', fontWeight: '600', letterSpacing: '-0.02em' }],
-        section: ['1rem', { lineHeight: '1.35', fontWeight: '600', letterSpacing: '-0.011em' }],
+        title: ['1.375rem', { lineHeight: '1.2', fontWeight: '800', letterSpacing: '-0.03em' }],
+        section: ['1rem', { lineHeight: '1.35', fontWeight: '700', letterSpacing: '-0.014em' }],
         dense: ['0.8125rem', { lineHeight: '1.45' }],
       },
       zIndex: {
