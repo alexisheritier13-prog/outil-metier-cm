@@ -22,7 +22,7 @@ export function UserAvatar({ name, avatarUrl, size = 'md', className }: Props) {
   return (
     <span
       className={cn(
-        'bg-primary-surface text-primary-strong ring-border/60 inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold ring-1',
+        'bg-primary-surface text-primary-strong ring-border/60 inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl font-semibold ring-1',
         SIZES[size],
         className,
       )}

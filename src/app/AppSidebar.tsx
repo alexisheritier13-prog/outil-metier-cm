@@ -1,42 +1,36 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
+  AudioWaveform,
   Bell,
   CalendarDays,
+  CalendarHeart,
   ChevronRight,
   LayoutGrid,
   Library,
   LifeBuoy,
   ListChecks,
   LogOut,
-  Search,
   Settings,
   Shield,
   Trash2,
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { openGlobalSearch } from '@/lib/appShortcuts';
 import { UserAvatar } from '@/components/UserAvatar';
-import { NotificationBell } from '@/components/NotificationBell';
 import { FeedbackButton } from '@/components/FeedbackButton';
-import type { AppNotification } from '@/shared/types';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useIsPlatformAdmin } from '@/app/platform/usePlatform';
 import { useSignOut } from '@/auth/useAuthActions';
 import { ROLE_LABELS } from '@/shared/constants/roles';
 import { countReviewQueue } from '@/services/posts';
 import { countNewAlerts } from '@/services/alerts';
+import { countUnattachedKeyDatesThisMonth } from '@/services/keyDates';
 import { useOpenRequestCount } from '@/app/requests/useRequests';
 
-function hrefForInternal(n: AppNotification): string {
-  if (n.type === 'job_failed') return '/app/parametres/jobs';
-  if (n.postId) return `/app/planning?post=${n.postId}`;
-  return '/app';
-}
-
-/** Barre latérale de l'espace agence. */
+/** Barre latérale de l'espace agence : panneau flottant, navigation groupée. */
 export function AppSidebar() {
   const { data: profile } = useCurrentProfile();
   const { data: isPlatformAdmin } = useIsPlatformAdmin();
@@ -54,29 +48,24 @@ export function AppSidebar() {
     enabled: Boolean(profile),
   });
   const requestCount = useOpenRequestCount(Boolean(profile));
+  const unattachedKeyDates = useQuery({
+    queryKey: ['key-dates', 'unattached-this-month'],
+    queryFn: countUnattachedKeyDatesThisMonth,
+    enabled: Boolean(profile),
+  });
+  const monthLabel = new Date().toLocaleDateString('fr-FR', { month: 'long' });
 
   return (
-    <div className="bg-surface flex h-full w-[248px] shrink-0 flex-col">
-      <div className="flex items-center gap-2.5 px-4 pb-2 pt-4">
-        <span className="flex-1 text-[15px] font-semibold tracking-tight">Cadence</span>
-        <NotificationBell hrefFor={hrefForInternal} align="start" />
+    <div className="flex h-full w-full flex-col">
+      <div className="flex items-center gap-2.5 px-4 pb-3 pt-4">
+        <span className="bg-primary text-primary-foreground grid h-8 w-8 shrink-0 place-items-center rounded-xl">
+          <AudioWaveform className="h-[18px] w-[18px]" aria-hidden="true" strokeWidth={2.25} />
+        </span>
+        <span className="flex-1 text-[15px] font-bold tracking-tight">Cadence</span>
       </div>
 
-      <div className="px-3 pb-1 pt-2">
-        <button
-          type="button"
-          onClick={openGlobalSearch}
-          className="border-border bg-surface-2/60 text-muted-foreground hover:bg-surface-2 hover:text-foreground flex w-full items-center gap-2.5 rounded-lg border px-3 py-2 text-sm transition-colors"
-        >
-          <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className="flex-1 text-left">Rechercher</span>
-          <kbd className="border-border bg-surface text-muted-foreground rounded border px-1 text-[10px] font-medium">
-            ⌘K
-          </kbd>
-        </button>
-      </div>
-
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
+        <SectionLabel>Pilotage</SectionLabel>
         <Item to="/app" end icon={LayoutGrid}>
           Accueil
         </Item>
@@ -84,19 +73,7 @@ export function AppSidebar() {
           Planning
         </Item>
 
-        <Group
-          label="Validation"
-          icon={ListChecks}
-          match={['/app/a-valider', '/app/demandes']}
-          dataTour="nav-validation"
-        >
-          <SubItem to="/app/a-valider" badge={reviewCount.data}>
-            À valider
-          </SubItem>
-          <SubItem to="/app/demandes" badge={requestCount.data}>
-            Demandes clients
-          </SubItem>
-        </Group>
+        <ValidationSection reviewCount={reviewCount.data} requestCount={requestCount.data} />
 
         <Item to="/app/clients" icon={Users} dataTour="nav-clients">
           Clients
@@ -123,9 +100,8 @@ export function AppSidebar() {
         >
           Alertes
         </Item>
-      </nav>
 
-      <div className="border-border/70 space-y-1 border-t px-3 py-3">
+        <SectionLabel>Espace</SectionLabel>
         {isManager && (
           <Item to="/app/corbeille" icon={Trash2}>
             Corbeille
@@ -145,12 +121,33 @@ export function AppSidebar() {
           Aide
         </Item>
         <FeedbackButton />
-      </div>
+      </nav>
 
-      <div className="border-border/70 bg-surface shadow-xs m-3 mt-0 flex items-center gap-2.5 rounded-xl border p-2.5">
+      {Boolean(unattachedKeyDates.data) && (
+        <div className="mx-3 mt-2 space-y-2.5 rounded-2xl bg-gradient-to-br from-primary to-primary-strong p-4 text-primary-foreground">
+          <span className="bg-primary-foreground/15 grid h-8 w-8 place-items-center rounded-lg">
+            <CalendarHeart className="h-[18px] w-[18px]" aria-hidden="true" />
+          </span>
+          <p className="text-sm font-semibold leading-snug">
+            {unattachedKeyDates.data} marronnier{(unattachedKeyDates.data ?? 0) > 1 ? 's' : ''} en{' '}
+            {monthLabel}
+          </p>
+          <p className="text-primary-foreground/80 text-xs leading-snug">
+            Pas encore rattaché{(unattachedKeyDates.data ?? 0) > 1 ? 's' : ''} à un post.
+          </p>
+          <NavLink
+            to="/app/planning"
+            className="bg-surface text-foreground hover:bg-surface-2 block rounded-lg py-2 text-center text-sm font-medium transition-colors"
+          >
+            Voir le calendrier
+          </NavLink>
+        </div>
+      )}
+
+      <div className="m-3 mt-2 flex items-center gap-2.5 rounded-2xl p-2.5">
         <NavLink
           to="/app/mon-compte"
-          className="hover:bg-surface-2 -m-1 flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors"
+          className="hover:bg-surface-2 -m-1 flex min-w-0 flex-1 items-center gap-2.5 rounded-xl p-1 transition-colors"
         >
           <UserAvatar
             name={profile?.fullName || profile?.email || '?'}
@@ -169,7 +166,7 @@ export function AppSidebar() {
           type="button"
           onClick={() => signOut.mutate()}
           aria-label="Se déconnecter"
-          className="text-muted-foreground hover:bg-surface-2 hover:text-foreground rounded-md p-1.5 transition-colors"
+          className="text-muted-foreground hover:bg-surface-2 hover:text-foreground rounded-lg p-1.5 transition-colors"
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -178,13 +175,21 @@ export function AppSidebar() {
   );
 }
 
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-label-foreground px-3.5 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-wider first:pt-1">
+      {children}
+    </p>
+  );
+}
+
 type IconType = typeof Bell;
 
 function itemClass(active: boolean) {
   return cn(
-    'flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors duration-150',
+    'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors duration-150',
     active
-      ? 'bg-primary text-primary-foreground shadow-sm'
+      ? 'bg-primary text-primary-foreground shadow-primary'
       : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
   );
 }
@@ -228,6 +233,36 @@ function Item({
   );
 }
 
+/**
+ * Groupe « Validation » : toujours déplié (pas de repli), sous-items décalés
+ * reliés par un filet vertical, précédés d'une pastille de la couleur du
+ * statut qu'ils représentent.
+ */
+function ValidationSection({
+  reviewCount,
+  requestCount,
+}: {
+  reviewCount?: number;
+  requestCount?: number;
+}) {
+  return (
+    <div>
+      <div className="text-muted-foreground flex items-center gap-3 px-3.5 py-2.5 text-[0.9rem] font-medium">
+        <ListChecks className="h-5 w-5 shrink-0" aria-hidden="true" strokeWidth={2} />
+        <span className="flex-1 text-left">Validation</span>
+      </div>
+      <div className="border-border ml-[0.65rem] space-y-1 border-l pb-1 pl-3">
+        <SubItem to="/app/a-valider" dot="info" badge={reviewCount}>
+          À valider
+        </SubItem>
+        <SubItem to="/app/demandes" dot="warning" badge={requestCount}>
+          Demandes clients
+        </SubItem>
+      </div>
+    </div>
+  );
+}
+
 function Group({
   label,
   icon: Icon,
@@ -251,7 +286,7 @@ function Group({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors',
+          'flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-[0.9rem] font-medium transition-colors',
           containsActive && !open
             ? 'text-foreground'
             : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
@@ -265,45 +300,46 @@ function Group({
           aria-hidden="true"
         />
       </button>
-      {open && <div className="mt-1 space-y-1 pl-4">{children}</div>}
+      {open && (
+        <div className="border-border ml-[0.65rem] mt-1 space-y-1 border-l pl-3">{children}</div>
+      )}
     </div>
   );
 }
+
+const DOT_COLOR = {
+  neutral: 'bg-muted-foreground/50',
+  info: 'bg-info',
+  warning: 'bg-warning',
+} as const;
 
 function SubItem({
   to,
   children,
   badge,
+  dot = 'neutral',
 }: {
   to: string;
   children: ReactNode;
   badge?: number;
+  /** Couleur du statut représenté — reste affichée que l'item soit actif ou non. */
+  dot?: keyof typeof DOT_COLOR;
 }) {
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-3 rounded-lg py-2.5 pl-3.5 pr-2 text-[0.9rem] transition-colors',
+          'flex items-center gap-2 rounded-xl py-2.5 pl-2.5 pr-2 text-[0.9rem] transition-colors',
           isActive
             ? 'bg-primary-surface text-primary-strong font-medium'
             : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
         )
       }
     >
-      {({ isActive }) => (
-        <>
-          <span
-            className={cn(
-              'h-1.5 w-1.5 shrink-0 rounded-full',
-              isActive ? 'bg-primary' : 'bg-muted-foreground/50',
-            )}
-            aria-hidden="true"
-          />
-          <span className="flex-1 truncate">{children}</span>
-          <CountBadge value={badge} />
-        </>
-      )}
+      <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', DOT_COLOR[dot])} aria-hidden="true" />
+      <span className="flex-1 truncate">{children}</span>
+      <CountBadge value={badge} />
     </NavLink>
   );
 }
@@ -323,7 +359,7 @@ function CountBadge({
       className={cn(
         'min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-semibold tabular-nums leading-5',
         tone === 'danger'
-          ? 'bg-danger text-danger-foreground'
+          ? 'bg-danger-surface text-danger-strong'
           : onDark
             ? 'bg-primary-foreground/20 text-primary-foreground'
             : 'bg-primary-surface text-primary-strong',

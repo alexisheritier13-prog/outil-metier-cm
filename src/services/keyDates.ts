@@ -1,6 +1,7 @@
 import { getSupabase } from '@/lib/supabase';
 import { toKeyDate, type KeyDate, type KeyDateScope, type Post, toPost } from '@/shared/types';
 import type { Network } from '@/shared/constants/networks';
+import { keyDateOccurrences } from '@/app/posts/keyDateEvents';
 
 /** Calendrier des marronniers (Story 7.3). RLS : global + sector visibles de tout
  *  interne actif ; client suit l'accès. */
@@ -12,6 +13,38 @@ export async function listKeyDates(): Promise<KeyDate[]> {
     .order('event_date');
   if (error) throw error;
   return data.map(toKeyDate);
+}
+
+/**
+ * Marronniers du mois courant (parmi ceux visibles de l'utilisateur) qui n'ont
+ * encore aucun post rattaché (`posts.origin_type = 'key_date'`).
+ */
+export async function countUnattachedKeyDatesThisMonth(): Promise<number> {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-based
+
+  const all = await listKeyDates();
+  const occurrences = keyDateOccurrences(all, [year]).filter((o) => {
+    const [, m] = o.date.split('-');
+    return Number(m) - 1 === month;
+  });
+  if (occurrences.length === 0) return 0;
+
+  // Une occurrence récurrente a un id `<key_date.id>:<année>` ; on retrouve l'id réel.
+  const baseId = (occurrenceId: string) => occurrenceId.split(':')[0] ?? occurrenceId;
+  const baseIds = [...new Set(occurrences.map((o) => baseId(o.id)))];
+
+  const { data, error } = await getSupabase()
+    .from('posts')
+    .select('origin_id')
+    .eq('origin_type', 'key_date')
+    .is('deleted_at', null)
+    .in('origin_id', baseIds);
+  if (error) throw error;
+
+  const attached = new Set((data ?? []).map((r) => r.origin_id as string));
+  return occurrences.filter((o) => !attached.has(baseId(o.id))).length;
 }
 
 /** Marronniers applicables à un client (globaux + son secteur + les siens). */

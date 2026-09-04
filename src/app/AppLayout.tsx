@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { useAccountSettings } from '@/app/account/useAccount';
 import { GlobalSearch } from '@/components/GlobalSearch';
 import { OnboardingHost } from '@/onboarding/OnboardingHost';
 import { useGlobalShortcuts } from '@/lib/appShortcuts';
 import { AppSidebar } from './AppSidebar';
+import { AppTopBar } from './AppTopBar';
 
 export function AppLayout() {
   const [drawer, setDrawer] = useState(false);
@@ -23,26 +23,17 @@ export function AppLayout() {
   }
 
   return (
-    <div className="bg-background min-h-dvh lg:h-dvh lg:overflow-hidden lg:p-4">
-      {/* Conteneur flottant unique : coins arrondis + ombre douce (desktop). */}
-      <div className="bg-surface lg:shadow-panel lg:h-[calc(100dvh-2rem)] mx-auto flex min-h-dvh w-full overflow-hidden lg:min-h-0 lg:rounded-3xl lg:border">
-        {/* Sidebar (desktop) */}
-        <aside className="border-border hidden shrink-0 border-r lg:block">
-          <AppSidebar />
+    <div className="bg-background min-h-dvh lg:h-dvh lg:overflow-hidden">
+      <div className="mx-auto flex min-h-dvh w-full max-w-[1580px] gap-5 p-4 lg:h-dvh lg:overflow-hidden">
+        {/* Sidebar : panneau blanc flottant, sticky (desktop) */}
+        <aside className="hidden shrink-0 lg:block">
+          <div className="bg-surface shadow-panel sticky top-4 h-[calc(100dvh-2rem)] w-[248px] overflow-hidden rounded-3xl">
+            <AppSidebar />
+          </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="bg-surface flex items-center gap-3 border-b px-4 py-2.5 lg:hidden">
-            <button
-              type="button"
-              aria-label={drawer ? 'Fermer le menu' : 'Ouvrir le menu'}
-              onClick={() => setDrawer((v) => !v)}
-              className="hover:bg-surface-2 rounded-md p-1.5"
-            >
-              {drawer ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-            <span className="text-sm font-semibold tracking-tight">Cadence</span>
-          </header>
+        <div className="flex min-w-0 flex-1 flex-col gap-4 lg:h-full lg:overflow-hidden lg:py-0">
+          <AppTopBar drawerOpen={drawer} onToggleDrawer={() => setDrawer((v) => !v)} />
 
           <main className="min-w-0 flex-1 overflow-y-auto">
             <Outlet />
@@ -62,8 +53,10 @@ export function AppLayout() {
             className="bg-foreground/30 absolute inset-0"
             onClick={() => setDrawer(false)}
           />
-          <div className="animate-in slide-in-from-left absolute inset-y-0 left-0 h-full duration-200">
-            <AppSidebar />
+          <div className="animate-in slide-in-from-left absolute inset-y-0 left-0 h-full w-[280px] p-3 duration-200">
+            <div className="bg-surface shadow-panel h-full w-full overflow-hidden rounded-3xl">
+              <AppSidebar />
+            </div>
           </div>
         </div>
       )}
