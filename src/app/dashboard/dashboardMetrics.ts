@@ -62,19 +62,26 @@ export interface FirstTimeApprovalRate {
 }
 
 /**
- * Part des posts créés dans les 30 derniers jours, aujourd'hui validés (validé,
+ * Part des posts créés dans une fenêtre de 30 jours, aujourd'hui validés (validé,
  * planifié ou publié), qui n'ont JAMAIS été renvoyés par le client (aucune
  * transition « à valider client → brouillon/validation interne » dans leur
  * historique). `null` s'il n'y a aucun post éligible (rien à mesurer).
+ *
+ * `offsetDays` décale la fenêtre dans le passé (0 = les 30 derniers jours,
+ * 30 = les 30 jours précédents) — sert à calculer la comparaison au mois
+ * précédent sans dupliquer la logique.
  */
-export async function fetchFirstTimeApprovalRate(): Promise<FirstTimeApprovalRate | null> {
-  const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
-  const { data: posts, error } = await getSupabase()
+export async function fetchFirstTimeApprovalRate(offsetDays = 0): Promise<FirstTimeApprovalRate | null> {
+  const since = new Date(Date.now() - (30 + offsetDays) * 86_400_000).toISOString();
+  const until = offsetDays > 0 ? new Date(Date.now() - offsetDays * 86_400_000).toISOString() : null;
+  let q = getSupabase()
     .from('posts')
     .select('id, created_at')
     .in('status', ['approved', 'scheduled', 'published'])
     .is('deleted_at', null)
     .gte('created_at', since);
+  if (until) q = q.lt('created_at', until);
+  const { data: posts, error } = await q;
   if (error) throw error;
   const ids = (posts ?? []).map((p) => p.id as string);
   if (ids.length === 0) return null;

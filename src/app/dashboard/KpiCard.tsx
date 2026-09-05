@@ -43,39 +43,51 @@ export function KpiCard({
     <Link
       to={to}
       className={cn(
-        'surface-card group relative flex items-center gap-3 p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
+        'surface-card group relative flex flex-col gap-[11px] rounded-[20px] p-4 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md',
         tone && TONE_CARD[tone],
       )}
     >
-      <Maximize2
-        className="text-muted-foreground/50 group-hover:text-muted-foreground absolute right-3 top-3 h-3.5 w-3.5 transition-colors"
-        aria-hidden="true"
-      />
-      <span
-        className={cn(
-          'shadow-primary grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-white',
-          tone ? TONE_GRADIENT[tone] : ACCENT_GRADIENT[accent],
-        )}
-      >
-        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-      </span>
-      <span className="min-w-0 flex-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-label-foreground truncate text-[13px] font-semibold">{label}</span>
+        <Maximize2
+          className="text-muted-foreground/50 group-hover:text-muted-foreground h-3.5 w-3.5 shrink-0 transition-colors"
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <span
+          className={cn(
+            'shadow-primary grid h-9 w-9 shrink-0 place-items-center rounded-[13px] bg-gradient-to-br text-white',
+            tone ? TONE_GRADIENT[tone] : ACCENT_GRADIENT[accent],
+          )}
+        >
+          <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+        </span>
         {loading ? (
           <Skeleton className="h-7 w-10" />
         ) : (
-          <span className="block text-[1.6875rem] font-extrabold leading-none tabular-nums tracking-tight">
+          <span
+            className={cn(
+              'block text-[27px] font-extrabold leading-none tabular-nums tracking-tight',
+              accent === 'danger' && 'text-danger-strong',
+            )}
+          >
             {value ?? 0}
           </span>
         )}
+      </div>
+
+      {context && (
         <span
-          className={cn('mt-1 block truncate text-xs font-medium', tone ? TONE_TEXT[tone] : 'text-muted-foreground')}
+          className={cn(
+            'truncate text-[12.5px]',
+            tone ? TONE_TEXT[tone] : 'text-muted-foreground',
+          )}
         >
-          {label}
+          {context}
         </span>
-        {context && (
-          <span className="text-muted-foreground/80 mt-0.5 block truncate text-[11px]">{context}</span>
-        )}
-      </span>
+      )}
     </Link>
   );
 }

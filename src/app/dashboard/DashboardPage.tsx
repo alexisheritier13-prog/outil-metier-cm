@@ -10,6 +10,7 @@ import {
   GaugeCircle,
   Inbox,
   MessageSquareText,
+  Plus,
   Send,
   TrendingUp,
   TriangleAlert,
@@ -19,11 +20,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { UserAvatar } from '@/components/UserAvatar';
 import { FirstRunGuide } from './FirstRunGuide';
 import { Skeleton } from '@/components/ui/skeleton';
-import { NetworkIcon } from '@/components/NetworkIcon';
 import { MiniBarChart, type MiniBar } from '@/components/MiniBarChart';
 import { SectionCard } from './SectionCard';
 import { KpiCard } from './KpiCard';
 import { PostRow } from './PostRow';
+import { HalfGauge } from './HalfGauge';
+import { ActivityFeed } from './ActivityFeed';
 import { clientColor, clientInitials } from '@/lib/clientColor';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
@@ -38,7 +40,6 @@ import { listAlerts, setAlertStatus } from '@/services/alerts';
 import { listClients } from '@/services/clients';
 import { listRecentActivity } from '@/services/clientActivity';
 import { ALERT_TYPE_LABELS } from '@/shared/types';
-import { activityLabel } from '@/app/clients/tabs/activity';
 import { relativeAge } from '@/lib/relativeTime';
 import {
   fetchFirstTimeApprovalRate,
@@ -50,7 +51,6 @@ import {
 const PIPELINE_STATUSES = POST_STATUSES.filter((s) => s !== 'published');
 const MONTH_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 const DAY_MS = 86_400_000;
-const ACTIVITY_VISIBLE = 5;
 
 export function DashboardPage() {
   const { data: me } = useCurrentProfile();
@@ -95,7 +95,13 @@ export function DashboardPage() {
   });
   const firstTimeQ = useQuery({
     queryKey: ['dashboard', 'first-time-approval'],
-    queryFn: fetchFirstTimeApprovalRate,
+    queryFn: () => fetchFirstTimeApprovalRate(),
+  });
+  // Comparaison honnête au mois précédent (mêmes règles, fenêtre décalée de 30 j)
+  // plutôt qu'une variation inventée.
+  const previousFirstTimeQ = useQuery({
+    queryKey: ['dashboard', 'first-time-approval', 'previous'],
+    queryFn: () => fetchFirstTimeApprovalRate(30),
   });
   const changeStatus = useChangePostStatus();
   const pipelineQ = useQuery({
@@ -217,18 +223,23 @@ export function DashboardPage() {
   }
 
   const activityRows = activityQ.data ?? [];
-  const activityVisible = activityExpanded ? activityRows : activityRows.slice(0, ACTIVITY_VISIBLE);
-  const activityHidden = activityRows.slice(ACTIVITY_VISIBLE);
-  const oldestHiddenAt = activityHidden[activityHidden.length - 1]?.createdAt;
 
   return (
     <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:gap-5">
-      <header className="flex shrink-0 items-center gap-2.5">
-        <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="md" />
-        <h1 className="text-title tracking-tight">
-          Bonjour {firstName}
-          <span className="text-muted-foreground ml-2 text-sm font-normal capitalize">{today}</span>
-        </h1>
+      <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2">
+        <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
+        <div className="min-w-0">
+          <h1 className="text-[20px] font-extrabold leading-tight tracking-[-0.03em]">
+            Hey, {firstName}
+          </h1>
+          <p className="text-muted-foreground text-[13px] capitalize">{today}</p>
+        </div>
+        <Link
+          to="/app/planning?new=1"
+          className="shadow-primary bg-primary text-primary-foreground ml-auto flex h-11 shrink-0 items-center gap-1.5 rounded-[15px] px-4 text-sm font-semibold"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" /> Nouveau post
+        </Link>
       </header>
 
       <PriorityBanner
@@ -239,11 +250,11 @@ export function DashboardPage() {
       />
 
       {/* À traiter */}
-      <div className="grid shrink-0 gap-3 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid shrink-0 grid-cols-1 gap-3.5 [&>*]:animate-in [&>*]:fade-in [&>*]:slide-in-from-bottom-2 [&>*]:fill-mode-backwards [&>*]:duration-300 [&>*:nth-child(2)]:[animation-delay:60ms] [&>*:nth-child(3)]:[animation-delay:120ms] [&>*:nth-child(4)]:[animation-delay:180ms] sm:grid-cols-2 min-[1100px]:grid-cols-4">
         <KpiCard
           to="/app/a-valider"
           icon={Inbox}
-          accent="primary"
+          accent="info"
           label="À valider en interne"
           value={internalQ.data?.length}
           loading={internalQ.isLoading}
@@ -252,7 +263,7 @@ export function DashboardPage() {
         <KpiCard
           to="/app/a-valider"
           icon={Send}
-          accent="info"
+          accent="warning"
           label="En attente du client"
           value={clientQ.data?.length}
           loading={clientQ.isLoading}
@@ -270,6 +281,7 @@ export function DashboardPage() {
         <KpiCard
           to="/app/alertes"
           icon={TriangleAlert}
+          accent="danger"
           label="Alertes non vues"
           value={newAlerts.length}
           loading={alertsQ.isLoading}
@@ -380,14 +392,18 @@ export function DashboardPage() {
             <ProductionPanel counts={pipelineCounts} total={pipelineTotal} loading={pipelineQ.isLoading} />
           </div>
 
-          <div className="surface-card shrink-0 p-4">
+          <div className="surface-card shrink-0 rounded-[20px] p-4">
             <p className="text-muted-foreground mb-2 text-xs font-medium">
               Validé du premier coup <span className="text-muted-foreground/70">· 30 derniers jours</span>
             </p>
             {firstTimeQ.isLoading ? (
-              <Skeleton className="mx-auto h-16 w-16 rounded-full" />
+              <Skeleton className="mx-auto h-16 w-24" />
             ) : firstTimeQ.data ? (
-              <FirstTimeGauge rate={firstTimeQ.data.rate} total={firstTimeQ.data.total} />
+              <HalfGauge
+                rate={firstTimeQ.data.rate}
+                total={firstTimeQ.data.total}
+                previousRate={previousFirstTimeQ.data?.rate ?? null}
+              />
             ) : (
               <p className="text-muted-foreground py-2 text-sm">
                 Pas assez de posts récents pour ce chiffre.
@@ -409,6 +425,9 @@ export function DashboardPage() {
               <ul className="divide-border/60 max-h-[26vh] divide-y overflow-y-auto">
                 {watchlist.map(([clientId, issues]) => {
                   const cc = clientColor(clientId);
+                  // Rouge seulement pour un vrai retard (validation en retard) —
+                  // les autres signaux (trou calendrier, client inactif) restent neutres.
+                  const isLate = issues.includes(ALERT_TYPE_LABELS.validation_overdue);
                   return (
                     <li key={clientId}>
                       <Link
@@ -416,15 +435,21 @@ export function DashboardPage() {
                         className="hover:bg-surface-2 flex items-center gap-3 p-3 text-sm"
                       >
                         <span
-                          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-xs font-semibold"
+                          className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-xl text-xs font-bold"
                           style={{ backgroundColor: cc.soft, color: cc.ink }}
                           aria-hidden="true"
                         >
                           {clientInitials(clientName(clientId))}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate font-medium">{clientName(clientId)}</span>
-                          <span className="text-warning-strong text-xs">{issues.join(' · ')}</span>
+                          <span className="block truncate text-[13px] font-bold">{clientName(clientId)}</span>
+                          <span
+                            className="block truncate text-[11.5px] font-[650]"
+                            style={{ color: isLate ? 'oklch(0.5 0.16 27)' : undefined }}
+                          >
+                            {!isLate && <span className="text-muted-foreground">{issues.join(' · ')}</span>}
+                            {isLate && issues.join(' · ')}
+                          </span>
                         </span>
                         <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
                       </Link>
@@ -444,45 +469,13 @@ export function DashboardPage() {
                   <Skeleton className="h-8 w-full" />
                   <Skeleton className="h-8 w-full" />
                 </div>
-              ) : activityRows.length === 0 ? (
-                <p className="text-muted-foreground p-4 text-sm">Rien à afficher.</p>
               ) : (
-                <ul className="divide-border/60 relative divide-y">
-                  {activityVisible.map((e, i) => (
-                    <li key={e.historyId} className="relative flex items-start gap-3 p-3 text-sm">
-                      {i < activityVisible.length - 1 && (
-                        <span className="bg-border absolute left-[1.6rem] top-9 h-[calc(100%-0.5rem)] w-px" />
-                      )}
-                      <span className="bg-primary-surface text-primary-strong relative grid h-6 w-6 shrink-0 place-items-center rounded-full">
-                        <NetworkIcon network={e.network} />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate">
-                          {activityLabel(e)}
-                          <span className="text-muted-foreground"> · {clientName(e.clientId)}</span>
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {e.actorName || 'Système'} · {relativeAge(e.createdAt)}
-                        </span>
-                      </span>
-                    </li>
-                  ))}
-                  {!activityExpanded && activityHidden.length > 0 && (
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => setActivityExpanded(true)}
-                        className="hover:bg-surface-2 text-muted-foreground flex w-full items-center gap-2 p-3 text-left text-sm transition-colors"
-                      >
-                        <span className="bg-surface-3 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-medium">
-                          +{activityHidden.length}
-                        </span>
-                        {activityHidden.length} action{activityHidden.length > 1 ? 's' : ''} de plus
-                        {oldestHiddenAt && <> · {relativeAge(oldestHiddenAt)}</>}
-                      </button>
-                    </li>
-                  )}
-                </ul>
+                <ActivityFeed
+                  rows={activityRows}
+                  expanded={activityExpanded}
+                  onExpand={() => setActivityExpanded(true)}
+                  clientName={clientName}
+                />
               )}
             </div>
           </SectionCard>
@@ -568,23 +561,23 @@ function PriorityBanner({
 
   if (alerts.length === 0) {
     return (
-      <div className="surface-card flex shrink-0 items-center gap-3 p-4">
-        <span className="bg-success text-success-foreground grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+      <div className="surface-card flex shrink-0 items-center gap-[15px] rounded-[20px] p-4 px-[18px]">
+        <span className="bg-success text-success-foreground grid h-11 w-11 shrink-0 place-items-center rounded-[15px]">
           <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
         </span>
-        <p className="text-sm font-medium">Rien d'urgent aujourd'hui. Bon travail.</p>
+        <p className="text-[14.5px] font-[750]">Rien d'urgent aujourd'hui. Bon travail.</p>
       </div>
     );
   }
 
   return (
-    <div className="surface-card flex shrink-0 items-center gap-3 p-4">
-      <span className="bg-surface-inverse text-surface-inverse-foreground grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+    <div className="surface-card flex shrink-0 items-center gap-[15px] rounded-[20px] p-4 px-[18px]">
+      <span className="bg-surface-inverse text-surface-inverse-foreground grid h-11 w-11 shrink-0 place-items-center rounded-[15px]">
         <BellRing className="h-5 w-5" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide">Priorité du jour</p>
-        <p className="truncate text-sm">
+        <p className="text-[14.5px] font-[750]">Priorité du jour</p>
+        <p className="text-[13.5px] leading-[1.45]" style={{ color: 'oklch(0.45 0.02 265)' }}>
           {alerts.map((a, i) => (
             <span key={a.id}>
               {i > 0 && ' '}
@@ -596,7 +589,7 @@ function PriorityBanner({
       <button
         type="button"
         onClick={onTreat}
-        className="bg-primary text-primary-foreground shrink-0 rounded-lg px-4 py-2 text-sm font-medium"
+        className="bg-primary text-primary-foreground shadow-primary flex h-[38px] shrink-0 items-center rounded-[13px] px-4 text-sm font-semibold"
       >
         Traiter
       </button>
@@ -616,24 +609,6 @@ function highlightClient(message: string, name: string | null, clientId: string 
       </span>
       {after}
     </>
-  );
-}
-
-function FirstTimeGauge({ rate, total }: { rate: number; total: number }) {
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className="relative grid h-16 w-16 place-items-center rounded-full"
-        style={{
-          background: `conic-gradient(var(--success) ${rate}%, var(--surface-3) ${rate}% 100%)`,
-        }}
-      >
-        <span className="bg-surface absolute inset-1 grid place-items-center rounded-full text-sm font-bold tabular-nums">
-          {rate}%
-        </span>
-      </div>
-      <p className="text-muted-foreground mt-2 text-center text-[11px]">{total} posts · 30 j</p>
-    </div>
   );
 }
 
