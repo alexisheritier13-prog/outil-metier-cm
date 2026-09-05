@@ -11,6 +11,7 @@ import type {
   EventClickArg,
   EventContentArg,
   EventDropArg,
+  EventMountArg,
 } from '@fullcalendar/core';
 import { parisWallTimeToUtc } from '@/shared/utils/tz';
 import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
@@ -130,6 +131,18 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
     onRangeChange?.({ title: arg.view.title, start: arg.start, end: arg.end });
   }
 
+  // FullCalendar réserve un créneau fixe (~50px) par événement en vue Mois,
+  // quel que soit le contenu réel — ce qui rend les lignes de la grille très
+  // inégales (une case avec 3 posts devient bien plus haute qu'une case
+  // vide). Aucune règle CSS ne parvient à le surcharger (FC réapplique la
+  // hauteur lui-même) : on la resserre donc directement sur l'élément monté,
+  // pour que toutes les cases gardent la même taille.
+  function handleEventDidMount(arg: EventMountArg) {
+    if (view !== 'dayGridMonth') return;
+    const harness = arg.el.closest<HTMLElement>('.fc-daygrid-event-harness');
+    harness?.style.setProperty('height', '1.25rem', 'important');
+  }
+
   return (
     <div className={fill ? 'fc-monochrome h-full' : 'fc-monochrome'}>
       <FullCalendar
@@ -141,18 +154,26 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         locale="fr"
         firstDay={1}
         weekNumbers={view === 'dayGridMonth'}
+        // N'affiche que les semaines nécessaires au mois (pas de 6ᵉ ligne
+        // vide) : avec des cases à hauteur fixe, chaque ligne en moins compte.
+        fixedWeekCount={false}
         weekNumberContent={(arg) => <WeekBadge weekStart={arg.date} posts={posts} />}
         // Boutons texte plutôt qu'icônes `role="img"` sans alt (a11y, Story 9.5).
         buttonIcons={false}
         buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
         buttonHints={{ prev: 'Période précédente', next: 'Période suivante', today: "Aller à aujourd'hui" }}
-        height={fill ? '100%' : 'auto'}
+        // En Mois, chaque case a une hauteur fixe (uniformité) : la grille doit
+        // donc garder sa taille naturelle plutôt que d'être étirée/compressée
+        // pour remplir le conteneur (ce qui coupait des semaines sur les
+        // écrans plus courts). La Semaine, elle, reste calée sur la hauteur
+        // disponible (sa plage d'heures est déjà resserrée pour y tenir).
+        height={fill && view === 'timeGridWeek' ? '100%' : 'auto'}
         events={events}
         editable={editable}
         eventStartEditable={editable}
         eventDurationEditable={false}
         droppable={false}
-        dayMaxEvents={view === 'dayGridMonth' ? 3 : fill ? true : 4}
+        dayMaxEvents={view === 'dayGridMonth' ? 1 : fill ? true : 4}
         // Plage resserrée aux heures ouvrées : la semaine tient sur un écran
         // sans défilement (24h complètes ne servaient qu'à afficher du vide).
         slotMinTime="07:00:00"
@@ -163,6 +184,7 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         nowIndicator
         eventDrop={handleDrop}
         eventClick={handleClick}
+        eventDidMount={handleEventDidMount}
         dateClick={onCreateAt ? handleDateClick : undefined}
         datesSet={handleDatesSet}
         eventContent={(arg: EventContentArg) => {

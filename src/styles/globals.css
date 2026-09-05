@@ -245,10 +245,14 @@
   padding-bottom: 0.25rem;
 }
 .fc-monochrome .fc-daygrid-day-frame {
-  min-height: 6.25rem;
+  /* Hauteur fixe (pas min-height) : toutes les cases ont la même taille,
+     qu'il y ait 0 ou plusieurs posts ce jour-là (le surplus passe derrière
+     le lien « +N de plus »). */
+  height: 7.25rem;
   background: var(--surface);
   border-radius: 0.9375rem; /* 15px */
   padding: 0.25rem;
+  overflow: hidden;
 }
 .fc-monochrome .fc-day-today .fc-daygrid-day-frame {
   outline: 2px solid var(--primary);

@@ -356,7 +356,7 @@ export function PlanningPage() {
         />
       </div>
 
-      <div className="mt-3 min-h-0 flex-1 overflow-hidden">
+      <div className={`mt-3 min-h-0 flex-1 ${mode === 'month' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
         {loading && <TableSkeleton rows={8} />}
 
         {!loading && mode === 'list' && (
