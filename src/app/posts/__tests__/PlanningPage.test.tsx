@@ -43,11 +43,13 @@ const client: Client = {
   updatedAt: '',
 };
 
+// Liste/Kanban se limitent au mois courant (navigation ‹ › par mois) : la
+// date doit tomber dans le mois réel du test, pas une date fixe arbitraire.
 const post: Post = {
   id: 'p1',
   clientId: 'c1',
   network: 'instagram',
-  scheduledAt: '2026-07-01T08:00:00.000Z',
+  scheduledAt: new Date().toISOString(),
   caption: 'Bonjour le monde',
   canvaUrl: null,
   status: 'draft',

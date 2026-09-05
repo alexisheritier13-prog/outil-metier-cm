@@ -17,56 +17,112 @@ import { listPostTemplates } from '@/services/postTemplates';
 import { listKeyDates } from '@/services/keyDates';
 import { keyDateOccurrences } from './keyDateEvents';
 import { postsToIcs } from '@/shared/utils/ics';
-import { parisDateKey } from '@/shared/utils/tz';
+import { parisDateKey, toParisParts } from '@/shared/utils/tz';
 import { downloadTextFile } from '@/lib/download';
-import type { Post } from '@/shared/types';
-import type { CalendarViewHandle } from './CalendarView';
+import type { Post, Profile } from '@/shared/types';
+import { MONTH_NAMES } from './monthNames';
 import type { MonthGridHandle } from './MonthGrid';
+import type { WeekGridHandle } from './WeekGrid';
 import { PostForm } from './PostForm';
 import { SeriesForm } from './SeriesForm';
-import { PostsTable } from './PostsTable';
+import { PostList } from './PostList';
 import { PostSheet } from './PostSheet';
 import { BulkActionBar } from './BulkActionBar';
 import { FiltersBar } from './FiltersBar';
 import { useFilters } from './useFilters';
 import { useCreatePost, useCreateSeries, usePosts } from './usePosts';
 
-const CalendarView = lazy(() =>
-  import('./CalendarView').then((m) => ({ default: m.CalendarView })),
-);
 const MonthGrid = lazy(() => import('./MonthGrid').then((m) => ({ default: m.MonthGrid })));
-const KanbanView = lazy(() => import('./KanbanView').then((m) => ({ default: m.KanbanView })));
+const WeekGrid = lazy(() => import('./WeekGrid').then((m) => ({ default: m.WeekGrid })));
+const KanbanBoard = lazy(() => import('./KanbanBoard').then((m) => ({ default: m.KanbanBoard })));
 
 type ViewMode = 'month' | 'week' | 'list' | 'kanban';
+const VIEW_MODES: readonly ViewMode[] = ['month', 'week', 'list', 'kanban'];
+const VIEW_LS_KEY = 'planning-view';
 
 const PENDING_STATUSES = ['internal_review', 'client_review'] as const;
+
+function isViewMode(v: string | null): v is ViewMode {
+  return VIEW_MODES.includes(v as ViewMode);
+}
 
 export function PlanningPage() {
   const { data: me } = useCurrentProfile();
   const canReassign = me?.role === 'lead' || me?.role === 'admin';
-  // Sur petit écran la grille du calendrier est illisible : on démarre sur la liste.
-  const [mode, setMode] = useState<ViewMode>(() =>
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(max-width: 640px)').matches
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Vue persistée dans l'URL (partageable), miroir localStorage — même
+  // convention que `useFilters`. Sur petit écran la grille est illisible :
+  // on démarre sur la liste si rien n'est mémorisé.
+  const [mode, setModeState] = useState<ViewMode>(() => {
+    const fromUrl = searchParams.get('vue');
+    if (isViewMode(fromUrl)) return fromUrl;
+    try {
+      const saved = localStorage.getItem(VIEW_LS_KEY);
+      if (isViewMode(saved)) return saved;
+    } catch {
+      /* ignore */
+    }
+    return typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(max-width: 640px)').matches
       ? 'list'
-      : 'month',
-  );
+      : 'month';
+  });
+  function setMode(next: ViewMode) {
+    setModeState(next);
+    const sp = new URLSearchParams(searchParams);
+    sp.set('vue', next);
+    setSearchParams(sp, { replace: true });
+    try {
+      localStorage.setItem(VIEW_LS_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
   const [createOpen, setCreateOpen] = useState(false);
   const [createDate, setCreateDate] = useState<string | null>(null);
   const [seriesOpen, setSeriesOpen] = useState(false);
   const [openPost, setOpenPost] = useState<Post | null>(null);
   const [showKeyDates, setShowKeyDates] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [searchParams, setSearchParams] = useSearchParams();
   const [range, setRange] = useState<{ title: string; start: Date; end: Date } | null>(null);
+  // Liste/Kanban n'ont pas de grille avec son propre curseur : la période
+  // affichée (mois) vit ici, purement côté client — jamais via le filtre
+  // Du/Au de la barre de filtres, qui alimente `usePosts` et est donc
+  // partagé avec Mois/Semaine (le contaminer casserait leur navigation).
+  const [periodCursor, setPeriodCursor] = useState(() => {
+    const p = toParisParts(new Date());
+    return { year: p.year, month0: p.month - 1 };
+  });
   const monthRef = useRef<MonthGridHandle>(null);
-  const weekRef = useRef<CalendarViewHandle>(null);
+  const weekRef = useRef<WeekGridHandle>(null);
+  function shiftPeriod(delta: number) {
+    setPeriodCursor((c) => {
+      const d = new Date(Date.UTC(c.year, c.month0 + delta, 1));
+      return { year: d.getUTCFullYear(), month0: d.getUTCMonth() };
+    });
+  }
   const nav = {
-    prev: () => (mode === 'month' ? monthRef.current?.prev() : weekRef.current?.prev()),
-    next: () => (mode === 'month' ? monthRef.current?.next() : weekRef.current?.next()),
-    today: () => (mode === 'month' ? monthRef.current?.today() : weekRef.current?.today()),
+    prev: () => {
+      if (mode === 'month') monthRef.current?.prev();
+      else if (mode === 'week') weekRef.current?.prev();
+      else shiftPeriod(-1);
+    },
+    next: () => {
+      if (mode === 'month') monthRef.current?.next();
+      else if (mode === 'week') weekRef.current?.next();
+      else shiftPeriod(1);
+    },
+    today: () => {
+      if (mode === 'month') monthRef.current?.today();
+      else if (mode === 'week') weekRef.current?.today();
+      else {
+        const p = toParisParts(new Date());
+        setPeriodCursor({ year: p.year, month0: p.month - 1 });
+      }
+    },
   };
+  const periodTitle = `${MONTH_NAMES[periodCursor.month0]} ${periodCursor.year}`;
 
   const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
     useFilters();
@@ -83,10 +139,11 @@ export function PlanningPage() {
     queryKey: ['posts', 'client-counts', JSON.stringify(clientCountFilters)],
     queryFn: () => listPosts(clientCountFilters),
   });
+  // Chargée pour tout le monde désormais (pas juste lead/admin) : l'avatar de
+  // l'auteur s'affiche sur les cartes Semaine/Liste/Kanban pour tous les rôles.
   const authors = useQuery({
     queryKey: ['internal-users-lite'],
     queryFn: listInternalUsers,
-    enabled: canReassign,
   });
   const templates = useQuery({ queryKey: ['post-templates'], queryFn: listPostTemplates });
   const keyDates = useQuery({
@@ -114,6 +171,11 @@ export function PlanningPage() {
     return m;
   }, [clientCountsQ.data]);
 
+  const authorById = useMemo(
+    () => new Map<string, Profile>((authors.data ?? []).map((a) => [a.id, a])),
+    [authors.data],
+  );
+
   // Garde le post ouvert synchronisé avec les données fraîches.
   const currentOpen = useMemo(
     () => (openPost ? ((posts.data ?? []).find((p) => p.id === openPost.id) ?? openPost) : null),
@@ -137,8 +199,9 @@ export function PlanningPage() {
     }
   }, [searchParams, setSearchParams]);
 
-  // Une sélection ne survit pas à un changement de filtre (les ids affichés changent).
-  useEffect(() => setSelected(new Set()), [filterKey]);
+  // Une sélection ne survit pas à un changement de filtre ou de période
+  // affichée (les ids affichés changent).
+  useEffect(() => setSelected(new Set()), [filterKey, periodCursor]);
 
   const toggleSelect = (id: string) =>
     setSelected((s) => {
@@ -210,11 +273,47 @@ export function PlanningPage() {
     [visibleRows],
   );
 
+  // Semaine : mêmes principes que le pied de grille du Mois, mais à l'échelle
+  // de la semaine affichée (calculés depuis `visibleRows`, jamais inventés).
+  const weekClientCount = useMemo(
+    () => (mode === 'week' ? new Set(visibleRows.map((p) => p.clientId)).size : 0),
+    [visibleRows, mode],
+  );
+  const peakDayLabel = useMemo(() => {
+    if (mode !== 'week' || visibleRows.length === 0) return null;
+    const byDay = new Map<string, number>();
+    for (const p of visibleRows) {
+      const key = parisDateKey(p.scheduledAt);
+      byDay.set(key, (byDay.get(key) ?? 0) + 1);
+    }
+    let best: [string, number] | null = null;
+    for (const entry of byDay) if (!best || entry[1] > best[1]) best = entry;
+    if (!best) return null;
+    const [y, m, d] = best[0].split('-').map(Number) as [number, number, number];
+    return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    });
+  }, [visibleRows, mode]);
+
+  // Liste/Kanban : posts du mois affiché par `periodCursor`, filtrés côté
+  // client (jamais via le filtre Du/Au, partagé avec Mois/Semaine).
+  const periodRows = useMemo(() => {
+    if (mode !== 'list' && mode !== 'kanban') return rows;
+    return rows.filter((p) => {
+      const parts = toParisParts(p.scheduledAt);
+      return parts.year === periodCursor.year && parts.month === periodCursor.month0 + 1;
+    });
+  }, [rows, mode, periodCursor]);
+
   if (!me || !isInternalRole(me.role)) return null;
 
   const loading = posts.isLoading || clients.isLoading;
   const hasClients = (clients.data ?? []).length > 0;
-  const showCalendarNav = mode === 'month' || mode === 'week';
+  const showCalendarNav = mode === 'month' || mode === 'week' || mode === 'list' || mode === 'kanban';
+  const showKeyDatesToggle = mode === 'month' || mode === 'week';
 
   return (
     <div className="animate-in fade-in flex flex-col px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:overflow-hidden">
@@ -243,7 +342,7 @@ export function PlanningPage() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="min-w-[136px] text-center text-[15px] font-[750] capitalize">
-                {range?.title ?? ''}
+                {mode === 'list' || mode === 'kanban' ? periodTitle : (range?.title ?? '')}
               </span>
               <button
                 type="button"
@@ -263,7 +362,7 @@ export function PlanningPage() {
             </div>
           )}
 
-          {showCalendarNav && (
+          {showKeyDatesToggle && (
             <label className="bg-surface-2 flex h-[34px] cursor-pointer items-center gap-1.5 rounded-xl px-3 text-sm font-semibold">
               <input
                 type="checkbox"
@@ -371,12 +470,14 @@ export function PlanningPage() {
         {loading && <TableSkeleton rows={8} />}
 
         {!loading && mode === 'list' && (
-          <div className="h-full overflow-y-auto lg:min-h-0">
-            <PostsTable
-              posts={rows}
+          <div className="h-full lg:min-h-0">
+            <PostList
+              posts={periodRows}
               clientName={clientName}
+              authorById={authorById}
               onOpen={setOpenPost}
               hasClients={hasClients}
+              onResetFilters={resetFilters}
               selectedIds={selected}
               onToggleSelect={toggleSelect}
               onToggleAll={toggleAll}
@@ -384,13 +485,15 @@ export function PlanningPage() {
           </div>
         )}
         {!loading && mode === 'kanban' && (
-          <div className="h-full overflow-auto lg:min-h-0">
+          <div className="h-full lg:min-h-0">
             <Suspense fallback={<FullPageSpinner />}>
-              <KanbanView
-                posts={rows}
+              <KanbanBoard
+                posts={periodRows}
                 role={me.role}
                 clientName={clientName}
+                authorById={authorById}
                 onOpen={setOpenPost}
+                onCreateDraft={hasClients ? () => setCreateOpen(true) : undefined}
                 selectedIds={selected}
                 onToggleSelect={toggleSelect}
               />
@@ -448,29 +551,51 @@ export function PlanningPage() {
           </div>
         )}
         {!loading && mode === 'week' && (
-          <div className="min-h-[34rem] h-full">
+          <div className="flex h-full flex-col gap-4">
             <Suspense fallback={<FullPageSpinner />}>
-              <CalendarView
-                ref={weekRef}
-                posts={rows}
-                view="timeGridWeek"
-                clientName={clientName}
-                onOpen={setOpenPost}
-                onCreateAt={
-                  hasClients
-                    ? (iso) => {
-                        setCreateDate(iso);
-                        setCreateOpen(true);
-                      }
-                    : undefined
-                }
-                editable
-                keyDates={keyDateMarkers}
-                fill
-                showInternalToolbar={false}
-                onRangeChange={setRange}
-              />
+              <div className="min-h-[34rem] flex-1 lg:min-h-0">
+                <WeekGrid
+                  ref={weekRef}
+                  posts={rows}
+                  clientName={clientName}
+                  onOpen={setOpenPost}
+                  onCreateAt={
+                    hasClients
+                      ? (iso) => {
+                          setCreateDate(iso);
+                          setCreateOpen(true);
+                        }
+                      : undefined
+                  }
+                  editable
+                  keyDates={keyDateMarkers}
+                  onRangeChange={setRange}
+                />
+              </div>
             </Suspense>
+
+            <div className="surface-card flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1.5 rounded-[20px] p-[15px_18px] text-[13px]">
+              <span className="font-semibold">
+                Créneaux de 2 h — glisser une carte change l'heure de publication.
+              </span>
+              <span className="text-muted-foreground ml-auto font-semibold tabular-nums">
+                <span className="text-foreground font-extrabold">{visibleRows.length}</span> post
+                {visibleRows.length > 1 ? 's' : ''} cette semaine
+                {weekClientCount > 0 && (
+                  <>
+                    {' · '}
+                    <span className="text-foreground font-extrabold">{weekClientCount}</span> client
+                    {weekClientCount > 1 ? 's' : ''}
+                  </>
+                )}
+                {peakDayLabel && (
+                  <>
+                    {' · jour de pic '}
+                    <span className="text-foreground font-extrabold capitalize">{peakDayLabel}</span>
+                  </>
+                )}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -485,12 +610,12 @@ export function PlanningPage() {
       {(mode === 'list' || mode === 'kanban') && (
         <BulkActionBar
           selectedIds={[...selected]}
-          posts={rows}
+          posts={periodRows}
           clientName={clientName}
           role={me.role}
           canReassign={canReassign}
           authors={authors.data ?? []}
-          onSelectAll={() => setSelected(new Set(rows.map((p) => p.id)))}
+          onSelectAll={() => setSelected(new Set(periodRows.map((p) => p.id)))}
           onClear={() => setSelected(new Set())}
         />
       )}

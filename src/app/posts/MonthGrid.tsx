@@ -3,6 +3,7 @@ import { parisDateKey, parisWallTimeToUtc, toParisParts } from '@/shared/utils/t
 import type { Post } from '@/shared/types';
 import { DayCell } from './DayCell';
 import { WeekSummaryCell } from './WeekSummaryCell';
+import { MONTH_NAMES } from './monthNames';
 import { useReschedulePost } from './usePosts';
 
 interface KeyDateMarker {
@@ -28,10 +29,6 @@ interface Props {
 }
 
 const WEEKDAY_HEADERS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-const MONTH_NAMES = [
-  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
-];
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
