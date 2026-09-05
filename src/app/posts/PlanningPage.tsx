@@ -139,11 +139,12 @@ export function PlanningPage() {
     queryKey: ['posts', 'client-counts', JSON.stringify(clientCountFilters)],
     queryFn: () => listPosts(clientCountFilters),
   });
-  // Chargée pour tout le monde désormais (pas juste lead/admin) : l'avatar de
-  // l'auteur s'affiche sur les cartes Semaine/Liste/Kanban pour tous les rôles.
+  // Chargée seulement pour lead/admin (réassignation) — l'avatar « équipe »
+  // des cartes Semaine/Liste/Kanban ne s'affiche donc que pour ces rôles.
   const authors = useQuery({
     queryKey: ['internal-users-lite'],
     queryFn: listInternalUsers,
+    enabled: canReassign,
   });
   const templates = useQuery({ queryKey: ['post-templates'], queryFn: listPostTemplates });
   const keyDates = useQuery({
