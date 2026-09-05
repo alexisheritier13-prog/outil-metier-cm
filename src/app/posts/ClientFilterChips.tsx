@@ -1,9 +1,9 @@
-import { clientColor, clientInitials } from '@/lib/clientColor';
+import { clientColor } from '@/lib/clientColor';
 import { cn } from '@/lib/utils';
 import type { Client } from '@/shared/types';
 
 /**
- * Un bouton par client (pastille de sa couleur + compteur), au lieu d'un menu
+ * Un bouton par client (puce de sa couleur + compteur), au lieu d'un menu
  * déroulant — même filtre multi-sélection que l'ancien composant (`clientIds`),
  * juste rendu autrement. Actif = anneau bleu, inactif = discret.
  */
@@ -35,21 +35,20 @@ export function ClientFilterChips({
             onClick={() => toggle(c.id)}
             aria-pressed={selected.includes(c.id)}
             className={cn(
-              'flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-sm font-medium transition-[opacity,box-shadow]',
-              active
-                ? 'border-primary/40 bg-surface shadow-xs ring-primary/30 ring-1'
-                : 'border-border bg-surface opacity-70 hover:opacity-100',
+              'flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-surface px-2.5 text-sm font-semibold transition-[opacity,box-shadow]',
+              active ? 'text-foreground' : 'text-muted-foreground opacity-70 hover:opacity-100',
             )}
+            style={active ? { boxShadow: 'inset 0 0 0 1.5px oklch(0.55 0.2 264 / 0.35)' } : undefined}
           >
             <span
-              className="grid h-4 w-4 shrink-0 place-items-center rounded-full text-[9px] font-bold"
-              style={{ backgroundColor: cc.color, color: 'white' }}
+              className="h-[9px] w-[9px] shrink-0 rounded-[3px]"
+              style={{ backgroundColor: cc.color }}
               aria-hidden="true"
-            >
-              {clientInitials(c.name)[0]}
-            </span>
+            />
             {c.name}
-            <span className="text-muted-foreground tabular-nums">{counts.get(c.id) ?? 0}</span>
+            <span className="bg-surface-2 rounded-full px-1.5 py-px text-[11px] font-extrabold tabular-nums">
+              {counts.get(c.id) ?? 0}
+            </span>
           </button>
         );
       })}

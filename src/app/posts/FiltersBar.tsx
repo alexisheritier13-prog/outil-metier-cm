@@ -26,12 +26,15 @@ export function FiltersBar({ clients, clientCounts, filters, onChange, onReset, 
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center gap-2">
         {clients.length > 0 && (
-          <ClientFilterChips
-            clients={clients}
-            counts={clientCounts}
-            selected={filters.clientIds}
-            onChange={(clientIds) => onChange({ clientIds })}
-          />
+          <>
+            <ClientFilterChips
+              clients={clients}
+              counts={clientCounts}
+              selected={filters.clientIds}
+              onChange={(clientIds) => onChange({ clientIds })}
+            />
+            <span className="bg-border h-[22px] w-px shrink-0" aria-hidden="true" />
+          </>
         )}
         <MultiSelect
           label="Statut"
@@ -113,15 +116,18 @@ function MultiSelect({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1">
+        <button
+          type="button"
+          className="bg-surface flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-sm font-semibold"
+        >
           {label}
           {selected.length > 0 && (
-            <span className="bg-foreground text-background rounded px-1 text-[10px]">
+            <span className="bg-surface-2 rounded-full px-1.5 py-px text-[11px] font-extrabold tabular-nums">
               {selected.length}
             </span>
           )}
-          <ChevronDown className="h-3.5 w-3.5" />
-        </Button>
+          <ChevronDown className="text-muted-foreground h-3.5 w-3.5" />
+        </button>
       </PopoverTrigger>
       <PopoverContent className="max-h-72 overflow-y-auto">
         {options.map((o) => (

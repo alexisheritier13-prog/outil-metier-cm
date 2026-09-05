@@ -12,9 +12,13 @@ vi.mock('@/services/posts');
 vi.mock('@/services/clients');
 vi.mock('@/services/auth');
 vi.mock('@/services/users', () => ({ listInternalUsers: vi.fn().mockResolvedValue([]) }));
-// Évite de charger FullCalendar dans jsdom.
+// Évite de charger FullCalendar dans jsdom (vue Semaine).
 vi.mock('@/app/posts/CalendarView', () => ({
   CalendarView: ({ posts }: { posts: Post[] }) => <div>calendrier ({posts.length})</div>,
+}));
+// Vue Mois : grille maison (pas de dépendance externe), mockée pour isoler le test.
+vi.mock('@/app/posts/MonthGrid', () => ({
+  MonthGrid: ({ posts }: { posts: Post[] }) => <div>calendrier ({posts.length})</div>,
 }));
 
 const me: Profile = {

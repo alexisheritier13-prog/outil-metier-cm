@@ -16,11 +16,11 @@ export function StatusLegend({ className }: { className?: string }) {
         {LEGEND_STATUSES.map((s) => (
           <li key={s} className="flex items-center gap-1.5">
             <span
-              className="h-2 w-2 shrink-0 rounded-full"
+              className="h-[9px] w-[9px] shrink-0 rounded-[3px]"
               style={{ backgroundColor: STEP_BAR_COLOR[s] }}
               aria-hidden="true"
             />
-            {POST_STATUS_LABELS[s]}
+            <span className="text-xs font-semibold">{POST_STATUS_LABELS[s]}</span>
           </li>
         ))}
       </ul>

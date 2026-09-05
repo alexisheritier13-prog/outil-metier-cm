@@ -1,14 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {
-  CalendarArrowDown,
-  CalendarPlus,
-  ChevronLeft,
-  ChevronRight,
-  Info,
-  Plus,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Info, Layers, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormSheet } from '@/components/form';
 import { FullPageSpinner } from '@/components/FullPageSpinner';
@@ -28,6 +21,7 @@ import { parisDateKey } from '@/shared/utils/tz';
 import { downloadTextFile } from '@/lib/download';
 import type { Post } from '@/shared/types';
 import type { CalendarViewHandle } from './CalendarView';
+import type { MonthGridHandle } from './MonthGrid';
 import { PostForm } from './PostForm';
 import { SeriesForm } from './SeriesForm';
 import { PostsTable } from './PostsTable';
@@ -40,6 +34,7 @@ import { useCreatePost, useCreateSeries, usePosts } from './usePosts';
 const CalendarView = lazy(() =>
   import('./CalendarView').then((m) => ({ default: m.CalendarView })),
 );
+const MonthGrid = lazy(() => import('./MonthGrid').then((m) => ({ default: m.MonthGrid })));
 const KanbanView = lazy(() => import('./KanbanView').then((m) => ({ default: m.KanbanView })));
 
 type ViewMode = 'month' | 'week' | 'list' | 'kanban';
@@ -65,7 +60,13 @@ export function PlanningPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [searchParams, setSearchParams] = useSearchParams();
   const [range, setRange] = useState<{ title: string; start: Date; end: Date } | null>(null);
-  const calendarRef = useRef<CalendarViewHandle>(null);
+  const monthRef = useRef<MonthGridHandle>(null);
+  const weekRef = useRef<CalendarViewHandle>(null);
+  const nav = {
+    prev: () => (mode === 'month' ? monthRef.current?.prev() : weekRef.current?.prev()),
+    next: () => (mode === 'month' ? monthRef.current?.next() : weekRef.current?.next()),
+    today: () => (mode === 'month' ? monthRef.current?.today() : weekRef.current?.today()),
+  };
 
   const { filters, set: setFilters, reset: resetFilters, toService, isEmpty: filtersEmpty } =
     useFilters();
@@ -218,7 +219,7 @@ export function PlanningPage() {
   return (
     <div className="animate-in fade-in flex flex-col px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:overflow-hidden">
       <div className="shrink-0 space-y-3">
-        <div className="surface-card flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
+        <div className="surface-card flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[20px] p-[15px_18px]">
           <Segmented
             ariaLabel="Vue du calendrier"
             value={mode}
@@ -233,33 +234,37 @@ export function PlanningPage() {
 
           {showCalendarNav && (
             <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="icon"
+              <button
+                type="button"
                 aria-label="Période précédente"
-                onClick={() => calendarRef.current?.prev()}
+                onClick={nav.prev}
+                className="border-border bg-surface flex h-8 w-8 items-center justify-center rounded-[11px] border"
               >
                 <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="min-w-[9rem] text-center text-sm font-semibold capitalize">
+              </button>
+              <span className="min-w-[136px] text-center text-[15px] font-[750] capitalize">
                 {range?.title ?? ''}
               </span>
-              <Button
-                variant="outline"
-                size="icon"
+              <button
+                type="button"
                 aria-label="Période suivante"
-                onClick={() => calendarRef.current?.next()}
+                onClick={nav.next}
+                className="border-border bg-surface flex h-8 w-8 items-center justify-center rounded-[11px] border"
               >
                 <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => calendarRef.current?.today()}>
+              </button>
+              <button
+                type="button"
+                onClick={nav.today}
+                className="border-border bg-surface ml-1 flex h-8 items-center rounded-[11px] border px-3 text-sm font-semibold"
+              >
                 Aujourd'hui
-              </Button>
+              </button>
             </div>
           )}
 
           {showCalendarNav && (
-            <label className="text-muted-foreground flex cursor-pointer items-center gap-1.5 text-sm">
+            <label className="bg-surface-2 flex h-[34px] cursor-pointer items-center gap-1.5 rounded-xl px-3 text-sm font-semibold">
               <input
                 type="checkbox"
                 className="accent-primary"
@@ -274,17 +279,23 @@ export function PlanningPage() {
             <Button disabled={!hasClients} onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4" /> Nouveau post
             </Button>
-            <Button variant="outline" disabled={!hasClients} onClick={() => setSeriesOpen(true)}>
-              <CalendarPlus className="h-4 w-4" /> Série
-            </Button>
-            <Button
-              variant="outline"
+            <button
+              type="button"
+              disabled={!hasClients}
+              onClick={() => setSeriesOpen(true)}
+              className="border-border bg-surface flex h-[34px] items-center gap-1.5 rounded-xl border px-3 text-sm font-semibold disabled:opacity-50"
+            >
+              <Layers className="h-4 w-4" /> Série
+            </button>
+            <button
+              type="button"
               onClick={exportIcs}
               disabled={rows.length === 0}
               title="Exporter le résultat filtré au format iCalendar"
+              className="border-border bg-surface flex h-[34px] items-center gap-1.5 rounded-xl border px-3 text-sm font-semibold disabled:opacity-50"
             >
-              <CalendarArrowDown className="h-4 w-4" /> Exporter .ics
-            </Button>
+              <Download className="h-4 w-4" /> Exporter .ics
+            </button>
             <FormSheet
               open={createOpen}
               onOpenChange={(v) => {
@@ -386,14 +397,13 @@ export function PlanningPage() {
             </Suspense>
           </div>
         )}
-        {!loading && (mode === 'month' || mode === 'week') && (
-          <div className="flex h-full flex-col gap-2">
+        {!loading && mode === 'month' && (
+          <div className="flex h-full flex-col gap-4">
             <Suspense fallback={<FullPageSpinner />}>
               <div className="min-h-[34rem] flex-1 lg:min-h-0">
-                <CalendarView
-                  ref={calendarRef}
+                <MonthGrid
+                  ref={monthRef}
                   posts={rows}
-                  view={mode === 'month' ? 'dayGridMonth' : 'timeGridWeek'}
                   clientName={clientName}
                   onOpen={setOpenPost}
                   onCreateAt={
@@ -406,27 +416,61 @@ export function PlanningPage() {
                   }
                   editable
                   keyDates={keyDateMarkers}
-                  fill
-                  showInternalToolbar={false}
                   onRangeChange={setRange}
                 />
               </div>
             </Suspense>
 
-            {mode === 'month' && (
-              <div className="surface-card flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 text-xs">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Info className="h-3.5 w-3.5" /> La pastille indique le client, la couleur de la
-                  carte indique le statut.
-                </span>
-                <StatusLegend className="hidden sm:block" />
-                <span className="text-muted-foreground ml-auto tabular-nums">
-                  {visibleRows.length} post{visibleRows.length > 1 ? 's' : ''} ce mois
-                  {pendingCount > 0 && ` · ${pendingCount} en attente`}
-                  {busiestWeekLabel && ` · semaine la plus chargée ${busiestWeekLabel}`}
-                </span>
-              </div>
-            )}
+            <div className="surface-card flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1.5 rounded-[20px] p-[15px_18px] text-[13px]">
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Info className="h-3.5 w-3.5" aria-hidden="true" /> La pastille indique le client,
+                la couleur de la carte indique le statut.
+              </span>
+              <StatusLegend className="hidden sm:block" />
+              <span className="text-muted-foreground ml-auto font-semibold tabular-nums">
+                <span className="text-foreground font-extrabold">{visibleRows.length}</span> post
+                {visibleRows.length > 1 ? 's' : ''} ce mois
+                {pendingCount > 0 && (
+                  <>
+                    {' · '}
+                    <span className="text-foreground font-extrabold">{pendingCount}</span> en
+                    attente
+                  </>
+                )}
+                {busiestWeekLabel && (
+                  <>
+                    {' · semaine la plus chargée '}
+                    <span className="text-foreground font-extrabold">{busiestWeekLabel}</span>
+                  </>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+        {!loading && mode === 'week' && (
+          <div className="min-h-[34rem] h-full">
+            <Suspense fallback={<FullPageSpinner />}>
+              <CalendarView
+                ref={weekRef}
+                posts={rows}
+                view="timeGridWeek"
+                clientName={clientName}
+                onOpen={setOpenPost}
+                onCreateAt={
+                  hasClients
+                    ? (iso) => {
+                        setCreateDate(iso);
+                        setCreateOpen(true);
+                      }
+                    : undefined
+                }
+                editable
+                keyDates={keyDateMarkers}
+                fill
+                showInternalToolbar={false}
+                onRangeChange={setRange}
+              />
+            </Suspense>
           </div>
         )}
       </div>

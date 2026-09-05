@@ -18,6 +18,7 @@ export default {
           DEFAULT: 'var(--surface)',
           2: 'var(--surface-2)',
           3: 'var(--surface-3)',
+          sunk: 'var(--surface-sunk)',
           inverse: 'var(--surface-inverse)',
         },
         primary: {
@@ -76,6 +77,7 @@ export default {
         },
         'surface-inverse-foreground': 'var(--surface-inverse-foreground)',
         'label-foreground': 'var(--label-foreground)',
+        'ink-faint': 'var(--ink-faint)',
         accent: {
           DEFAULT: 'var(--accent)',
           foreground: 'var(--accent-foreground)',
