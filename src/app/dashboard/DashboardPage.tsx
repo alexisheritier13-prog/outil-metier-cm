@@ -222,7 +222,7 @@ export function DashboardPage() {
   const oldestHiddenAt = activityHidden[activityHidden.length - 1]?.createdAt;
 
   return (
-    <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
+    <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:gap-5">
       <header className="flex shrink-0 items-center gap-2.5">
         <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="md" />
         <h1 className="text-title tracking-tight">
@@ -282,7 +282,7 @@ export function DashboardPage() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
         {/* Cette semaine */}
         <SectionCard
           icon={CalendarRange}
@@ -300,8 +300,8 @@ export function DashboardPage() {
               Tout voir <ArrowRight className="h-3 w-3" />
             </Link>
           }
-          className="min-w-0 lg:min-h-0 lg:flex-1"
-          bodyClassName="overflow-y-auto lg:min-h-0 lg:flex-1"
+          className="min-w-0 lg:flex-1"
+          bodyClassName="max-h-[70vh] overflow-y-auto"
           dataTour="dash-week"
         >
           {weekQ.isLoading ? (
@@ -351,7 +351,7 @@ export function DashboardPage() {
         </SectionCard>
 
         {/* Colonne droite — défile comme un bloc, en dessous du graphe le reste est secondaire */}
-        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:w-[380px] lg:shrink-0 lg:overflow-y-auto">
+        <div className="flex min-w-0 flex-col gap-4 lg:w-[380px] lg:shrink-0">
           <SectionCard
             icon={TrendingUp}
             title="Posts publiés par mois"

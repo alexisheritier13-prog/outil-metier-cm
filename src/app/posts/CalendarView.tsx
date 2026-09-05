@@ -153,6 +153,13 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         eventDurationEditable={false}
         droppable={false}
         dayMaxEvents={view === 'dayGridMonth' ? 3 : fill ? true : 4}
+        // Plage resserrée aux heures ouvrées : la semaine tient sur un écran
+        // sans défilement (24h complètes ne servaient qu'à afficher du vide).
+        slotMinTime="07:00:00"
+        slotMaxTime="21:00:00"
+        slotDuration="01:00:00"
+        slotLabelInterval="01:00:00"
+        expandRows
         nowIndicator
         eventDrop={handleDrop}
         eventClick={handleClick}

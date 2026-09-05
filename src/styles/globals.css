@@ -265,6 +265,17 @@
 .fc-monochrome .fc-day-sun .fc-daygrid-day-frame {
   background: color-mix(in oklch, var(--surface-2) 45%, var(--surface));
 }
+/* Colonne « Semaine » : la pastille est plus petite que la ligne (dont la
+   hauteur suit le contenu des jours) — on la centre au lieu de la laisser
+   collée en haut avec du vide dessous. */
+.fc-monochrome .fc-daygrid-week-number {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
 .fc-monochrome .fc-event {
   cursor: pointer;
   box-shadow: none;
