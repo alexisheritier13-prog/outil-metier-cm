@@ -245,28 +245,18 @@
   padding-bottom: 0.25rem;
 }
 .fc-monochrome .fc-daygrid-day-frame {
-  /* Étirée à la hauteur de la ligne (pas min-height) — les lignes sont
-     égalisées en pixels par `equalizeMonthRows` (CalendarView) car leur
-     nombre change avec le mois et un simple % de <tr> n'est pas fiable. */
-  height: 100%;
+  /* Hauteur posée en JS par `equalizeMonthRows` (CalendarView), pas ici :
+     un % de hauteur sur une <tr> reste un minimum en mise en page table
+     (le contenu peut encore la pousser plus haut) — seule une valeur fixe
+     en pixels + cet overflow:hidden empêche vraiment la ligne de grandir. */
   background: var(--surface);
   border-radius: 0.9375rem; /* 15px */
   padding: 0.25rem;
   overflow: hidden;
 }
-/* 8ᵉ colonne « Semaine » : même tuile blanche que les cases du mois. Un <a>
-   est inline par défaut (height:100% n'aurait aucun effet) : display:flex
-   lui donne une hauteur réelle, sans quoi le mini-histogramme à l'intérieur
-   (en %) se retrouve sans référence et déborde. */
-.fc-monochrome .fc-daygrid-week-number {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  background: var(--surface);
-  border-radius: 0.9375rem;
-  text-decoration: none;
-  overflow: hidden;
-}
+/* La colonne « Semaine » n'utilise plus l'option `weekNumbers` de
+   FullCalendar (elle superposait un badge DANS la case du lundi, masquant sa
+   date et ses posts) — elle est reconstruite à côté dans CalendarView.tsx. */
 .fc-monochrome .fc-day-today .fc-daygrid-day-frame {
   outline: 2px solid var(--primary);
   outline-offset: -2px;

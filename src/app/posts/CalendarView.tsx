@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -16,7 +16,6 @@ import type {
 import { parisWallTimeToUtc } from '@/shared/utils/tz';
 import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
-import { NETWORK_BRAND } from '@/components/networkBrand';
 import { POST_STATUS_ICONS } from '@/components/postStatusIcons';
 import { clientColor } from '@/lib/clientColor';
 import type { Post } from '@/shared/types';
@@ -68,7 +67,12 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
   const reschedule = useReschedulePost();
   const calendarRef = useRef<FullCalendar>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const weekColRef = useRef<HTMLDivElement>(null);
   const equalizeTimer = useRef<ReturnType<typeof setTimeout>>();
+  // Semaines visibles du mois affiché — sert à construire nous-mêmes la
+  // colonne « Semaine » (FullCalendar n'en fait pas une vraie 8ᵉ colonne :
+  // son option `weekNumbers` superpose juste un badge dans la case du lundi).
+  const [weekStarts, setWeekStarts] = useState<Date[]>([]);
 
   useImperativeHandle(ref, () => ({
     prev: () => calendarRef.current?.getApi().prev(),
@@ -129,6 +133,13 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
 
   function handleDatesSet(arg: DatesSetArg) {
     onRangeChange?.({ title: arg.view.title, start: arg.start, end: arg.end });
+    if (view === 'dayGridMonth') {
+      const starts: Date[] = [];
+      for (const d = new Date(arg.start); d < arg.end; d.setDate(d.getDate() + 7)) {
+        starts.push(new Date(d));
+      }
+      setWeekStarts(starts);
+    }
     // Le nombre de lignes change avec le mois (4 à 6) : on ne peut pas fixer
     // leur part de hauteur en CSS statique, donc on la recalcule ici.
     setTimeout(equalizeMonthRows, 0);
@@ -154,18 +165,40 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
   function equalizeMonthRows() {
     if (view !== 'dayGridMonth') return;
     const root = containerRef.current;
-    const body = root?.querySelector<HTMLElement>('.fc-daygrid-body');
     const rows = root?.querySelectorAll<HTMLElement>('.fc-daygrid-body tr');
-    if (!body || !rows || rows.length === 0) return;
-    // Un % sur une <tr> n'est pas fiable en mise en page table (souvent
-    // traité comme auto) : on calcule donc un partage en pixels, à partir
-    // de la hauteur réelle du corps de la grille.
-    const each = body.getBoundingClientRect().height / rows.length;
+    const headerCell = root?.querySelector<HTMLElement>('.fc-col-header-cell');
+    if (!root || !rows || rows.length === 0) return;
+    // Le budget vient du conteneur (hauteur fixe, imposée du dehors), jamais
+    // du contenu de la grille elle-même : mesurer `.fc-daygrid-body` après
+    // coup renvoie sa taille NATURELLE (celle que le contenu demande), qui
+    // peut dépasser ce qui est réellement disponible (jours à 2-3 posts) —
+    // diviser cette valeur-là ne fait que déplacer le débordement au lieu de
+    // le supprimer. Le budget fixe garantit qu'on ne dépasse jamais l'espace
+    // alloué, quitte à ce qu'un jour très chargé s'appuie sur « +N de plus ».
+    const available = root.getBoundingClientRect().height - (headerCell?.getBoundingClientRect().height ?? 0);
+    const each = available / rows.length;
     rows.forEach((r: HTMLElement) => r.style.setProperty('height', `${each}px`, 'important'));
+    // La hauteur sur la <tr> n'est qu'un minimum en mise en page table : le
+    // contenu (un jour à 2 posts + « +N de plus ») peut encore la pousser
+    // plus haut. On plafonne donc aussi la tuile elle-même (hauteur fixe +
+    // overflow:hidden, au lieu de height:100%) pour que la ligne ne puisse
+    // plus grandir derrière son dos.
+    root
+      .querySelectorAll<HTMLElement>('.fc-daygrid-day-frame')
+      .forEach((f) => f.style.setProperty('height', `${each}px`, 'important'));
+    // La colonne « Semaine » (à côté, hors FullCalendar) aligne juste son
+    // en-tête sur celui des jours ; ses lignes se répartissent en CSS
+    // (flex-1) plutôt qu'en pixels calculés, pour ne jamais désynchroniser
+    // sa hauteur totale de celle de la grille.
+    const header = root?.querySelector<HTMLElement>('.fc-col-header-cell');
+    const headerH = header?.getBoundingClientRect().height ?? 0;
+    const weekHeader = weekColRef.current?.querySelector<HTMLElement>('[data-week-header]');
+    if (weekHeader) weekHeader.style.setProperty('height', `${headerH}px`, 'important');
   }
 
   return (
-    <div ref={containerRef} className={fill ? 'fc-monochrome h-full' : 'fc-monochrome'}>
+    <div className={fill ? 'flex h-full gap-2' : 'flex'}>
+    <div ref={containerRef} className={fill ? 'fc-monochrome h-full min-w-0 flex-1' : 'fc-monochrome min-w-0 flex-1'}>
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -177,8 +210,6 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         // N'affiche que les semaines nécessaires au mois (pas de 6ᵉ ligne
         // vide) : avec des cases à hauteur fixe, chaque ligne en moins compte.
         fixedWeekCount={false}
-        weekNumbers={view === 'dayGridMonth'}
-        weekNumberContent={(arg) => <WeekBadge weekStart={arg.date} posts={posts} />}
         // Boutons texte plutôt qu'icônes `role="img"` sans alt (a11y, Story 9.5).
         buttonIcons={false}
         buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
@@ -189,7 +220,7 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         eventStartEditable={editable}
         eventDurationEditable={false}
         droppable={false}
-        dayMaxEvents={view === 'dayGridMonth' ? 3 : fill ? true : 4}
+        dayMaxEvents={view === 'dayGridMonth' ? 2 : fill ? true : 4}
         // Plage resserrée aux heures ouvrées : la semaine tient sur un écran
         // sans défilement (24h complètes ne servaient qu'à afficher du vide).
         slotMinTime="07:00:00"
@@ -227,14 +258,6 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
                 aria-hidden="true"
               />
               <span className="font-medium tabular-nums">{arg.timeText}</span>
-              <svg
-                viewBox="0 0 24 24"
-                className="h-2.5 w-2.5 shrink-0 opacity-70"
-                fill={NETWORK_BRAND[post.network].hex}
-                aria-hidden="true"
-              >
-                <path d={NETWORK_BRAND[post.network].path} />
-              </svg>
               <span className="truncate">{post.caption || 'Sans légende'}</span>
               <StatusIcon
                 className={`ml-auto size-3 shrink-0 ${STATUS_ICON_COLOR[post.status]}`}
@@ -248,6 +271,34 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
           );
         }}
       />
+    </div>
+    {/* Colonne « Semaine », construite à part : FullCalendar n'en fait pas une
+        vraie colonne (son option `weekNumbers` superpose juste un badge dans
+        la case du lundi, qui masquait sa date et ses posts). */}
+    {view === 'dayGridMonth' && (
+      <div ref={weekColRef} className="flex h-full w-24 shrink-0 flex-col">
+        <div
+          data-week-header
+          className="text-muted-foreground flex shrink-0 items-end pb-1 text-[13px] font-medium"
+        >
+          Semaine
+        </div>
+        {/* Les lignes se répartissent à parts égales (flex-1) au lieu d'une
+            hauteur calculée en pixels : la colonne ne peut alors jamais
+            dépasser (ou être plus courte) que la grille FullCalendar juste
+            à côté, toutes deux calées sur `h-full`. */}
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
+          {weekStarts.map((ws) => (
+            <div
+              key={ws.toISOString()}
+              className="bg-surface min-h-0 flex-1 overflow-hidden rounded-[0.9375rem]"
+            >
+              <WeekBadge weekStart={ws} posts={posts} />
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
     </div>
   );
 });
