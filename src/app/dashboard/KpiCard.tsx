@@ -2,7 +2,7 @@ import { Maximize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { ACCENT_GRADIENT, type Accent, type IconType } from './SectionCard';
+import type { Accent, IconType } from './SectionCard';
 
 const TONE_CARD = {
   danger: 'ring-danger-border bg-danger-surface ring-1',
@@ -14,10 +14,19 @@ const TONE_TEXT = {
 } as const;
 // Classes Tailwind écrites en toutes lettres (une classe interpolée à l'exécution
 // ne serait pas détectée par le scan JIT).
-const TONE_GRADIENT = {
-  danger: 'from-danger to-danger/80',
-  warning: 'from-warning to-warning/80',
+const TONE_ICON_TILE = {
+  danger: 'bg-danger-surface text-danger-strong',
+  warning: 'bg-warning-surface text-warning-strong',
 } as const;
+/** Tuile d'icône en pastille ronde teintée (pas de dégradé plein) — cohérent
+ *  avec les pastilles de statut/réseau utilisées ailleurs sur l'Accueil. */
+const ACCENT_ICON_TILE: Record<Accent, string> = {
+  primary: 'bg-primary-surface text-primary-strong',
+  info: 'bg-info-surface text-info-strong',
+  success: 'bg-success-surface text-success-strong',
+  warning: 'bg-warning-surface text-warning-strong',
+  danger: 'bg-danger-surface text-danger-strong',
+};
 
 export function KpiCard({
   to,
@@ -58,8 +67,8 @@ export function KpiCard({
       <div className="flex items-center gap-3">
         <span
           className={cn(
-            'shadow-primary grid h-9 w-9 shrink-0 place-items-center rounded-[13px] bg-gradient-to-br text-white',
-            tone ? TONE_GRADIENT[tone] : ACCENT_GRADIENT[accent],
+            'grid h-9 w-9 shrink-0 place-items-center rounded-full',
+            tone ? TONE_ICON_TILE[tone] : ACCENT_ICON_TILE[accent],
           )}
         >
           <Icon className="h-[18px] w-[18px]" aria-hidden="true" />

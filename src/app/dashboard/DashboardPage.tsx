@@ -7,11 +7,11 @@ import {
   BellRing,
   CalendarRange,
   CheckCircle2,
-  GaugeCircle,
   Inbox,
   MessageSquareText,
   Plus,
   Send,
+  SlidersHorizontal,
   TrendingUp,
   TriangleAlert,
   Users,
@@ -29,24 +29,19 @@ import { ActivityFeed } from './ActivityFeed';
 import { clientColor, clientInitials } from '@/lib/clientColor';
 import { useCurrentProfile } from '@/auth/useCurrentProfile';
 import { isInternalRole } from '@/shared/constants/roles';
-import { POST_STATUSES, POST_STATUS_LABELS, type PostStatus } from '@/shared/constants/postStatus';
+import { POST_STATUSES } from '@/shared/constants/postStatus';
 import { parisDateKey } from '@/shared/utils/tz';
 import { listPosts, listReviewQueue } from '@/services/posts';
 import { listInternalUsers } from '@/services/users';
 import { useChangePostStatus } from '@/app/posts/usePosts';
-import type { Alert, Post } from '@/shared/types';
+import type { Alert } from '@/shared/types';
 import { listClientRequests } from '@/services/clientRequests';
 import { listAlerts, setAlertStatus } from '@/services/alerts';
 import { listClients } from '@/services/clients';
 import { listRecentActivity } from '@/services/clientActivity';
 import { ALERT_TYPE_LABELS } from '@/shared/types';
 import { relativeAge } from '@/lib/relativeTime';
-import {
-  fetchFirstTimeApprovalRate,
-  fetchMonthlyPostCounts,
-  pickPriorityAlerts,
-  STEP_BAR_COLOR,
-} from './dashboardMetrics';
+import { fetchFirstTimeApprovalRate, fetchMonthlyPostCounts, pickPriorityAlerts } from './dashboardMetrics';
 
 const PIPELINE_STATUSES = POST_STATUSES.filter((s) => s !== 'published');
 const MONTH_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
@@ -113,13 +108,6 @@ export function DashboardPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['alerts'] }),
   });
 
-  const pipelineCounts = useMemo(() => {
-    const c = Object.fromEntries(PIPELINE_STATUSES.map((s) => [s, 0])) as Record<PostStatus, number>;
-    for (const p of pipelineQ.data ?? []) c[p.status] = (c[p.status] ?? 0) + 1;
-    return c;
-  }, [pipelineQ.data]);
-  const pipelineTotal = (pipelineQ.data ?? []).length;
-
   const clientName = useMemo(() => {
     const m = new Map((clientsQ.data ?? []).map((c) => [c.id, c.name]));
     return (id: string | null) => (id ? (m.get(id) ?? '—') : '—');
@@ -135,21 +123,19 @@ export function DashboardPage() {
   const hasCritical = newAlerts.some((a) => a.severity === 'critical');
 
   const weekPosts = weekQ.data;
-  const byDay = useMemo(() => {
-    const groups = new Map<string, Post[]>();
-    for (const p of [...(weekPosts ?? [])].sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))) {
-      const key = parisDateKey(p.scheduledAt);
-      const arr = groups.get(key) ?? [];
-      arr.push(p);
-      groups.set(key, arr);
-    }
-    return [...groups.entries()];
-  }, [weekPosts]);
+  const weekList = useMemo(
+    () => [...(weekPosts ?? [])].sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
+    [weekPosts],
+  );
   const weekTotal = weekPosts?.length ?? 0;
   const weekClientCount = useMemo(
     () => new Set((weekPosts ?? []).map((p) => p.clientId)).size,
     [weekPosts],
   );
+  const weekRangeLabel = useMemo(() => {
+    const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    return `du ${fmt(new Date())} au ${fmt(new Date(Date.now() + 6 * DAY_MS))}`;
+  }, []);
 
   const watchlist = useMemo(() => {
     const byClient = new Map<string, string[]>();
@@ -225,7 +211,7 @@ export function DashboardPage() {
   const activityRows = activityQ.data ?? [];
 
   return (
-    <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:gap-5">
+    <div className="animate-in fade-in flex flex-col gap-4 px-5 py-5 duration-300 ease-out sm:px-8 lg:h-full lg:gap-5 lg:overflow-hidden">
       <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2">
         <UserAvatar name={me.fullName || me.email} avatarUrl={me.avatarUrl} size="lg" />
         <div className="min-w-0">
@@ -294,26 +280,27 @@ export function DashboardPage() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+      <div className="grid grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[1.15fr_1fr]">
         {/* Cette semaine */}
         <SectionCard
           icon={CalendarRange}
           title="Cette semaine"
           subtitle={
             weekTotal > 0
-              ? `${weekTotal} post${weekTotal > 1 ? 's' : ''}, ${weekClientCount} client${weekClientCount > 1 ? 's' : ''}`
+              ? `${weekTotal} post${weekTotal > 1 ? 's' : ''}, ${weekClientCount} client${weekClientCount > 1 ? 's' : ''} — ${weekRangeLabel}`
               : undefined
           }
           action={
             <Link
               to="/app/planning"
-              className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium"
+              aria-label="Voir tout le planning"
+              className="text-muted-foreground hover:text-foreground hover:bg-surface-2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
             >
-              Tout voir <ArrowRight className="h-3 w-3" />
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
             </Link>
           }
-          className="min-w-0 lg:flex-1"
-          bodyClassName="max-h-[70vh] overflow-y-auto"
+          className="min-w-0 lg:h-full"
+          bodyClassName="lg:min-h-0 lg:flex-1 overflow-y-auto"
           dataTour="dash-week"
         >
           {weekQ.isLoading ? (
@@ -322,48 +309,40 @@ export function DashboardPage() {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : byDay.length === 0 ? (
+          ) : weekList.length === 0 ? (
             <EmptyState
               title="Rien de prévu"
               description="Aucun post planifié sur les 7 prochains jours. Ouvrez le planning pour en créer."
             />
           ) : (
-            <div className="space-y-3 p-3">
-              {byDay.map(([day, posts]) => (
-                <div key={day}>
-                  <p className="text-muted-foreground mb-1.5 px-1 text-xs font-medium uppercase tracking-wide">
-                    {dayLabel(day)}
-                  </p>
-                  <div className="space-y-1.5">
-                    {posts.map((p) => {
-                      const due =
-                        p.status === 'scheduled' && new Date(p.scheduledAt).getTime() <= Date.now();
-                      return (
-                        <PostRow
-                          key={p.id}
-                          post={p}
-                          clientName={clientName(p.clientId)}
-                          author={authorById.get(p.authorId)}
-                          due={due}
-                          markPending={changeStatus.isPending}
-                          onMarkPublished={() =>
-                            changeStatus.mutate(
-                              { id: p.id, to: 'published' },
-                              { onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard'] }) },
-                            )
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-1.5 p-3">
+              {weekList.map((p) => {
+                const due = p.status === 'scheduled' && new Date(p.scheduledAt).getTime() <= Date.now();
+                return (
+                  <PostRow
+                    key={p.id}
+                    post={p}
+                    clientName={clientName(p.clientId)}
+                    dayLabel={dayLabel(parisDateKey(p.scheduledAt))}
+                    author={authorById.get(p.authorId)}
+                    due={due}
+                    markPending={changeStatus.isPending}
+                    onMarkPublished={() =>
+                      changeStatus.mutate(
+                        { id: p.id, to: 'published' },
+                        { onSuccess: () => qc.invalidateQueries({ queryKey: ['dashboard'] }) },
+                      )
+                    }
+                  />
+                );
+              })}
             </div>
           )}
         </SectionCard>
 
-        {/* Colonne droite — défile comme un bloc, en dessous du graphe le reste est secondaire */}
-        <div className="flex min-w-0 flex-col gap-4 lg:w-[380px] lg:shrink-0">
+        {/* Colonne droite — chart + gauge/watchlist gardent leur hauteur naturelle,
+            l'activité récente absorbe l'espace restant et défile si besoin. */}
+        <div className="flex min-w-0 flex-col gap-4 lg:h-full">
           <SectionCard
             icon={TrendingUp}
             title="Posts publiés par mois"
@@ -388,81 +367,112 @@ export function DashboardPage() {
             )}
           </SectionCard>
 
-          <div className="shrink-0">
-            <ProductionPanel counts={pipelineCounts} total={pipelineTotal} loading={pipelineQ.isLoading} />
-          </div>
-
-          <div className="surface-card shrink-0 rounded-[20px] p-4">
-            <p className="text-muted-foreground mb-2 text-xs font-medium">
-              Validé du premier coup <span className="text-muted-foreground/70">· 30 derniers jours</span>
-            </p>
-            {firstTimeQ.isLoading ? (
-              <Skeleton className="mx-auto h-16 w-24" />
-            ) : firstTimeQ.data ? (
-              <HalfGauge
-                rate={firstTimeQ.data.rate}
-                total={firstTimeQ.data.total}
-                previousRate={previousFirstTimeQ.data?.rate ?? null}
-              />
-            ) : (
-              <p className="text-muted-foreground py-2 text-sm">
-                Pas assez de posts récents pour ce chiffre.
+          <div className="grid shrink-0 grid-cols-1 gap-3.5 sm:grid-cols-2">
+            <div className="surface-card flex flex-col rounded-[20px] p-4">
+              <p className="text-muted-foreground mb-2 text-xs font-medium">
+                Validé du premier coup <span className="text-muted-foreground/70">· 30 derniers jours</span>
               </p>
-            )}
-          </div>
+              {firstTimeQ.isLoading ? (
+                <Skeleton className="mx-auto h-16 w-24" />
+              ) : firstTimeQ.data ? (
+                <HalfGauge
+                  rate={firstTimeQ.data.rate}
+                  total={firstTimeQ.data.total}
+                  previousRate={previousFirstTimeQ.data?.rate ?? null}
+                />
+              ) : (
+                <p className="text-muted-foreground py-2 text-sm">
+                  Pas assez de posts récents pour ce chiffre.
+                </p>
+              )}
+            </div>
 
-          <SectionCard icon={Users} title="Clients à surveiller" accent="warning" className="shrink-0">
-            {alertsQ.isLoading ? (
-              <div className="space-y-2 p-4">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : watchlist.length === 0 ? (
-              <p className="text-muted-foreground p-4 text-sm">
-                Aucun signal — tous les clients sont à jour.
-              </p>
-            ) : (
-              <ul className="divide-border/60 max-h-[26vh] divide-y overflow-y-auto">
-                {watchlist.map(([clientId, issues]) => {
-                  const cc = clientColor(clientId);
-                  // Rouge seulement pour un vrai retard (validation en retard) —
-                  // les autres signaux (trou calendrier, client inactif) restent neutres.
-                  const isLate = issues.includes(ALERT_TYPE_LABELS.validation_overdue);
-                  return (
-                    <li key={clientId}>
-                      <Link
-                        to={`/app/clients/${clientId}`}
-                        className="hover:bg-surface-2 flex items-center gap-3 p-3 text-sm"
-                      >
-                        <span
-                          className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-xl text-xs font-bold"
-                          style={{ backgroundColor: cc.soft, color: cc.ink }}
-                          aria-hidden="true"
+            <SectionCard
+              icon={Users}
+              title="Clients à surveiller"
+              accent="warning"
+              subtitle={`${watchlist.length} sur ${(clientsQ.data ?? []).length}`}
+              action={
+                <Link
+                  to="/app/clients"
+                  className="text-muted-foreground hover:text-foreground shrink-0 text-xs font-medium"
+                >
+                  Tout
+                </Link>
+              }
+            >
+              {alertsQ.isLoading ? (
+                <div className="space-y-2 p-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : watchlist.length === 0 ? (
+                <p className="text-muted-foreground p-4 text-sm">
+                  Aucun signal — tous les clients sont à jour.
+                </p>
+              ) : (
+                <ul className="divide-border/60 max-h-[26vh] divide-y overflow-y-auto">
+                  {watchlist.map(([clientId, issues]) => {
+                    const cc = clientColor(clientId);
+                    // Rouge seulement pour un vrai retard (validation en retard) —
+                    // les autres signaux (trou calendrier, client inactif) restent neutres.
+                    const isLate = issues.includes(ALERT_TYPE_LABELS.validation_overdue);
+                    return (
+                      <li key={clientId}>
+                        <Link
+                          to={`/app/clients/${clientId}`}
+                          className="hover:bg-surface-2 flex items-center gap-3 p-3 text-sm"
                         >
-                          {clientInitials(clientName(clientId))}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[13px] font-bold">{clientName(clientId)}</span>
                           <span
-                            className="block truncate text-[11.5px] font-[650]"
-                            style={{ color: isLate ? 'oklch(0.5 0.16 27)' : undefined }}
+                            className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-xl text-xs font-bold"
+                            style={{ backgroundColor: cc.soft, color: cc.ink }}
+                            aria-hidden="true"
                           >
-                            {!isLate && <span className="text-muted-foreground">{issues.join(' · ')}</span>}
-                            {isLate && issues.join(' · ')}
+                            {clientInitials(clientName(clientId))}
                           </span>
-                        </span>
-                        <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </SectionCard>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-[13px] font-bold">
+                              {clientName(clientId)}
+                            </span>
+                            <span
+                              className="block truncate text-[11.5px] font-[650]"
+                              style={{ color: isLate ? 'oklch(0.5 0.16 27)' : undefined }}
+                            >
+                              {!isLate && <span className="text-muted-foreground">{issues.join(' · ')}</span>}
+                              {isLate && issues.join(' · ')}
+                            </span>
+                          </span>
+                          <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </SectionCard>
+          </div>
 
-          <SectionCard icon={Activity} title="Activité récente" className="shrink-0">
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone défilable sans enfant focusable, rendue accessible au clavier (axe) */}
-            <div tabIndex={0} role="region" aria-label="Activité récente">
+          <SectionCard
+            icon={Activity}
+            title="Activité récente"
+            className="min-h-0 lg:flex-1"
+            bodyClassName="lg:min-h-0 lg:flex-1 overflow-y-auto"
+            action={
+              <button
+                type="button"
+                onClick={() => setActivityExpanded(true)}
+                className="text-muted-foreground hover:text-foreground shrink-0 text-xs font-medium"
+              >
+                Journal
+              </button>
+            }
+          >
+            <div
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone défilable sans enfant focusable, rendue accessible au clavier (axe)
+              tabIndex={0}
+              role="region"
+              aria-label="Activité récente"
+            >
               {activityQ.isLoading ? (
                 <div className="space-y-2 p-4">
                   <Skeleton className="h-8 w-full" />
@@ -482,60 +492,6 @@ export function DashboardPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function ProductionPanel({
-  counts,
-  total,
-  loading,
-}: {
-  counts: Record<PostStatus, number>;
-  total: number;
-  loading?: boolean;
-}) {
-  return (
-    <SectionCard icon={GaugeCircle} title="Production en cours" subtitle={loading ? '…' : `${total} post${total > 1 ? 's' : ''} hors publiés`} bodyClassName="p-4">
-      {loading ? (
-        <div className="space-y-2">
-          {PIPELINE_STATUSES.map((s) => (
-            <Skeleton key={s} className="h-5 w-full" />
-          ))}
-        </div>
-      ) : total === 0 ? (
-        <p className="text-muted-foreground text-sm">Aucun post en préparation pour le moment.</p>
-      ) : (
-        <ul className="space-y-1.5">
-          {PIPELINE_STATUSES.map((s) => {
-            const n = counts[s];
-            const max = Math.max(...PIPELINE_STATUSES.map((k) => counts[k]), 1);
-            return (
-              <li key={s} className="flex items-center gap-3 text-sm">
-                <span className="text-muted-foreground flex w-32 shrink-0 items-center gap-2">
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: STEP_BAR_COLOR[s] }}
-                    aria-hidden="true"
-                  />
-                  <span className="truncate">{POST_STATUS_LABELS[s]}</span>
-                </span>
-                <span className="bg-surface-2 relative h-5 flex-1 overflow-hidden rounded-md">
-                  <span
-                    className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-500 ease-out"
-                    style={{
-                      width: `${Math.max((n / max) * 100, n > 0 ? 6 : 0)}%`,
-                      backgroundColor: STEP_BAR_COLOR[s],
-                    }}
-                    aria-hidden="true"
-                  />
-                </span>
-                <span className="w-6 shrink-0 text-right font-semibold tabular-nums">{n}</span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </SectionCard>
   );
 }
 
@@ -577,10 +533,10 @@ function PriorityBanner({
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[14.5px] font-[750]">Priorité du jour</p>
-        <p className="text-[13.5px] leading-[1.45]" style={{ color: 'oklch(0.45 0.02 265)' }}>
+        <p className="text-[13.5px] leading-[1.45]" style={{ color: 'oklch(0.38 0.02 265)' }}>
           {alerts.map((a, i) => (
             <span key={a.id}>
-              {i > 0 && ' '}
+              {i > 0 && ', et '}
               {highlightClient(a.message, a.clientId ? clientName(a.clientId) : null, a.clientId)}
             </span>
           ))}
