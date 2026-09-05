@@ -63,6 +63,13 @@ export default {
           strong: 'var(--info-strong)',
           border: 'var(--info-border)',
         },
+        keydate: {
+          DEFAULT: 'var(--keydate)',
+          foreground: 'var(--keydate-foreground)',
+          surface: 'var(--keydate-surface)',
+          strong: 'var(--keydate-strong)',
+          border: 'var(--keydate-border)',
+        },
         muted: {
           DEFAULT: 'var(--muted)',
           foreground: 'var(--muted-foreground)',

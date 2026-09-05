@@ -1,26 +1,8 @@
 import { getSupabase } from '@/lib/supabase';
 import { listPosts } from '@/services/posts';
-import { POST_STATUS_ORDER, type PostStatus } from '@/shared/constants/postStatus';
 import type { Alert, AlertSeverity } from '@/shared/types';
 
-/**
- * Étape du post dans le circuit à 5 temps (brouillon → validation interne →
- * validation client → validé → planifié). « Publié » est au-delà du circuit,
- * plafonné à l'étape 5 lui aussi.
- */
-export function postStep(status: PostStatus): number {
-  return Math.min(POST_STATUS_ORDER[status] + 1, 5);
-}
-
-/** Couleur de la barre de progression, par étape — même teinte que le badge de statut. */
-export const STEP_BAR_COLOR: Record<PostStatus, string> = {
-  draft: 'var(--border-strong)',
-  internal_review: 'var(--info)',
-  client_review: 'var(--warning)',
-  approved: 'var(--success)',
-  scheduled: 'var(--primary)',
-  published: 'var(--primary)',
-};
+export { postStep, STEP_BAR_COLOR } from '@/shared/constants/postStatus';
 
 const SEV_RANK: Record<AlertSeverity, number> = { critical: 0, warning: 1, info: 2 };
 

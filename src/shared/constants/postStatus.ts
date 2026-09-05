@@ -50,6 +50,25 @@ export const POST_STATUS_ORDER: Record<PostStatus, number> = {
   published: 5,
 };
 
+/**
+ * Étape du post dans le circuit à 5 temps (brouillon → validation interne →
+ * validation client → validé → planifié). « Publié » est au-delà du circuit,
+ * plafonné à l'étape 5 lui aussi.
+ */
+export function postStep(status: PostStatus): number {
+  return Math.min(POST_STATUS_ORDER[status] + 1, 5);
+}
+
+/** Couleur d'accent par statut — barre de progression, légendes, pastilles. */
+export const STEP_BAR_COLOR: Record<PostStatus, string> = {
+  draft: 'var(--border-strong)',
+  internal_review: 'var(--info)',
+  client_review: 'var(--warning)',
+  approved: 'var(--success)',
+  scheduled: 'var(--primary)',
+  published: 'var(--primary)',
+};
+
 /** Statuts exposés au contact client (les autres restent internes). */
 export const CLIENT_VISIBLE_STATUSES = [
   'client_review',

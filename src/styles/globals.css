@@ -96,6 +96,13 @@
     --info-strong: oklch(0.4 0.13 240); /* texte sur --info-surface */
     --info-border: oklch(0.86 0.06 240);
 
+    /* ── Marronnier (violet · hue 300) — repère de calendrier, jamais un statut ── */
+    --keydate: oklch(0.55 0.15 300);
+    --keydate-foreground: oklch(0.99 0 0);
+    --keydate-surface: oklch(0.95 0.035 300);
+    --keydate-strong: oklch(0.42 0.14 300); /* texte sur --keydate-surface */
+    --keydate-border: oklch(0.86 0.07 300);
+
     /* `--destructive` = alias danger (boutons/erreurs shadcn) */
     --destructive: var(--danger);
     --destructive-foreground: var(--danger-foreground);
@@ -217,27 +224,59 @@
   letter-spacing: -0.01em;
   text-transform: capitalize;
 }
-/* Cases du mois : hauteur mini + libellé de jour plus discret */
+/* Grille en tuiles arrondies : le fond de la grille est le « sol » teinté
+   (surface-2), les cases sont des tuiles blanches séparées par un vrai gap
+   (border-spacing) plutôt qu'un tableau à bordures. */
+.fc-monochrome .fc-scrollgrid,
+.fc-monochrome table {
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0.5rem;
+}
+.fc-monochrome .fc-scrollgrid {
+  background: var(--surface-2);
+  border-radius: var(--radius-card);
+}
+.fc-monochrome td,
+.fc-monochrome th {
+  border: 0;
+}
+.fc-monochrome .fc-col-header-cell {
+  padding-bottom: 0.25rem;
+}
 .fc-monochrome .fc-daygrid-day-frame {
   min-height: 6.25rem;
+  background: var(--surface);
+  border-radius: 0.9375rem; /* 15px */
+  padding: 0.25rem;
+}
+.fc-monochrome .fc-day-today .fc-daygrid-day-frame {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
 }
 .fc-monochrome .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
   border-radius: 999px;
-  padding: 0 0.35rem;
-  font-weight: 600;
+  padding: 0 0.4rem;
+  font-weight: 700;
 }
-.fc-monochrome .fc-day-sat,
-.fc-monochrome .fc-day-sun {
-  background: color-mix(in oklch, var(--surface-2) 55%, transparent);
+.fc-monochrome .fc-day-sat .fc-daygrid-day-frame,
+.fc-monochrome .fc-day-sun .fc-daygrid-day-frame {
+  background: color-mix(in oklch, var(--surface-2) 45%, var(--surface));
 }
 .fc-monochrome .fc-event {
   cursor: pointer;
   box-shadow: none;
-  border-radius: 5px;
+  border-radius: 6px;
   padding: 1px 0;
   margin-block: 1px;
+}
+/* 8ᵉ colonne « Semaine » */
+.fc-monochrome .fc-daygrid-week-number {
+  background: transparent;
+  padding: 0;
+  width: 4.5rem;
 }
 .fc-monochrome .fc-daygrid-more-link {
   color: var(--muted-foreground);
@@ -267,25 +306,23 @@
   border-color: var(--border);
   color: var(--muted-foreground);
 }
-/* Marronniers : surimpression discrète (filet pointillé en tête), non cliquable */
+/* Marronniers : étiquette violette compacte (rendue par eventContent), non cliquable */
 .fc-monochrome .fc-keydate {
   background: transparent;
   border: 0;
-  border-top: 1px dashed var(--muted-foreground);
   border-radius: 0;
   cursor: default;
-  opacity: 0.7;
 }
 .fc-monochrome .fc-daygrid-day-number,
 .fc-monochrome .fc-col-header-cell-cushion {
   color: var(--muted-foreground);
   text-decoration: none;
 }
-/* Jours hors mois : distingués par le fond de cellule, pas par une opacité
+/* Jours hors mois : distingués par le fond de la tuile, pas par une opacité
    qui ferait chuter le contraste du numéro sous le seuil AA (Story 9.5). */
 .fc-monochrome .fc-day-other .fc-daygrid-day-top {
   opacity: 1;
 }
-.fc-monochrome .fc-day-other {
+.fc-monochrome .fc-day-other .fc-daygrid-day-frame {
   background: color-mix(in oklch, var(--surface-2) 70%, transparent);
 }
