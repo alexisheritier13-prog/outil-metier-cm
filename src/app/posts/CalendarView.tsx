@@ -19,7 +19,6 @@ import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { NETWORK_BRAND } from '@/components/networkBrand';
 import { POST_STATUS_ICONS } from '@/components/postStatusIcons';
 import { clientColor, clientInitials } from '@/lib/clientColor';
-import { MiniBarChart } from '@/components/MiniBarChart';
 import type { Post } from '@/shared/types';
 import { useReschedulePost } from './usePosts';
 
@@ -68,6 +67,8 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
 ) {
   const reschedule = useReschedulePost();
   const calendarRef = useRef<FullCalendar>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const equalizeTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useImperativeHandle(ref, () => ({
     prev: () => calendarRef.current?.getApi().prev(),
@@ -129,6 +130,9 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
 
   function handleDatesSet(arg: DatesSetArg) {
     onRangeChange?.({ title: arg.view.title, start: arg.start, end: arg.end });
+    // Le nombre de lignes change avec le mois (4 à 6) : on ne peut pas fixer
+    // leur part de hauteur en CSS statique, donc on la recalcule ici.
+    setTimeout(equalizeMonthRows, 0);
   }
 
   // FullCalendar réserve un créneau fixe (~50px) par événement en vue Mois,
@@ -141,10 +145,28 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
     if (view !== 'dayGridMonth') return;
     const harness = arg.el.closest<HTMLElement>('.fc-daygrid-event-harness');
     harness?.style.setProperty('height', '1.25rem', 'important');
+    // Le contenu (nb d'événements) influence encore le partage de hauteur
+    // que FullCalendar fait entre les lignes ; on ré-égalise après chaque
+    // salve de montage d'événements (debounce simple).
+    if (equalizeTimer.current) clearTimeout(equalizeTimer.current);
+    equalizeTimer.current = setTimeout(equalizeMonthRows, 30);
+  }
+
+  function equalizeMonthRows() {
+    if (view !== 'dayGridMonth') return;
+    const root = containerRef.current;
+    const body = root?.querySelector<HTMLElement>('.fc-daygrid-body');
+    const rows = root?.querySelectorAll<HTMLElement>('.fc-daygrid-body tr');
+    if (!body || !rows || rows.length === 0) return;
+    // Un % sur une <tr> n'est pas fiable en mise en page table (souvent
+    // traité comme auto) : on calcule donc un partage en pixels, à partir
+    // de la hauteur réelle du corps de la grille.
+    const each = body.getBoundingClientRect().height / rows.length;
+    rows.forEach((r: HTMLElement) => r.style.setProperty('height', `${each}px`, 'important'));
   }
 
   return (
-    <div className={fill ? 'fc-monochrome h-full' : 'fc-monochrome'}>
+    <div ref={containerRef} className={fill ? 'fc-monochrome h-full' : 'fc-monochrome'}>
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -153,21 +175,14 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         headerToolbar={showInternalToolbar ? { left: 'prev,next today', center: 'title', right: '' } : false}
         locale="fr"
         firstDay={1}
-        weekNumbers={view === 'dayGridMonth'}
         // N'affiche que les semaines nécessaires au mois (pas de 6ᵉ ligne
         // vide) : avec des cases à hauteur fixe, chaque ligne en moins compte.
         fixedWeekCount={false}
-        weekNumberContent={(arg) => <WeekBadge weekStart={arg.date} posts={posts} />}
         // Boutons texte plutôt qu'icônes `role="img"` sans alt (a11y, Story 9.5).
         buttonIcons={false}
         buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
         buttonHints={{ prev: 'Période précédente', next: 'Période suivante', today: "Aller à aujourd'hui" }}
-        // En Mois, chaque case a une hauteur fixe (uniformité) : la grille doit
-        // donc garder sa taille naturelle plutôt que d'être étirée/compressée
-        // pour remplir le conteneur (ce qui coupait des semaines sur les
-        // écrans plus courts). La Semaine, elle, reste calée sur la hauteur
-        // disponible (sa plage d'heures est déjà resserrée pour y tenir).
-        height={fill && view === 'timeGridWeek' ? '100%' : 'auto'}
+        height={fill ? '100%' : 'auto'}
         events={events}
         editable={editable}
         eventStartEditable={editable}
@@ -234,49 +249,6 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
     </div>
   );
 });
-
-/** Contenu de la 8ᵉ colonne « Semaine » : numéro, total, mini-histogramme lun.→ven. */
-function WeekBadge({ weekStart, posts }: { weekStart: Date; posts: Post[] }) {
-  const days = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
-  const counts = days.map(
-    (d) => posts.filter((p) => isSameDay(new Date(p.scheduledAt), d)).length,
-  );
-  const total = counts.reduce((s, n) => s + n, 0);
-  const weekNumber = getISOWeek(weekStart);
-
-  return (
-    <div className="from-primary-surface to-surface flex w-full flex-col gap-1 rounded-lg bg-gradient-to-br p-1.5 text-center">
-      <span className="text-primary-strong text-[10px] font-bold">S{weekNumber}</span>
-      <span className="text-[9px] font-semibold tabular-nums">
-        {total} post{total > 1 ? 's' : ''}
-      </span>
-      <MiniBarChart
-        height={20}
-        bars={counts.map((n, i) => ({
-          key: String(i),
-          label: '',
-          segments: [{ value: n, color: 'var(--primary)', label: '' }],
-        }))}
-      />
-    </div>
-  );
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-
-function getISOWeek(d: Date): number {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = date.getUTCDay() || 7;
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-}
 
 /**
  * Couleur de l'icône de statut sur l'événement. Le SENS est porté par la FORME de

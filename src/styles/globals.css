@@ -245,10 +245,11 @@
   padding-bottom: 0.25rem;
 }
 .fc-monochrome .fc-daygrid-day-frame {
-  /* Hauteur fixe (pas min-height) : toutes les cases ont la même taille,
-     qu'il y ait 0 ou plusieurs posts ce jour-là (le surplus passe derrière
-     le lien « +N de plus »). */
-  height: 7.25rem;
+  /* Étirée à la hauteur de la ligne (pas min-height) : avec un seul
+     événement affiché par case (dayMaxEvents=1, le surplus passe derrière
+     le lien « +N de plus ») et un créneau resserré par événement
+     (eventDidMount), toutes les lignes du mois restent uniformes. */
+  height: 100%;
   background: var(--surface);
   border-radius: 0.9375rem; /* 15px */
   padding: 0.25rem;
@@ -269,16 +270,23 @@
 .fc-monochrome .fc-day-sun .fc-daygrid-day-frame {
   background: color-mix(in oklch, var(--surface-2) 45%, var(--surface));
 }
-/* Colonne « Semaine » : la pastille est plus petite que la ligne (dont la
-   hauteur suit le contenu des jours) — on la centre au lieu de la laisser
-   collée en haut avec du vide dessous. */
-.fc-monochrome .fc-daygrid-week-number {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
+/* Vue Semaine : la grille horaire n'a pas de tuile par case (comme le Mois),
+   elle laisserait sinon voir le fond gris du scrollgrid partout. On blanchit
+   les colonnes et on redonne un fin quadrillage horaire pour la lisibilité. */
+.fc-monochrome .fc-timegrid-col-frame,
+.fc-monochrome .fc-timegrid-body {
+  background: var(--surface);
+}
+.fc-monochrome .fc-timegrid-slot-lane {
+  border-bottom: 1px solid var(--border);
+}
+.fc-monochrome .fc-timegrid-col.fc-day-sat .fc-timegrid-col-frame,
+.fc-monochrome .fc-timegrid-col.fc-day-sun .fc-timegrid-col-frame {
+  background: color-mix(in oklch, var(--surface-2) 35%, var(--surface));
+}
+.fc-monochrome .fc-timegrid-axis,
+.fc-monochrome .fc-timegrid-slot-label {
+  border: 0;
 }
 .fc-monochrome .fc-event {
   cursor: pointer;
@@ -286,12 +294,6 @@
   border-radius: 6px;
   padding: 1px 0;
   margin-block: 1px;
-}
-/* 8ᵉ colonne « Semaine » */
-.fc-monochrome .fc-daygrid-week-number {
-  background: transparent;
-  padding: 0;
-  width: 4.5rem;
 }
 .fc-monochrome .fc-daygrid-more-link {
   color: var(--muted-foreground);
