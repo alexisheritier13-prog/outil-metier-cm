@@ -18,7 +18,7 @@ import { POST_STATUS_LABELS } from '@/shared/constants/postStatus';
 import { NETWORK_LABELS } from '@/shared/constants/networks';
 import { NETWORK_BRAND } from '@/components/networkBrand';
 import { POST_STATUS_ICONS } from '@/components/postStatusIcons';
-import { clientColor, clientInitials } from '@/lib/clientColor';
+import { clientColor } from '@/lib/clientColor';
 import type { Post } from '@/shared/types';
 import { useReschedulePost } from './usePosts';
 
@@ -97,7 +97,6 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         id: p.id,
         title: p.caption || 'Sans légende',
         start: p.scheduledAt,
-        classNames: [`fc-status-${p.status}`],
         extendedProps: { post: p },
       })),
       ...keyDates.map((k) => ({
@@ -144,7 +143,7 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
   function handleEventDidMount(arg: EventMountArg) {
     if (view !== 'dayGridMonth') return;
     const harness = arg.el.closest<HTMLElement>('.fc-daygrid-event-harness');
-    harness?.style.setProperty('height', '1.25rem', 'important');
+    harness?.style.setProperty('height', '1.625rem', 'important');
     // Le contenu (nb d'événements) influence encore le partage de hauteur
     // que FullCalendar fait entre les lignes ; on ré-égalise après chaque
     // salve de montage d'événements (debounce simple).
@@ -178,6 +177,8 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         // N'affiche que les semaines nécessaires au mois (pas de 6ᵉ ligne
         // vide) : avec des cases à hauteur fixe, chaque ligne en moins compte.
         fixedWeekCount={false}
+        weekNumbers={view === 'dayGridMonth'}
+        weekNumberContent={(arg) => <WeekBadge weekStart={arg.date} posts={posts} />}
         // Boutons texte plutôt qu'icônes `role="img"` sans alt (a11y, Story 9.5).
         buttonIcons={false}
         buttonText={{ today: "Aujourd'hui", prev: 'Précédent', next: 'Suivant' }}
@@ -188,7 +189,7 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
         eventStartEditable={editable}
         eventDurationEditable={false}
         droppable={false}
-        dayMaxEvents={view === 'dayGridMonth' ? 1 : fill ? true : 4}
+        dayMaxEvents={view === 'dayGridMonth' ? 3 : fill ? true : 4}
         // Plage resserrée aux heures ouvrées : la semaine tient sur un écran
         // sans défilement (24h complètes ne servaient qu'à afficher du vide).
         slotMinTime="07:00:00"
@@ -216,16 +217,15 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
           const StatusIcon = POST_STATUS_ICONS[post.status];
           return (
             <div
-              className="flex w-full items-center gap-1 overflow-hidden px-1 text-[11px] leading-tight"
+              className="flex w-full items-center gap-1 overflow-hidden rounded px-1 py-px text-[11px] leading-tight"
+              style={{ backgroundColor: cc.soft, color: cc.ink }}
               title={`${clientName(post.clientId)} · ${NETWORK_LABELS[post.network]} · ${POST_STATUS_LABELS[post.status]}`}
             >
               <span
-                className="grid h-3.5 w-3.5 shrink-0 place-items-center rounded-[3px] text-[8px] font-bold text-white"
+                className="h-1.5 w-1.5 shrink-0 rounded-full"
                 style={{ backgroundColor: cc.color }}
                 aria-hidden="true"
-              >
-                {clientInitials(clientName(post.clientId))[0]}
-              </span>
+              />
               <span className="font-medium tabular-nums">{arg.timeText}</span>
               <svg
                 viewBox="0 0 24 24"
@@ -241,7 +241,9 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
                 strokeWidth={2.5}
                 aria-hidden="true"
               />
-              <span className="sr-only">{POST_STATUS_LABELS[post.status]}</span>
+              <span className="sr-only">
+                {clientName(post.clientId)} · {POST_STATUS_LABELS[post.status]}
+              </span>
             </div>
           );
         }}
@@ -249,6 +251,59 @@ export const CalendarView = forwardRef<CalendarViewHandle, Props>(function Calen
     </div>
   );
 });
+
+/** Contenu de la 8ᵉ colonne « Semaine » : numéro, total, mini-histogramme lun.→ven.
+ *  `h-full` + `justify-between` : quelle que soit la hauteur de la ligne (les
+ *  lignes sont égalisées par `equalizeMonthRows`), le bloc l'occupe entièrement
+ *  au lieu de rester une pastille collée en haut avec du vide dessous. */
+function WeekBadge({ weekStart, posts }: { weekStart: Date; posts: Post[] }) {
+  const days = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+  const counts = days.map(
+    (d) => posts.filter((p) => isSameDay(new Date(p.scheduledAt), d)).length,
+  );
+  const total = counts.reduce((s, n) => s + n, 0);
+  const max = Math.max(...counts, 1);
+  const weekNumber = getISOWeek(weekStart);
+
+  return (
+    <div className="flex h-full w-full flex-col justify-between gap-1 px-2 py-1.5 text-left">
+      <div className="flex items-baseline justify-between gap-1">
+        <span className="text-sm font-bold">S{weekNumber}</span>
+        <span className="text-muted-foreground whitespace-nowrap text-[10px]">
+          {total} post{total > 1 ? 's' : ''}
+        </span>
+      </div>
+      <div className="flex h-6 items-end gap-1">
+        {counts.map((n, i) => (
+          <span
+            key={i}
+            className="flex-1 rounded-[2px]"
+            style={{
+              height: `${Math.max((n / max) * 100, n > 0 ? 30 : 10)}%`,
+              backgroundColor: n > 0 ? 'var(--primary)' : 'var(--surface-2)',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function getISOWeek(d: Date): number {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
 
 /**
  * Couleur de l'icône de statut sur l'événement. Le SENS est porté par la FORME de

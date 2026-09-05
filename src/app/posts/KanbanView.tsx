@@ -4,6 +4,7 @@ import type { Role } from '@/shared/constants/roles';
 import { canTransition, transitionNeedsComment } from '@/shared/utils/transitions';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
+import { clientColor } from '@/lib/clientColor';
 import { cn } from '@/lib/utils';
 import type { Post } from '@/shared/types';
 import { useChangePostStatus } from './usePosts';
@@ -114,7 +115,14 @@ export function KanbanView({ posts, role, clientName, onOpen, selectedIds, onTog
                           {parisDateLabel(p.scheduledAt)} · {parisTimeLabel(p.scheduledAt)}
                         </span>
                       </div>
-                      <div className="font-medium">{clientName(p.clientId)}</div>
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: clientColor(p.clientId).color }}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">{clientName(p.clientId)}</span>
+                      </div>
                       <div className="text-muted-foreground line-clamp-2">
                         {p.caption || 'Sans légende'}
                       </div>

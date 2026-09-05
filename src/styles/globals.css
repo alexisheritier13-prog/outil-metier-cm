@@ -245,14 +245,26 @@
   padding-bottom: 0.25rem;
 }
 .fc-monochrome .fc-daygrid-day-frame {
-  /* Étirée à la hauteur de la ligne (pas min-height) : avec un seul
-     événement affiché par case (dayMaxEvents=1, le surplus passe derrière
-     le lien « +N de plus ») et un créneau resserré par événement
-     (eventDidMount), toutes les lignes du mois restent uniformes. */
+  /* Étirée à la hauteur de la ligne (pas min-height) — les lignes sont
+     égalisées en pixels par `equalizeMonthRows` (CalendarView) car leur
+     nombre change avec le mois et un simple % de <tr> n'est pas fiable. */
   height: 100%;
   background: var(--surface);
   border-radius: 0.9375rem; /* 15px */
   padding: 0.25rem;
+  overflow: hidden;
+}
+/* 8ᵉ colonne « Semaine » : même tuile blanche que les cases du mois. Un <a>
+   est inline par défaut (height:100% n'aurait aucun effet) : display:flex
+   lui donne une hauteur réelle, sans quoi le mini-histogramme à l'intérieur
+   (en %) se retrouve sans référence et déborde. */
+.fc-monochrome .fc-daygrid-week-number {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: var(--surface);
+  border-radius: 0.9375rem;
+  text-decoration: none;
   overflow: hidden;
 }
 .fc-monochrome .fc-day-today .fc-daygrid-day-frame {
@@ -301,27 +313,6 @@
 }
 .fc-monochrome .fc-daygrid-more-link:hover {
   color: var(--foreground);
-}
-/* Teinte de statut sur l'événement (fond léger + contour plein, jamais une bande) */
-.fc-monochrome .fc-status-internal_review {
-  background: var(--info-surface);
-  border-color: var(--info-border);
-}
-.fc-monochrome .fc-status-client_review {
-  background: var(--warning-surface);
-  border-color: var(--warning-border);
-}
-.fc-monochrome .fc-status-approved,
-.fc-monochrome .fc-status-scheduled {
-  background: var(--success-surface);
-  border-color: var(--success-border);
-}
-/* « publié » = terminé : fond gris neutre, texte gris lisible (pas d'opacité qui
-   ferait chuter le contraste sous AA). */
-.fc-monochrome .fc-status-published {
-  background: var(--surface-3);
-  border-color: var(--border);
-  color: var(--muted-foreground);
 }
 /* Marronniers : étiquette violette compacte (rendue par eventContent), non cliquable */
 .fc-monochrome .fc-keydate {

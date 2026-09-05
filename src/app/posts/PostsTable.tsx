@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { StatusBadge } from '@/components/StatusBadge';
+import { clientColor } from '@/lib/clientColor';
 import { cn } from '@/lib/utils';
 import { POST_STATUS_ORDER } from '@/shared/constants/postStatus';
 import { parisDateLabel, parisTimeLabel } from '@/shared/utils/tz';
@@ -149,8 +150,13 @@ export function PostsTable({
                   {parisDateLabel(p.scheduledAt)}
                   <span className="text-muted-foreground/70"> · {parisTimeLabel(p.scheduledAt)}</span>
                 </span>
-                <span className="pointer-events-none truncate px-3 font-medium">
-                  {clientName(p.clientId)}
+                <span className="pointer-events-none flex items-center gap-1.5 truncate px-3 font-medium">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: clientColor(p.clientId).color }}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate">{clientName(p.clientId)}</span>
                 </span>
                 <span className="pointer-events-none px-3">
                   <NetworkIcon network={p.network} />
