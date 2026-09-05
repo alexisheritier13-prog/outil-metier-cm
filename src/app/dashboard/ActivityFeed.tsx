@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { NetworkIcon } from '@/components/NetworkIcon';
 import { activityCategory, type ActivityCategory } from '@/app/clients/tabs/activity';
 import { clientColor, clientInitials } from '@/lib/clientColor';
@@ -71,11 +71,13 @@ export function ActivityFeed({
   rows,
   expanded,
   onExpand,
+  onCollapse,
   clientName,
 }: {
   rows: ClientActivityEntry[];
   expanded: boolean;
   onExpand: () => void;
+  onCollapse: () => void;
   clientName: (id: string | null) => string;
 }) {
   const visible = expanded ? rows : rows.slice(0, VISIBLE);
@@ -137,6 +139,18 @@ export function ActivityFeed({
               {oldestHiddenAt && <> · {relativeAge(oldestHiddenAt)}</>}
             </span>
             <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+          </button>
+        </li>
+      )}
+      {expanded && rows.length > VISIBLE && (
+        <li>
+          <button
+            type="button"
+            onClick={onCollapse}
+            className="hover:bg-surface-2 text-muted-foreground flex w-full items-center justify-center gap-1.5 p-2.5 text-xs font-medium transition-colors"
+          >
+            Réduire
+            <ChevronUp className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           </button>
         </li>
       )}

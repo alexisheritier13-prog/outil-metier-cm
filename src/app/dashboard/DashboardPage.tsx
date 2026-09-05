@@ -299,7 +299,7 @@ export function DashboardPage() {
               <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
             </Link>
           }
-          className="min-w-0 lg:h-full"
+          className="min-w-0 lg:h-full lg:min-h-0"
           bodyClassName="lg:min-h-0 lg:flex-1 overflow-y-auto"
           dataTour="dash-week"
         >
@@ -342,7 +342,7 @@ export function DashboardPage() {
 
         {/* Colonne droite — chart + gauge/watchlist gardent leur hauteur naturelle,
             l'activité récente absorbe l'espace restant et défile si besoin. */}
-        <div className="flex min-w-0 flex-col gap-4 lg:h-full">
+        <div className="flex min-w-0 flex-col gap-4 lg:h-full lg:min-h-0">
           <SectionCard
             icon={TrendingUp}
             title="Posts publiés par mois"
@@ -460,10 +460,10 @@ export function DashboardPage() {
             action={
               <button
                 type="button"
-                onClick={() => setActivityExpanded(true)}
+                onClick={() => setActivityExpanded((v) => !v)}
                 className="text-muted-foreground hover:text-foreground shrink-0 text-xs font-medium"
               >
-                Journal
+                {activityExpanded ? 'Réduire' : 'Journal'}
               </button>
             }
           >
@@ -484,6 +484,7 @@ export function DashboardPage() {
                   rows={activityRows}
                   expanded={activityExpanded}
                   onExpand={() => setActivityExpanded(true)}
+                  onCollapse={() => setActivityExpanded(false)}
                   clientName={clientName}
                 />
               )}

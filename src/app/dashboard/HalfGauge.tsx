@@ -19,7 +19,7 @@ export function HalfGauge({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: OUTER, height: OUTER / 2 }}>
+      <div className="relative overflow-hidden" style={{ width: OUTER, height: OUTER / 2 }}>
         <div
           className="absolute left-0 top-0 rounded-full"
           style={{
